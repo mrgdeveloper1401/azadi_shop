@@ -4,9 +4,10 @@ from rest_framework.views import APIView
 # Create your views here.
 
 
-class PaymentListAPIView(APIView):
-    pass 
+class OrderListAPIView(APIView):
+    pass    
+    
 
-
-class PaymentDetailAPIView(APIView):
+class  OrderDetailAPIView(APIView):
     pass
+    
