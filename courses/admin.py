@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CourseCategory,Course
+from .models import CourseCategory,Course,DiscountCourse
 # Register your models here.
 @admin.register(CourseCategory)
 class Categoryadmin(admin.ModelAdmin):
@@ -8,6 +8,15 @@ class Categoryadmin(admin.ModelAdmin):
     
 @admin.register(Course)
 class Courseadmin(admin.ModelAdmin):
-    list_display=('name','price','category','user')
-    search_fields=('name','category','user')
-        
+    list_display=('name','price')
+    search_fields=('name',)
+
+
+@admin.register(DiscountCourse)
+class Courseadmin(admin.ModelAdmin):
+    list_display=('name','is_active')
+    search_fields=('name','is_active')
+    list_editable=('is_active',)
+
+
+ 

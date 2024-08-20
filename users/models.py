@@ -5,28 +5,63 @@ from django.utils.crypto import get_random_string
 import datetime
 from django.utils import timezone
 # Create your models here.
-class Account(AbstractUser):      
-      is_verified = models.BooleanField(default=False)
-      GRADE_CHOICES=(
+
+
+class UserAccount(AbstractUser):
+    ROLL_CHOICES=(
+        ('سوپرادمین','سوپرادمین'),
+        ('ادمین','ادمین'),
+        ('کاربر','کاربر')
+      
+    )
+    roll=models.CharField(max_length=10,choices=ROLL_CHOICES,default='کاربر')
+
+    class Meta:
+        ordering = ("-date_joined",)
+
+    def __str__(self):
+        return self.first_name + self.last_name
+
+
+
+
+class UserInfo (models.Model):      
+      
+    GRADE_CHOICES=(
         ('دهم','دهم'),
         ('یازدهم','یازدهم'),
         ('دوازدهم','دوازدهم')
       
     )
-      MAJOR_CHOICES=(
+    MAJOR_CHOICES=(
         ('تجربی','تجربی'),
         ('ریاضی','ریاضی'),
         ('انسانی','انسانی')
       
     )
-      grade=models.CharField(max_length=10,choices=GRADE_CHOICES,default='دهم')
-      major=models.CharField(max_length=10,choices=MAJOR_CHOICES,default='تجربی')
-      created_at = models.DateTimeField(auto_now_add=True)
-      objects = models.Manager()
+    user_id=models.OneToOneField(UserAccount,on_delete=models.CASCADE)
+    grade=models.CharField(max_length=10,choices=GRADE_CHOICES,default='دهم')
+    major=models.CharField(max_length=10,choices=MAJOR_CHOICES,default='تجربی')
+    objects = models.Manager()
 
-      class Meta:
-        ordering = ("-created_at",)
+    class Meta:
+        ordering = ['user_id__date_joined']
 
-      def __str__(self):
-        return self.first_name + self.last_name
+    def __str__(self):
+        return self.user_id.first_name + self.user_id.last_name
+
+
+class MobileCode(models.Model) :
+      
+    user_id=models.OneToOneField(UserAccount,on_delete=models.CASCADE)
+    code=models.CharField(max_length=6)
+    retry_count=models.IntegerField()
+
+    class Meta:
+        ordering = ['user_id__date_joined']
+
+    def __str__(self):
+        return self.user_id.first_name + self.user_id.last_name    
+
+
       

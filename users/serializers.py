@@ -1,12 +1,12 @@
 from rest_framework import serializers
-from users.models import Account,User
+from users.models import UserAccount,UserInfo,MobileCode
 from django.core.exceptions import ValidationError
 
 class UserRegisterSerializer(serializers.ModelSerializer):
    
     username= serializers.JSONField()
     class Meta:
-        model = Account
+        model = UserAccount
         fields = ('username',)
 
     # def create(self, validated_data):
@@ -24,19 +24,3 @@ class UserRegisterSerializer(serializers.ModelSerializer):
     #         raise serializers.ValidationError('send')
     #         return value 
     
-class SendSMSSerializer(serializers.ModelSerializer):
-    username= serializers.JSONField()
-    class Meta:
-        model = Account
-        fields = ('username',)
-    def validate(self,value) :
-        print(value)
-        try:
-            account=Account.objects.get(username=value['username']) 
-            if account.is_verified:
-                 raise serializers.ValidationError("Phone number is already verified")
-            
-        except Account .DoesNotExist:
-
-            raise serializers.ValidationError('This username is not exist')
-        return value

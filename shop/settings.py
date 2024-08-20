@@ -24,7 +24,7 @@ SECRET_KEY = 'django-insecure-%nbxaf^4wds=b=wv^(^+c4#dx&#3=1!3%ji_)q&46khs7&7lta
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-AUTH_USER_MODEL = 'users.Account'
+AUTH_USER_MODEL = 'users.UserAccount'
 # AUTH_USER_MODEL = 'courses.Course'
 # AUTH_USER_MODEL = 'courses.CourseCategory'
 
@@ -39,11 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
         "rest_framework",
+
         #local apps
         'users',
         'courses',
+        'order',
         'payment'
-        'order'
 
        
 

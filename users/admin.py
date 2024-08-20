@@ -1,18 +1,29 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
-from .models import Account
+from .models import UserAccount,UserInfo,MobileCode
 # Register your models here.
 
 
-@admin.register(Account)
+@admin.register(UserAccount)
 class AccountAdmin(UserAdmin):
-    model=Account
+    model=UserAccount
     fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('security_code' ,'is_verified','grade','major')}),
+        (None, {'fields': ('roll' ,)}),
     )
-    list_display=('first_name','last_name','username','is_verified')
-    list_filter=('username','is_verified','created_at')
+    list_display=('first_name','last_name','username','is_active')
+    list_filter=('username','is_active','date_joined')
     search_fields=('username',)
-    ordering=('created_at',)
-    list_editable=('is_verified',)
+    list_editable=('is_active',)
+
+
+@admin.register(UserInfo)
+class AccountAdmin(admin.ModelAdmin):
+    model=UserInfo
+    list_display=('user_id','grade','major')
+    list_filter=('grade','major')
+    search_fields=('user_id','grade','major')
+
+@admin.register(MobileCode)
+class AccountAdmin(admin.ModelAdmin):
+    model=UserInfo
