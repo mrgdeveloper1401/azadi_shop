@@ -38,10 +38,6 @@ class DiscountCourse(models.Model):
 
 
 
-
-
-
-
 class Course(models.Model):
     user = models.ForeignKey(User, related_name="courses", on_delete=models.CASCADE)
     category = models.ForeignKey(CourseCategory, related_name="courses", on_delete=models.CASCADE)

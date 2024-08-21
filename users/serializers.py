@@ -9,18 +9,41 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         model = UserAccount
         fields = ('username',)
 
-    # def create(self, validated_data):
-    #     if Account.objects.filter(username=validated_data['username']).exists():
-    #      raise serializers.ValidationError("Username is already taken.")
-    #     user = Account.objects.create(username=validated_data["username"])
-    #     user.save()
-    #     return user
+    def create(self, value):
+        if UserAccount.objects.filter(username=value['username']).exists():
+         raise serializers.ValidationError("Username is already taken.")
+        user = UserAccount.objects.create(username=value["username"])
+        user.save()
+        return value
     
-    # def send(self,value):
-    #         if  Account.objects.filter(username=value['username'],is_verified=False).exist():
-    #            raise serializers.ValidationError("Username is already taken.")
-    #         user=Account.objects.filter(username=value['username'],is_verified=False)
-    #         user.send_confirmation()
-    #         raise serializers.ValidationError('send')
-    #         return value 
+   
     
+class PasswordResetSerializer(serializers.Serializer):
+     
+    email= serializers.JSONField()
+    class Meta:
+        model = UserAccount
+        fields = ('email',)
+
+
+    def validate_email(self, value):
+        try:
+            user = UserAccount.objects.get(email=value)
+        except UserAccount.DoesNotExist:
+            raise serializers.ValidationError("User with this email does not exist.")
+        return value
+
+
+class SetNewPasswordSerializer(serializers.Serializer):
+    new_password = serializers.CharField(write_only=True)
+    confirm_password = serializers.CharField(write_only=True)
+
+    def validate(self, value):
+        if value['new_password'] != value['confirm_password']:
+            raise serializers.ValidationError("Passwords do not match.")
+        return value
+
+
+class Contact_usSerializer(serializers.Serializer):
+    subject=serializers.CharField()
+    message=serializers.CharField()
