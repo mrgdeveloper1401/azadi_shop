@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
 from django.contrib.auth.admin import UserAdmin
-from .models import UserAccount,UserInfo,MobileCode
+from .models import UserAccount,UserInfo,Otp
 # Register your models here.
 
 
@@ -9,7 +9,7 @@ from .models import UserAccount,UserInfo,MobileCode
 class AccountAdmin(UserAdmin):
     model=UserAccount
     fieldsets = UserAdmin.fieldsets + (
-        (None, {'fields': ('roll' ,)}),
+        (None, {'fields': ('role',)}),
     )
     list_display=('first_name','last_name','username','is_active')
     list_filter=('username','is_active','date_joined')
@@ -24,6 +24,6 @@ class AccountAdmin(admin.ModelAdmin):
     list_filter=('grade','major')
     search_fields=('user_id','grade','major')
 
-@admin.register(MobileCode)
+@admin.register(Otp)
 class AccountAdmin(admin.ModelAdmin):
-    model=UserInfo
+    model=Otp

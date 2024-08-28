@@ -20,7 +20,7 @@ class UserAccount(AbstractUser):
         ordering = ("-date_joined",)
 
     def __str__(self):
-        return self.first_name + self.last_name
+        return self.username
 
 
 
@@ -48,20 +48,26 @@ class UserInfo (models.Model):
         ordering = ['user_id__date_joined']
 
     def __str__(self):
-        return self.user_id.first_name + self.user_id.last_name
+        return self.username
 
 
-class MobileCode(models.Model) :
+class Otp (models.Model) :
       
-    user_id=models.OneToOneField(UserAccount,on_delete=models.CASCADE)
+    user=models.OneToOneField(UserAccount,on_delete=models.CASCADE)
     code=models.CharField(max_length=6)
-    retry_count=models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['user_id__date_joined']
-
+        ordering = ['-created_at']
+    
     def __str__(self):
-        return self.user_id.first_name + self.user_id.last_name    
+        return self.user.username
+
+    def is_expired(self):
+            # OTP expires after 1 minute
+            return timezone.now() > self.created_at + timezone.timedelta(minutes=5)
+     
+        
 
 
       
