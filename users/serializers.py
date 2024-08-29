@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from users.models import UserAccount,UserInfo,Otp
+from users.models import UserAccount,UserInfo,Otp,PasswordOtp
 from django.core.exceptions import ValidationError
 import random
 
@@ -27,6 +27,12 @@ class UserRegisterSerializer(serializers.Serializer):
         # self.send_sms(user.username, code)  
         return user
     
+    def validate(self, value):
+        if value['new_password'] != value['confirm_password']:
+            raise serializers.ValidationError("Passwords do not match.")
+        if len(value['confirm_password'])<8:
+             raise serializers.ValidationError("password must be  minimum 8 character") 
+        return value
     # def send_sms(self, username, code):
     #     # Replace with your Kavehnegar API details
         #   payload = {
@@ -70,6 +76,7 @@ class OTPVerificationSerializer(serializers.Serializer):
             raise serializers.ValidationError("Invalid OTP code.")   
         otp.user.is_active=True
         otp.user.save() 
+        otp.delete()
         return value
     
 
@@ -112,15 +119,43 @@ class LogoutSerializer(serializers.Serializer):
     
     
 class PasswordResetSerializer(serializers.Serializer):
-    email=serializers.CharField()
+    username=serializers.CharField()
     
-    def validate_email(self, value):
+    def create(self, value):
         try:
-            user = UserAccount.objects.get(email=value)
+            user = UserAccount.objects.get(username=value['username'],is_active=True)
+            code=random.randint(100,999)
+            otp=PasswordOtp.objects.create(user=user,code=code)
+            # self.send_sms(user.username, code)  
+            
         except UserAccount.DoesNotExist:
-            raise serializers.ValidationError("User with this email does not exist.")
+            raise serializers.ValidationError("User with this username does not exist.")
         return value
 
+
+class PasswordOTPVerificationSerializer(serializers.Serializer):
+
+    # username=serializers.CharField()
+    otp=serializers.CharField()
+        
+    def validate(self, value):
+        
+        try:
+            
+            # user=UserAccount.objects.get(username=data['username'])
+           otp=PasswordOtp.objects.get(code=value['otp'])
+            # otp = Otp.objects.get(user__username=data['username'])
+        except PasswordOtp.DoesNotExist:
+            raise serializers.ValidationError("OTP code does not exist.")
+
+        if otp.is_expired():
+            otp.delete()
+            raise serializers.ValidationError("OTP code has expired.")
+
+        if otp.code != value['otp']:
+            raise serializers.ValidationError("Invalid OTP code.")   
+        otp.user.is_verified=True
+        return value
 
 class SetNewPasswordSerializer(serializers.Serializer):
     new_password = serializers.CharField(write_only=True)
@@ -129,6 +164,9 @@ class SetNewPasswordSerializer(serializers.Serializer):
     def validate(self, value):
         if value['new_password'] != value['confirm_password']:
             raise serializers.ValidationError("Passwords do not match.")
+        if len(value['confirm_password'])<8:
+             raise serializers.ValidationError("password must be  minimum 8 character")
+            
         return value
 
 

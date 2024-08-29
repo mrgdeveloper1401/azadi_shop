@@ -8,13 +8,7 @@ from django.utils import timezone
 
 
 class UserAccount(AbstractUser):
-    ROLL_CHOICES=(
-        ('سوپرادمین','سوپرادمین'),
-        ('ادمین','ادمین'),
-        ('کاربر','کاربر')
-      
-    )
-    roll=models.CharField(max_length=10,choices=ROLL_CHOICES,default='کاربر')
+    is_verified=models.BooleanField(default=False)
 
     class Meta:
         ordering = ("-date_joined",)
@@ -70,4 +64,19 @@ class Otp (models.Model) :
         
 
 
+class PasswordOtp (models.Model) :
+      
+    user=models.OneToOneField(UserAccount,on_delete=models.CASCADE)
+    code=models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+    
+    def __str__(self):
+        return self.user.username
+
+    def is_expired(self):
+            # OTP expires after 1 minute
+            return timezone.now() > self.created_at + timezone.timedelta(minutes=5)
       

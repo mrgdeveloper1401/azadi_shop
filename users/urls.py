@@ -7,6 +7,7 @@ from .views import (
     UserLoginAPIView,
     UserLogoutAPIView,
     UserResetPasswordAPIIView,
+    PasswordOTPVerificationAPIView,
     PasswordResetConfirmAPIView,
     Contact_UsAPIView
 
@@ -22,7 +23,8 @@ urlpatterns = [
     path("login/", UserLoginAPIView.as_view(), name="user_login"),
     path("logout/", UserLogoutAPIView .as_view(), name="user_logout"),
     path('password-reset/', UserResetPasswordAPIIView.as_view(), name='password-reset'),
-    path('password-reset-confirm/<uidb64>/<token>/',PasswordResetConfirmAPIView.as_view(), name='password-reset-confirm'),
+     path('password-otp/', PasswordOTPVerificationAPIView.as_view(), name='password-otp'),
+    path('password-reset-confirm/',PasswordResetConfirmAPIView.as_view(), name='password-reset-confirm'),
     path("access_token/", TokenObtainPairView.as_view(), name="user_access_tooken"),
     path("refresh_token/", TokenRefreshView.as_view(), name="user_refresh_token"),
     path("contact_us/", Contact_UsAPIView.as_view(), name="user_contact_us"),
