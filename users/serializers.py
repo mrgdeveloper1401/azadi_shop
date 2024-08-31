@@ -14,12 +14,15 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         model = UserAccount
         fields = ('mobile_phone', 'password', 'confirm_password')
 
+        extra_kwargs = {
+            'password': {'write_only': True, 'style': {'input_type': 'password'}}
+        }
+
     def create(self, validated_data):
-        user = UserAccount.objects.create(**validated_data)
-        user.is_active = False
-        user.save()
+        del validated_data['confirm_password']
+        user = UserAccount.objects.create_user(**validated_data)
         get_code = Otp.objects.get(user__mobile_phone=validated_data['mobile_phone'])
-        # send_sms(get_code.mobile_phone, get_code.code)
+        # send_sms(get_code.user.mobile_phone, get_code.code)
         return user
 
     def validate(self, data):
@@ -33,7 +36,6 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 
 class OTPVerificationSerializer(serializers.Serializer):
-    # username=serializers.CharField()
     otp = serializers.CharField()
 
     def validate(self, value):

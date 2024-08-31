@@ -16,12 +16,21 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
+from debug_toolbar.toolbar import debug_toolbar_urls
+from shop.base import DEBUG
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("users/", include("users.urls", namespace="users")),
+    path("user/", include("users.urls", namespace="users")),
     path("courses/", include("courses.urls", namespace="courses")),
     # path("payment/", include("payment.urls", namespace="payment")),
     # path("order/", include("order.urls", namespace="order")),
+    #     swagger ui
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
 ]
+if DEBUG:
+    urlpatterns += debug_toolbar_urls()

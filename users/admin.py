@@ -1,11 +1,31 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
+from django.contrib.admin import SimpleListFilter
 
 from users.models import UserAccount, UserInfo, Otp
 
 
 # Register your models here.
+# user info simple list filter
+class IsActiveUserInfo(SimpleListFilter):
+    title = _("Is Active User")
+    parameter_name = 'is_active'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('False', _('In active user')),
+            ('True', _('Active user')),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == 'True':
+            return queryset.filter(user__is_active=True)
+        if self.value() == 'False':
+            return queryset.filter(user__is_active=False)
+        return queryset
+
+
 @admin.register(UserAccount)
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
@@ -46,12 +66,18 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(UserInfo)
 class UserInfoAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['user', 'grade', 'major', 'get_active']
+    list_select_related = ['user']
+    search_fields = ['user__mobile_phone']
+    list_max_show_all = 30
+    list_filter = [IsActiveUserInfo]
 
 
 @admin.register(Otp)
 class OtpAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['user', 'code', 'created_at', 'expired_at']
+    list_select_related = ['user']
+    search_fields = ['user__mobile_phone']
 
 
 # @admin.register(PasswordOtp)

@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
-from users.managers import UserManager
+from users.managers import UserManager, OtpManager
 
 
 # Create your models here.
@@ -48,12 +48,18 @@ class UserInfo(models.Model):
     def __str__(self):
         return self.user.mobile_phone
 
+    @property
+    def get_active(self):
+        return self.user.is_active
+
 
 class Otp(models.Model):
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='user_otp')
     code = models.PositiveSmallIntegerField(_('OTP code'), unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     expired_at = models.DateTimeField(blank=True, null=True)
+
+    objects = OtpManager()
 
     class Meta:
         db_table = 'opt'
@@ -64,8 +70,10 @@ class Otp(models.Model):
         return self.user.mobile_phone
 
     def is_expired(self):
-        # OTP expires after 1 minute
-        return timezone.now() > self.created_at + timezone.timedelta(minutes=5)
+        time_now = timezone.now().strftime('%H:%M:%S')
+        exp_time = self.expired_at.strftime('%H:%M:%S')
+        if time_now > exp_time:
+            self.delete()
 
 
 class PasswordOtp(models.Model):

@@ -17,6 +17,7 @@ from shop.email_config import *
 from shop.kavenegar_config import *
 from shop.rest_framework_config import *
 from shop.uppercase_password_validator import UppercasePasswordValidator
+from shop.celery import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,6 +41,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     "rest_framework",
     'rest_framework_simplejwt',
+    'drf_spectacular',
+    'debug_toolbar',
 
     #local apps
     'users.apps.UsersConfig',
@@ -50,6 +53,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -122,3 +126,19 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # user
 AUTH_USER_MODEL = 'users.UserAccount'
+
+# spectacular settings
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Azadi project',
+    'DESCRIPTION': 'Your project description',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    # OTHER SETTINGS
+}
+
+# debug toolbar
+INTERNAL_IPS = [
+    # ...
+    "127.0.0.1",
+    # ...
+]

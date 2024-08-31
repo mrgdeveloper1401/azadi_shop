@@ -18,3 +18,10 @@ def create_otp_code(sender, instance, created, **kwargs):
         Otp.objects.create(user=instance,
                            code=generate_random_code(),
                            expired_at=now() + timedelta(minutes=2))
+
+
+@receiver(post_save, sender=Otp)
+def delete_expired_otp(sender, created, instance, **kwargs):
+    if created:
+        if instance.expired_at and now() > instance.expired_at:
+            instance.delete()
