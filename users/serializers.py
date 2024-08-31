@@ -47,7 +47,7 @@ class OtpVerifySerializer(serializers.Serializer):
         return attrs
 
     def save(self, **kwargs):
-        user = self.validated_data['user']
+        user = UserAccount.objects.get(mobile_phone=self.validated_data['user'])
         user.is_active = True
         user.is_verified = True
         user.save()
