@@ -4,7 +4,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from users.serializers import UserRegisterSerializer, OTPVerificationSerializer, PasswordResetSerializer, \
+from users.models import Otp
+from users.serializers import UserRegisterSerializer, OtpVerifySerializer, PasswordResetSerializer, \
     SetNewPasswordSerializer, Contact_usSerializer, LoginSerializer, LogoutSerializer, PasswordOTPVerificationSerializer
 from users.models import UserAccount
 
@@ -13,17 +14,15 @@ class UserRegistrationAPIView(APIView):
     def post(self, request):
         serializer = UserRegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class UserVerifyCodeAPIView(APIView):
     def post(self, request, *args, **kwargs):
-        serializer = OTPVerificationSerializer(data=request.data, context={'request': request})
-        if serializer.is_valid():
-            # OTP is valid, perform necessary actions (e.g., mark as verified, log in the user, etc.)
-            return Response({"detail": "OTP verified successfully."}, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        ser_data = OtpVerifySerializer(data=request.data)
+        ser_data.is_valid(raise_exception=True)
+        ser_data.save()
+        return Response({"message": 'successfully varify account'}, status=status.HTTP_200_OK)
 
 
 class UserLoginAPIView(APIView):

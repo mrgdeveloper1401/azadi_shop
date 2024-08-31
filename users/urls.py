@@ -1,13 +1,13 @@
 from rest_framework.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, token_verify
 
-from users.views import UserRegistrationAPIView
+from users.views import UserRegistrationAPIView, UserVerifyCodeAPIView
 
 
 app_name = "users"
 urlpatterns = [
     path("register/", UserRegistrationAPIView.as_view(), name="user_register"),
-    # path("verify_code/", UserVerifyCodeAPIView.as_view(), name="user_verify"),
+    path("verify_code/", UserVerifyCodeAPIView.as_view(), name="user_verify"),
     # path("login/", UserLoginAPIView.as_view(), name="user_login"),
     # path("logout/", UserLogoutAPIView .as_view(), name="user_logout"),
     # path('password-reset/', UserResetPasswordAPIIView.as_view(), name='password-reset'),

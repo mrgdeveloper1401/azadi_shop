@@ -35,29 +35,23 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return data
 
 
-class OTPVerificationSerializer(serializers.Serializer):
-    otp = serializers.CharField()
+class OtpVerifySerializer(serializers.Serializer):
+    code = serializers.IntegerField()
 
-    def validate(self, value):
-
+    def validate(self, attrs):
         try:
-            # user=UserAccount.objects.get(username=data['username'])
-            otp = Otp.objects.get(code=value['otp'])
-            # otp = Otp.objects.get(user__username=data['username'])
-        except Otp.DoesNotExist:
-            raise serializers.ValidationError("OTP code does not exist.")
+            get_code = Otp.objects.get(code=attrs['code'])
+            attrs['user'] = get_code
+        except Exception as e:
+            raise ValidationError({'message': e})
+        return attrs
 
-        if otp.is_expired():
-            otp.delete()
-            otp.user.delete()
-            raise serializers.ValidationError("OTP code has expired.")
-
-        if otp.code != value['otp']:
-            raise serializers.ValidationError("Invalid OTP code.")
-        otp.user.is_active = True
-        otp.user.save()
-        otp.delete()
-        return value
+    def save(self, **kwargs):
+        user = self.validated_data['user']
+        user.is_active = True
+        user.is_verified = True
+        user.save()
+        Otp.objects.get(code=self.validated_data['code']).delete()
 
 
 class LoginSerializer(serializers.Serializer):
