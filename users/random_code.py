@@ -1,6 +1,6 @@
-from random import choices
+from random import choices, randint
 from string import digits
 
 
 def generate_random_code():
-    return int(''.join(choices(digits, k=9)))
+    return randint(1111, 999999999)

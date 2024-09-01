@@ -38,6 +38,7 @@ class UserAdmin(BaseUserAdmin):
                     "is_active",
                     "is_staff",
                     "is_superuser",
+                    "is_verified",
                     "groups",
                     "user_permissions",
                 ),
@@ -54,8 +55,9 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
-    list_display = ("mobile_phone", "email", "first_name", "last_name", "is_staff", 'is_superuser', 'is_active')
-    list_filter = ("is_staff", "is_superuser", "is_active", "groups")
+    list_display = ("mobile_phone", "email", "first_name", "last_name", "is_staff", 'is_superuser', 'is_active',
+                    "is_verified")
+    list_filter = ("is_staff", "is_superuser", "is_active", 'is_verified', "groups")
     search_fields = ("mobile_phone", "first_name", "last_name", "email")
     ordering = ("mobile_phone",)
     filter_horizontal = (
@@ -75,7 +77,7 @@ class UserInfoAdmin(admin.ModelAdmin):
 
 @admin.register(Otp)
 class OtpAdmin(admin.ModelAdmin):
-    list_display = ['user', 'code', 'created_at', 'expired_at']
+    list_display = ['user', 'id', 'code', 'created_at', 'expired_at']
     list_select_related = ['user']
     search_fields = ['user__mobile_phone']
 
