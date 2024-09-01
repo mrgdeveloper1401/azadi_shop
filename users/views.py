@@ -4,10 +4,12 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenBlacklistView
+from rest_framework_simplejwt.serializers import TokenBlacklistSerializer
 
 from users.models import Otp
 from users.serializers import UserRegisterSerializer, UserVerifyRegisterSerializer, UserResendVerifyRegisterSerializer, \
-    SendCodeMobilePhoneSerializer, VerifyCodeMobilePhoneSerializer
+    SendCodeMobilePhoneSerializer, VerifyCodeMobilePhoneSerializer, ResetPasswordSerializer
 from users.models import UserAccount
 
 
@@ -53,3 +55,13 @@ class VerifyCodeMobileApiview(APIView):
         ser_data.is_valid(raise_exception=True)
         ser_data.save()
         return Response({"message": "successfully verify code"}, status=status.HTTP_200_OK)
+
+
+class ResetPasswordAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        ser_data = ResetPasswordSerializer(data=request.data, context={'request': request.user})
+        ser_data.is_valid(raise_exception=True)
+        ser_data.save()
+        return Response({"message": "successfully reset password"}, status=status.HTTP_200_OK)

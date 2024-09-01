@@ -149,6 +149,26 @@ class VerifyCodeMobilePhoneSerializer(serializers.Serializer):
         return {"message": "successfully change mobile phone"}
 
 
-class SetNewPasswordSerializer(serializers.Serializer):
-    pass
+class ResetPasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True, min_length=8)
+    new_password = serializers.CharField(write_only=True, min_length=8)
+    confirm_password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise ValidationError({"message": _('password must be same')})
+        try:
+            validate_password(attrs['new_password'])
+        except Exception as e:
+            raise ValidationError({"message": e})
+        if not self.context['request'].check_password(attrs['old_password']):
+            raise ValidationError({"message": _("old password is wrong")})
+        return attrs
+
+    def create(self, validated_data):
+        del validated_data['confirm_password']
+        user = self.context['request']
+        user.set_password(validated_data['new_password'])
+        return {"message": "successfully reset password"}
+
 
