@@ -3,7 +3,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.views import TokenBlacklistView
 
 from users.views import UserRegistrationAPIView, UserVerifyRegisterCodeAPIView, OtpResendAPIView, SendCodeMobileApiView, \
-    VerifyCodeMobileApiview, ResetPasswordAPIView
+    VerifyCodeMobileApiview, ResetPasswordAPIView, ForgetPasswordApiView, ForgetPasswordConfirmAPIView
 
 app_name = "users"
 urlpatterns = [
@@ -13,6 +13,8 @@ urlpatterns = [
     path('send_code_change_mobile/', SendCodeMobileApiView.as_view(), name='send_code'),
     path('verify_code_change_mobile/', VerifyCodeMobileApiview.as_view(), name='verify_code'),
     path('reset_password/', ResetPasswordAPIView.as_view(), name='reset_password'),
+    path('forget_password/', ForgetPasswordApiView.as_view(), name='forget_password'),
+    path('forget_password_confrim/', ForgetPasswordConfirmAPIView.as_view(), name='forget_password_confirm'),
     path("jwt/create/", TokenObtainPairView.as_view(), name="user_access_token"),
     path("jwt/refresh/", TokenRefreshView.as_view(), name="user_refresh_token"),
     path('jwt/verify/', token_verify, name='user_verify_token'),

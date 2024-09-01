@@ -9,7 +9,8 @@ from rest_framework_simplejwt.serializers import TokenBlacklistSerializer
 
 from users.models import Otp
 from users.serializers import UserRegisterSerializer, UserVerifyRegisterSerializer, UserResendVerifyRegisterSerializer, \
-    SendCodeMobilePhoneSerializer, VerifyCodeMobilePhoneSerializer, ResetPasswordSerializer
+    SendCodeMobilePhoneSerializer, VerifyCodeMobilePhoneSerializer, ResetPasswordSerializer, ForgetPasswordSerializer, \
+    ForgetPasswordConfirmSerializer
 from users.models import UserAccount
 
 
@@ -65,3 +66,19 @@ class ResetPasswordAPIView(APIView):
         ser_data.is_valid(raise_exception=True)
         ser_data.save()
         return Response({"message": "successfully reset password"}, status=status.HTTP_200_OK)
+
+
+class ForgetPasswordApiView(APIView):
+    def post(self, request):
+        ser_data = ForgetPasswordSerializer(data=request.data)
+        ser_data.is_valid(raise_exception=True)
+        ser_data.save()
+        return Response({"message": "we send code and verify for forget password"}, status=status.HTTP_200_OK)
+
+
+class ForgetPasswordConfirmAPIView(APIView):
+    def post(self, request):
+        ser_data = ForgetPasswordConfirmSerializer(data=request.data)
+        ser_data.is_valid(raise_exception=True)
+        ser_data.save()
+        return Response({"message": "successfully change password"}, status=status.HTTP_200_OK)
