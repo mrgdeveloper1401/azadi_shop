@@ -76,8 +76,12 @@ class OtpResendSerializer(serializers.Serializer):
             raise ValidationError({'message': _("You have already verified your account.")})
 
         attrs['user'] = user
+
+        if Otp.objects.filter(user=attrs['user']).exists():
+            raise ValidationError({"message": _("you have already code, please try 2 minute")})
         return attrs
 
     def create(self, validated_data):
+        # TODO send sms
         return Otp.objects.create(user=validated_data['user'], code=generate_random_code(),
                            expired_at=now() + timedelta(minutes=2))
