@@ -169,6 +169,7 @@ class ResetPasswordSerializer(serializers.Serializer):
         del validated_data['confirm_password']
         user = self.context['request']
         user.set_password(validated_data['new_password'])
+        user.save()
         return {"message": "successfully reset password"}
 
 
