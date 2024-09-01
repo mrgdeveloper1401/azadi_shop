@@ -4,12 +4,14 @@ from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 
 from users.managers import UserManager, OtpManager
+from users.validators import MobileValidator
 
 
 # Create your models here.
 class UserAccount(AbstractUser):
     is_verified = models.BooleanField(default=False)
-    mobile_phone = models.CharField(_("mobile phone"), max_length=15, unique=True)
+    mobile_phone = models.CharField(_("mobile phone"), max_length=15, unique=True,
+                                    validators=[MobileValidator()])
     username = None
 
     USERNAME_FIELD = 'mobile_phone'
