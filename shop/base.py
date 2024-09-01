@@ -18,6 +18,7 @@ from shop.kavenegar_config import *
 from shop.rest_framework_config import *
 from shop.uppercase_password_validator import UppercasePasswordValidator
 from shop.celery import *
+from shop.simple_jwt_config import SIMPLE_JWT
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

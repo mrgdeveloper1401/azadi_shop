@@ -80,8 +80,3 @@ class OtpAdmin(admin.ModelAdmin):
     list_display = ['user', 'id', 'code', 'created_at', 'expired_at']
     list_select_related = ['user']
     search_fields = ['user__mobile_phone']
-
-
-# @admin.register(PasswordOtp)
-# class AccountAdmin(admin.ModelAdmin):
-#     model = PasswordOtp

@@ -1,10 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
-from django.utils import timezone
+from django.utils.timezone import now, timedelta
 
 from users.managers import UserManager, OtpManager
 from users.validators import MobileValidator
+from users.random_code import generate_random_code
 
 
 # Create your models here.
@@ -57,9 +58,9 @@ class UserInfo(models.Model):
 
 class Otp(models.Model):
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='user_otp')
-    code = models.PositiveSmallIntegerField(_('OTP code'), unique=True)
+    code = models.PositiveSmallIntegerField(_('OTP code'), unique=True, default=generate_random_code)
     created_at = models.DateTimeField(auto_now_add=True)
-    expired_at = models.DateTimeField(blank=True, null=True)
+    expired_at = models.DateTimeField(default=now() + timedelta(minutes=2))
 
     objects = OtpManager()
 
@@ -72,7 +73,7 @@ class Otp(models.Model):
         return self.user.mobile_phone
 
     def is_expired(self):
-        return timezone.now() > self.expired_at
+        return now() > self.expired_at
 
     def delete_if_expired(self):
         if self.is_expired():
@@ -80,18 +81,3 @@ class Otp(models.Model):
             return True
         return False
 
-
-class PasswordOtp(models.Model):
-    user = models.OneToOneField(UserAccount, on_delete=models.CASCADE)
-    code = models.CharField(max_length=6)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-created_at']
-
-    def __str__(self):
-        return self.user.mobile_phone
-
-    def is_expired(self):
-        # OTP expires after 1 minute
-        return timezone.now() > self.created_at + timezone.timedelta(minutes=5)

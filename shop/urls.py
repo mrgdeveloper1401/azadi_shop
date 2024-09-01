@@ -22,14 +22,18 @@ from shop.base import DEBUG
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("user/", include("users.urls", namespace="users")),
+    path("auth/", include("users.urls", namespace="users")),
     path("courses/", include("courses.urls", namespace="courses")),
     # path("payment/", include("payment.urls", namespace="payment")),
     # path("order/", include("order.urls", namespace="order")),
-    #     swagger ui
+
+    # swagger ui
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+
+    # api auth
+    path('api-auth/', include('rest_framework.urls')),
 
 ]
 if DEBUG:
