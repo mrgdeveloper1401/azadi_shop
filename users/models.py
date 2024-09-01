@@ -72,10 +72,13 @@ class Otp(models.Model):
         return self.user.mobile_phone
 
     def is_expired(self):
-        time_now = timezone.now().strftime('%H:%M:%S')
-        exp_time = self.expired_at.strftime('%H:%M:%S')
-        if time_now > exp_time:
+        return timezone.now() > self.expired_at
+
+    def delete_if_expired(self):
+        if self.is_expired():
             self.delete()
+            return True
+        return False
 
 
 class PasswordOtp(models.Model):

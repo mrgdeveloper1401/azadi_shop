@@ -8,6 +8,7 @@ from users.models import UserAccount, Otp
 from users.validators import MobileValidator
 from users.random_code import generate_random_code
 
+
 class UserRegisterSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True,
                                              min_length=8,
@@ -25,6 +26,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         del validated_data['confirm_password']
         user = UserAccount.objects.create_user(**validated_data)
         get_code = Otp.objects.get(user__mobile_phone=validated_data['mobile_phone'])
+        # TODO send sms
         # send_sms(get_code.user.mobile_phone, get_code.code)
         return user
 
@@ -44,9 +46,13 @@ class OtpVerifySerializer(serializers.Serializer):
     def validate(self, attrs):
         try:
             get_code = Otp.objects.get(code=attrs['code'])
-            attrs['user'] = get_code
         except Exception as e:
             raise ValidationError({'message': e})
+
+        if get_code.is_expired():
+            get_code.delete_if_expired()
+            raise ValidationError({'message': _('otp code is expired please resent code')})
+        attrs['user'] = get_code
         return attrs
 
     def save(self, **kwargs):
@@ -84,4 +90,4 @@ class OtpResendSerializer(serializers.Serializer):
     def create(self, validated_data):
         # TODO send sms
         return Otp.objects.create(user=validated_data['user'], code=generate_random_code(),
-                           expired_at=now() + timedelta(minutes=2))
+                                  expired_at=now() + timedelta(minutes=2))
