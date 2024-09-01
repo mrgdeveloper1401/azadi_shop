@@ -196,16 +196,19 @@ class ForgetPasswordConfirmSerializer(serializers.Serializer):
             validate_password(attrs['new_password'])
         except Exception as e:
             raise ValidationError({"message": e})
-        code = Otp.objects.get(code=attrs['code'])
+        try:
+            code = Otp.objects.get(code=attrs['code'])
+        except Otp.DoesNotExist:
+            raise ValidationError({"message": _("otp query code dose not exist")})
         if code.is_expired():
             code.delete_if_expired()
 
-        code['user'] = code.user
+        attrs['user'] = code.user
         return attrs
 
     def create(self, validated_data):
         del validated_data['confirm_password']
-        user = UserAccount.objects.get(mobile_phone=validated_data['user'].mobile_phone)
+        user = validated_data['user']
         user.set_password(validated_data['new_password'])
         user.save()
         return {"message": _("successfully change password")}
