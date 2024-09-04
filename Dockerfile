@@ -11,12 +11,16 @@ RUN apd update && \
     apk add build-essential \
     apk add gcc \
     apk add musl-dev \
-    apk add postgresql-dev
+    apk add postgresql-dev \
+    apk add libffi-dev \
+    apk add libpq-dev
 
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 RUN PYTHONDDONOTWRITEBYTECODE=1
 RUN PYTHONUNBUFFERED=1
+
+ENV DJANGO_SUPERUSER_PASSWORD=Admin.1234
 
 EXPOSE 8000
 

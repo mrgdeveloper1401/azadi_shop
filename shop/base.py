@@ -21,7 +21,7 @@ from shop.celery import *
 from shop.simple_jwt_config import SIMPLE_JWT
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -47,9 +47,9 @@ INSTALLED_APPS = [
 
     #local apps
     'users.apps.UsersConfig',
-    'courses.apps.CoursesConfig',
-    'order.apps.OrderConfig',
-    'payment.apps.PaymentConfig',
+    # 'courses.apps.CoursesConfig',
+    # 'order.apps.OrderConfig',
+    # 'payment.apps.PaymentConfig',
 
 ]
 
@@ -121,7 +121,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / '/var/www/static'
+STATIC_ROOT = BASE_DIR / 'static'
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
@@ -143,3 +144,11 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+# if DEBUG:
+#     DATABASE = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
