@@ -182,12 +182,22 @@ class ResetPasswordSerializer(serializers.Serializer):
 class ForgetPasswordSerializer(serializers.Serializer):
     mobile_phone = serializers.CharField(validators=[MobileValidator()])
 
+    def validate(self, attrs):
+        if not UserAccount.objects.filter(mobile_phone=attrs['mobile_phone']).exists():
+            # if user is exited or not exited we show this message
+            # when code is send tp mobile , if user is existing on database
+            raise ValidationError({"message": _("we send code this mobile phone")})
+        if Otp.objects.filter(user__mobile_phone=attrs['mobile_phone']).exists():
+            raise ValidationError({"message": _('you have already code please try agin 2 minute')})
+        attrs['user'] = UserAccount.objects.get(mobile_phone=attrs['mobile_phone'])
+        return attrs
+
     def create(self, validated_data):
-        if UserAccount.objects.filter(mobile_phone=validated_data['mobile_phone']).exists():
-            user = UserAccount.objects.get(mobile_phone=validated_data['mobile_phone'])
-            Otp.objects.create(user=user)
+        try:
+            Otp.objects.create(user=validated_data['user'])
             return {"message": "successfully send code for forget password"}
-        return {"message": "successfully send code for forget password"}
+        except UserAccount.DoesNotExist:
+            raise ValidationError({"message": "successfully send code for forget password"})
 
 
 class ForgetPasswordConfirmSerializer(serializers.Serializer):

@@ -81,6 +81,11 @@ class VerifyCodeMobileApiview(APIView):
 class ResetPasswordAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=ResetPasswordSerializer,
+        responses={200: ResetPasswordSerializer},
+        description="this url for reset password when user is authenticate"
+    )
     def post(self, request):
         ser_data = ResetPasswordSerializer(data=request.data, context={'request': request.user})
         ser_data.is_valid(raise_exception=True)
@@ -89,6 +94,10 @@ class ResetPasswordAPIView(APIView):
 
 
 class ForgetPasswordApiView(APIView):
+    @extend_schema(
+        request=ForgetPasswordSerializer,
+        responses={200: ForgetPasswordSerializer},
+    )
     def post(self, request):
         ser_data = ForgetPasswordSerializer(data=request.data)
         ser_data.is_valid(raise_exception=True)
