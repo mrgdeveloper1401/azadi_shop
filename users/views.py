@@ -1,11 +1,12 @@
-from django.contrib.auth import login
-from django.core.mail import send_mail
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenBlacklistView
 from rest_framework_simplejwt.serializers import TokenBlacklistSerializer
+from rest_framework.mixins import CreateModelMixin
+from rest_framework.viewsets import GenericViewSet
+from drf_spectacular.utils import extend_schema
 
 from users.models import Otp
 from users.serializers import UserRegisterSerializer, UserVerifyRegisterSerializer, UserResendVerifyRegisterSerializer, \
@@ -15,6 +16,13 @@ from users.models import UserAccount
 
 
 class UserRegistrationAPIView(APIView):
+    @extend_schema(
+        request=UserRegisterSerializer,
+        responses={201: UserRegisterSerializer},
+        description="enter mobile phone and password and confirm password for register user,"
+                    "one letter password must be upper case"
+                    "password must be same"
+    )
     def post(self, request):
         serializer = UserRegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -23,6 +31,11 @@ class UserRegistrationAPIView(APIView):
 
 
 class UserVerifyRegisterCodeAPIView(APIView):
+    @extend_schema(
+        request=UserVerifyRegisterSerializer,
+        responses={201: UserVerifyRegisterSerializer},
+        description='enter code and verify user register, but code time more then 2 minute code is expired'
+    )
     def post(self, request, *args, **kwargs):
         ser_data = UserVerifyRegisterSerializer(data=request.data)
         ser_data.is_valid(raise_exception=True)
@@ -31,6 +44,13 @@ class UserVerifyRegisterCodeAPIView(APIView):
 
 
 class OtpResendAPIView(APIView):
+    @extend_schema(
+        request=UserResendVerifyRegisterSerializer,
+        responses={201: UserResendVerifyRegisterSerializer},
+        description="resend code to mobile phone for verify user register."
+                    "if mobile phone is exited or mobile phone is dose not exited we show massage code is send to "
+                    "mobile phone"
+    )
     def post(self, request):
         serializer = UserResendVerifyRegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)

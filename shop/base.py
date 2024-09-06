@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from pathlib import Path
 from dotenv import load_dotenv
-from shop.settings import *
 from shop.email_config import *
 from shop.kavenegar_config import *
 from shop.rest_framework_config import *
@@ -32,6 +31,19 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+THIRD_PARTY_APPS = [
+    'users.apps.UsersConfig',
+    # 'courses.apps.CoursesConfig',
+    # 'order.apps.OrderConfig',
+    # 'payment.apps.PaymentConfig',
+]
+
+THIRD_PARTY_PACKAGE = [
+    "rest_framework",
+    'rest_framework_simplejwt',
+    'drf_spectacular',
+    'debug_toolbar',
+]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -40,16 +52,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    "rest_framework",
-    'rest_framework_simplejwt',
-    'drf_spectacular',
-    'debug_toolbar',
-
-    #local apps
-    'users.apps.UsersConfig',
-    # 'courses.apps.CoursesConfig',
-    # 'order.apps.OrderConfig',
-    # 'payment.apps.PaymentConfig',
+    *THIRD_PARTY_APPS,
+    *THIRD_PARTY_PACKAGE,
 
 ]
 
@@ -131,7 +135,7 @@ AUTH_USER_MODEL = 'users.UserAccount'
 
 # spectacular settings
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Azadi project',
+    'TITLE': 'Azad project',
     'DESCRIPTION': 'Your project description',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
@@ -144,11 +148,3 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
-
-# if DEBUG:
-#     DATABASE = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
-#     }

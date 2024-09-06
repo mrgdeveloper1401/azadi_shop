@@ -5,7 +5,6 @@ import sys
 from shop.base import DEBUG
 
 
-
 def main():
     """Run administrative tasks."""
     if DEBUG:

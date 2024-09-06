@@ -8,7 +8,7 @@ RUN apd update && \
     apk upgrade && \
     apk add python3-pip \
     apk add postgresql \
-    apk add build-essential \
+    apk add build-base \
     apk add gcc \
     apk add musl-dev \
     apk add postgresql-dev \

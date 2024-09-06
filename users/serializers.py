@@ -53,7 +53,7 @@ class UserVerifyRegisterSerializer(serializers.Serializer):
         try:
             get_code = Otp.objects.get(code=attrs['code'])
         except Exception as e:
-            raise ValidationError({'message': e})
+            raise ValidationError({'message': "code is wrong"})
 
         if get_code.is_expired():
             get_code.delete_if_expired()
@@ -85,15 +85,21 @@ class UserResendVerifyRegisterSerializer(serializers.Serializer):
         try:
             user = UserAccount.objects.get(mobile_phone=mobile_phone)
         except UserAccount.DoesNotExist:
-            raise ValidationError({'message': _("You must register first.")})
+            # if mobile is existed or not exited we show this message
+            # The code will be sent when the mobile number is in our database
+            raise ValidationError({'message': _(f"code is send to {mobile_phone}")})
 
         if user.is_active and user.is_verified:
-            raise ValidationError({'message': _("You have already verified your account.")})
+            # if mobile is existed or not exited we show this message
+            # The code will be sent when the mobile number is in our database
+            raise ValidationError({'message': _(f"code is send to {mobile_phone}")})
 
         attrs['user'] = user
 
         if Otp.objects.filter(user=attrs['user']).exists():
-            raise ValidationError({"message": _("you have already code, please try 2 minute")})
+            # if mobile is existed or not exited we show this message
+            # The code will be sent when the mobile number is in our database
+            raise ValidationError({"message": _(f"code is send to {mobile_phone}")})
         return attrs
 
     def create(self, validated_data):
