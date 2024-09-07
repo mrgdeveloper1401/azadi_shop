@@ -16,11 +16,11 @@ from shop.email_config import *
 from shop.kavenegar_config import *
 from shop.rest_framework_config import *
 from shop.uppercase_password_validator import UppercasePasswordValidator
-from shop.celery import *
+# from shop.celery import app
 from shop.simple_jwt_config import SIMPLE_JWT
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent.parent
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
@@ -31,6 +31,7 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
+
 THIRD_PARTY_APPS = [
     'users.apps.UsersConfig',
     # 'courses.apps.CoursesConfig',
@@ -87,7 +88,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'shop.wsgi.application'
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -148,3 +148,11 @@ INTERNAL_IPS = [
     "127.0.0.1",
     # ...
 ]
+
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / 'db.sqlite3',
+        }
+    }

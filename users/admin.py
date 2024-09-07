@@ -39,12 +39,13 @@ class UserAdmin(BaseUserAdmin):
                     "is_staff",
                     "is_superuser",
                     "is_verified",
+                    "is_deleted",
                     "groups",
                     "user_permissions",
                 ),
             },
         ),
-        (_("Important dates"), {"fields": ("last_login", "date_joined")}),
+        (_("Important dates"), {"fields": ("last_login", "date_joined", "deleted_at")}),
     )
     add_fieldsets = (
         (
@@ -56,7 +57,7 @@ class UserAdmin(BaseUserAdmin):
         ),
     )
     list_display = ("id", "mobile_phone", "email", "first_name", "last_name", "is_staff", 'is_superuser', 'is_active',
-                    "is_verified")
+                    "is_verified", "is_deleted", "deleted_at")
     list_filter = ("is_staff", "is_superuser", "is_active", 'is_verified', "groups")
     search_fields = ("mobile_phone", "first_name", "last_name", "email")
     ordering = ("mobile_phone",)
@@ -64,11 +65,13 @@ class UserAdmin(BaseUserAdmin):
         "groups",
         "user_permissions",
     )
+    readonly_fields = ['deleted_at']
+    list_display_links = ['id', "mobile_phone", "email"]
 
 
 @admin.register(UserInfo)
 class UserInfoAdmin(admin.ModelAdmin):
-    list_display = ["id", 'user', 'grade', 'major', 'get_active', "is_active"]
+    list_display = ["id", 'user', 'grade', 'major', 'get_active']
     list_select_related = ['user']
     search_fields = ['user__mobile_phone']
     list_max_show_all = 30

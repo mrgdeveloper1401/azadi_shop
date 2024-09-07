@@ -6,10 +6,11 @@ from django.utils.timezone import now, timedelta
 from users.managers import UserManager, OtpManager
 from users.validators import MobileValidator
 from users.random_code import generate_random_code
+from core.models import SoftDeleteMixin, CreateMixin, UpdateMixin
 
 
 # Create your models here.
-class UserAccount(AbstractUser):
+class UserAccount(AbstractUser, SoftDeleteMixin):
     is_verified = models.BooleanField(default=False)
     mobile_phone = models.CharField(_("mobile phone"), max_length=15, unique=True,
                                     validators=[MobileValidator()])
@@ -28,7 +29,7 @@ class UserAccount(AbstractUser):
         return self.mobile_phone
 
 
-class UserInfo(models.Model):
+class UserInfo(CreateMixin, UpdateMixin):
     GRADE_CHOICES = (
         ('دهم', 'دهم'),
         ('یازدهم', 'یازدهم'),
@@ -44,7 +45,6 @@ class UserInfo(models.Model):
     user = models.OneToOneField(UserAccount, on_delete=models.CASCADE, related_name='user_info')
     grade = models.CharField(max_length=10, choices=GRADE_CHOICES, default='دهم')
     major = models.CharField(max_length=10, choices=MAJOR_CHOICES, default='تجربی')
-    is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'user_info'
@@ -65,11 +65,9 @@ class UserInfo(models.Model):
         return self.user.last_name
 
 
-
-class Otp(models.Model):
+class Otp(CreateMixin):
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='user_otp')
     code = models.PositiveSmallIntegerField(_('OTP code'), unique=True, default=generate_random_code)
-    created_at = models.DateTimeField(auto_now_add=True)
     expired_at = models.DateTimeField(default=now() + timedelta(minutes=2))
 
     objects = OtpManager()

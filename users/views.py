@@ -1,3 +1,4 @@
+from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -119,14 +120,16 @@ class ForgetPasswordConfirmAPIView(APIView):
 
 
 class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
-    queryset = UserInfo.objects.select_related('user').filter(is_active=True)
+    queryset = UserInfo.objects.select_related('user').filter(user__is_active=True, user__is_verified=True)
     serializer_class = ProfileSerializer
     permission_classes = [IsOwnerProfile]
 
     def destroy(self, request, *args, **kwargs):
-        user = self.get_object()
-        user__is_active = False
-        user__is_verified = False
+        user_info = self.get_object()
+        user = user_info.user
         user.is_active = False
+        user.is_verified = False
+        user.is_deleted = True
+        user.deleted_at = now()
         user.save()
         return super().destroy(request, *args, **kwargs)
