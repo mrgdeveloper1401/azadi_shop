@@ -44,6 +44,8 @@ THIRD_PARTY_PACKAGE = [
     'rest_framework_simplejwt',
     'drf_spectacular',
     'debug_toolbar',
+    "rest_framework_simplejwt.token_blacklist",
+
 ]
 
 INSTALLED_APPS = [

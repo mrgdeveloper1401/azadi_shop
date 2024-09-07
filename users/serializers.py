@@ -93,7 +93,8 @@ class UserResendVerifyRegisterSerializer(serializers.Serializer):
             # if mobile is existed or not exited we show this message
             # The code will be sent when the mobile number is in our database
             raise ValidationError({'message': _(f"code is send to {mobile_phone}")})
-
+        if user.is_deleted:
+            raise ValidationError({'message': "sorry you deleted account"})
         attrs['user'] = user
 
         if Otp.objects.filter(user=attrs['user']).exists():
