@@ -55,7 +55,7 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
-    list_display = ("mobile_phone", "email", "first_name", "last_name", "is_staff", 'is_superuser', 'is_active',
+    list_display = ("id", "mobile_phone", "email", "first_name", "last_name", "is_staff", 'is_superuser', 'is_active',
                     "is_verified")
     list_filter = ("is_staff", "is_superuser", "is_active", 'is_verified', "groups")
     search_fields = ("mobile_phone", "first_name", "last_name", "email")
@@ -68,7 +68,7 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(UserInfo)
 class UserInfoAdmin(admin.ModelAdmin):
-    list_display = ['user', 'grade', 'major', 'get_active']
+    list_display = ["id", 'user', 'grade', 'major', 'get_active', "is_active"]
     list_select_related = ['user']
     search_fields = ['user__mobile_phone']
     list_max_show_all = 30

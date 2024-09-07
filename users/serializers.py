@@ -4,7 +4,7 @@ from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now, timedelta
 
-from users.models import UserAccount, Otp
+from users.models import UserAccount, Otp, UserInfo
 from users.validators import MobileValidator
 from users.random_code import generate_random_code
 
@@ -228,3 +228,36 @@ class ForgetPasswordConfirmSerializer(serializers.Serializer):
         user.set_password(validated_data['new_password'])
         user.save()
         return {"message": _("successfully change password")}
+
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = UserAccount
+        fields = ('last_login', "first_name", "last_name", "email", "is_verified", "date_joined", "id")
+
+        extra_kwargs = {
+            "last_login": {'read_only': True},
+            "date_joined": {'read_only': True},
+            "is_verified": {'read_only': True},
+            "id": {'read_only': True},
+        }
+
+
+class ProfileSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = UserInfo
+        fields = ('grade', "major", "user")
+
+    def update(self, instance, validated_data):
+        user_data = validated_data.pop('user', None)
+        if user_data:
+            user_instance = instance.user
+            for key, value in user_data.items():
+                setattr(user_instance, key, value)
+            user_instance.save()
+        for key, value in validated_data.items():
+            setattr(instance, key, value)
+        instance.save()
+        return instance

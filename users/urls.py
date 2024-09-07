@@ -1,11 +1,15 @@
+from django.urls import include
 from rest_framework.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, token_verify
 from rest_framework_simplejwt.views import TokenBlacklistView
+from rest_framework.routers import DefaultRouter
 
 from users.views import UserRegistrationAPIView, UserVerifyRegisterCodeAPIView, OtpResendAPIView, SendCodeMobileApiView, \
-    VerifyCodeMobileApiview, ResetPasswordAPIView, ForgetPasswordApiView, ForgetPasswordConfirmAPIView
+    VerifyCodeMobileApiview, ResetPasswordAPIView, ForgetPasswordApiView, ForgetPasswordConfirmAPIView, ProfileViewSet
 
 app_name = "users"
+router = DefaultRouter()
+router.register('profile', ProfileViewSet, basename='profile')
 urlpatterns = [
     path("register/", UserRegistrationAPIView.as_view(), name="user_register"),
     path("user_register_verify_code/", UserVerifyRegisterCodeAPIView.as_view(), name="user_verify"),
@@ -20,4 +24,5 @@ urlpatterns = [
     path('jwt/verify/', token_verify, name='user_verify_token'),
     path('api/token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),
     # path("contact_us/", Contact_UsAPIView.as_view(), name="user_contact_us"),
+    path('', include(router.urls)),
 ]

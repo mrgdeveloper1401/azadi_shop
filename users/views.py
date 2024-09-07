@@ -4,15 +4,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenBlacklistView
 from rest_framework_simplejwt.serializers import TokenBlacklistSerializer
-from rest_framework.mixins import CreateModelMixin
+from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.viewsets import GenericViewSet
 from drf_spectacular.utils import extend_schema
 
 from users.models import Otp
 from users.serializers import UserRegisterSerializer, UserVerifyRegisterSerializer, UserResendVerifyRegisterSerializer, \
     SendCodeMobilePhoneSerializer, VerifyCodeMobilePhoneSerializer, ResetPasswordSerializer, ForgetPasswordSerializer, \
-    ForgetPasswordConfirmSerializer
-from users.models import UserAccount
+    ForgetPasswordConfirmSerializer, ProfileSerializer
+from users.models import UserInfo
+from users.permissions import IsOwnerProfile
 
 
 class UserRegistrationAPIView(APIView):
@@ -106,8 +107,26 @@ class ForgetPasswordApiView(APIView):
 
 
 class ForgetPasswordConfirmAPIView(APIView):
+    @extend_schema(
+        request=ForgetPasswordConfirmSerializer,
+        responses={200, ForgetPasswordConfirmSerializer}
+    )
     def post(self, request):
         ser_data = ForgetPasswordConfirmSerializer(data=request.data)
         ser_data.is_valid(raise_exception=True)
         ser_data.save()
         return Response({"message": "successfully change password"}, status=status.HTTP_200_OK)
+
+
+class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
+    queryset = UserInfo.objects.select_related('user').filter(is_active=True)
+    serializer_class = ProfileSerializer
+    permission_classes = [IsOwnerProfile]
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+        user__is_active = False
+        user__is_verified = False
+        user.is_active = False
+        user.save()
+        return super().destroy(request, *args, **kwargs)

@@ -44,6 +44,7 @@ class UserInfo(models.Model):
     user = models.OneToOneField(UserAccount, on_delete=models.CASCADE, related_name='user_info')
     grade = models.CharField(max_length=10, choices=GRADE_CHOICES, default='دهم')
     major = models.CharField(max_length=10, choices=MAJOR_CHOICES, default='تجربی')
+    is_active = models.BooleanField(default=True)
 
     class Meta:
         db_table = 'user_info'
@@ -54,6 +55,15 @@ class UserInfo(models.Model):
     @property
     def get_active(self):
         return self.user.is_active
+
+    @property
+    def get_name(self):
+        return self.user.first_name
+
+    @property
+    def get_last_name(self):
+        return self.user.last_name
+
 
 
 class Otp(models.Model):
