@@ -2,16 +2,17 @@ from django.db import models
 from django.utils import timezone
 from slugify import slugify
 from shop.base import AUTH_USER_MODEL
+from treebeard.mp_tree import MP_Node
+
+from core.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
 
-class CourseCategory(models.Model):
-    name = models.CharField(max_length=10, blank=False, null=False)
-    icon = models.ImageField(upload_to='icons/', blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+class CourseCategory(MP_Node):
+    name = models.CharField(max_length=50)
+    node_order_by = ['name']
 
     class Meta:
-        ordering = ('-created_at',)
+        db_table = "category"
 
     def __str__(self):
         return self.name

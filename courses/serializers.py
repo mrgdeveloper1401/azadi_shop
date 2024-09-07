@@ -1,13 +1,11 @@
 from rest_framework import serializers
-from .models import Course, CourseCategory, DiscountCourse, Comment
+from courses.models import Course, CourseCategory, DiscountCourse, Comment
 
 
 class CategorySerializers(serializers.ModelSerializer):
-    id = serializers.IntegerField(read_only=True)
-
     class Meta:
         model = CourseCategory
-        fields = ['id', 'name', 'icon', 'created_at', 'updated_at']
+        fields = ['id', 'name']
 
 
 class CourseDiscountSerializers(serializers.ModelSerializer):
@@ -24,24 +22,24 @@ class CourseDiscountSerializers(serializers.ModelSerializer):
 
 
 class CommentSerializers(serializers.ModelSerializer):
+    # course = CourseSerializers(read_only=True)
     class Meta:
         model = Comment
-        fields = ['id', 'user', 'course', 'body', 'admin_response', 'created', 'updated', 'public']
-        read_only_fields = ['created', 'updated', 'admin_response']
+        fields = '__all__'
+        # fields = ['id', 'user', 'body', 'admin_response', 'created', 'updated', 'public']
+        # read_only_fields = ['created', 'updated', 'admin_response']
 
 
 class CourseSerializers(serializers.ModelSerializer):
-    category = serializers.PrimaryKeyRelatedField(queryset=CourseCategory.objects.all())
-    id = serializers.IntegerField(read_only=True)
-    total_price = serializers.SerializerMethodField()
-    course_discount = CourseDiscountSerializers(many=True, read_only=True)
-    ccomment = CommentSerializers(many=True, read_only=True)
+    # category = serializers.PrimaryKeyRelatedField(queryset=CourseCategory.objects.all())
+    # id = serializers.IntegerField(read_only=True)
+    # total_price = serializers.SerializerMethodField()
+    # course_discount = CourseDiscountSerializers(many=True, read_only=True)
+    # comment = CommentSerializers(many=True, read_only=True)
 
     class Meta:
         model = Course
-        fields = ['id', 'user', 'category', 'name', 'slug', 'desc',
-                  'price', 'total_price', 'course_discount', 'sales',
-                  'video', 'image', 'created_at', 'updated_at', 'ccomment']
+        fields = "__all__"
 
     def get_total_price(self, obj):
         return obj.get_total_price

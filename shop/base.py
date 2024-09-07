@@ -34,7 +34,7 @@ DEBUG = True
 
 THIRD_PARTY_APPS = [
     'users.apps.UsersConfig',
-    # 'courses.apps.CoursesConfig',
+    'courses.apps.CoursesConfig',
     # 'order.apps.OrderConfig',
     # 'payment.apps.PaymentConfig',
 ]
@@ -45,6 +45,7 @@ THIRD_PARTY_PACKAGE = [
     'drf_spectacular',
     'debug_toolbar',
     "rest_framework_simplejwt.token_blacklist",
+    "treebeard",
 
 ]
 
