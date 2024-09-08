@@ -1,5 +1,7 @@
 from rest_framework import serializers
+
 from courses.models import Course, CourseCategory, DiscountCourse, Comment
+from users.models import UserAccount
 
 
 class CreatCommentSerializer(serializers.ModelSerializer):
@@ -13,6 +15,9 @@ class CreatCommentSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializers(serializers.ModelSerializer):
+    user = serializers.CharField(source="user.get_full_name")
+    course = serializers.CharField(source="course.name")
+
     class Meta:
         model = Comment
         fields = ['id', 'user', 'course', 'body', 'created_at', 'updated_at', 'public']
@@ -24,7 +29,7 @@ class CourseSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ['id', 'user', 'category', 'name', 'slug', 'description', 'final_price', 'sales',
+        fields = ['id', 'user', 'category', 'name', 'slug', 'description', "price", 'final_price', 'sales',
                   'video', 'image', 'created_at', 'updated_at']
 
     def get_final_price(self, obj):

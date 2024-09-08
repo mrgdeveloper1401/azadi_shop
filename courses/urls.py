@@ -18,4 +18,4 @@ urlpatterns = [
     # path('discount/<int:pk>/', DiscountCourseApiView.as_view(), name='detail_discount'),
     # path('', include(router.urls)),
     # path('', include('courses.admin_api.urls')),
-] + router.urls + course_router.urls
+]

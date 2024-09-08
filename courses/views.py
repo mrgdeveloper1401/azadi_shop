@@ -19,10 +19,10 @@ class CategoryListAPIView(ReadOnlyModelViewSet):
 
 class CourseViewSet(ReadOnlyModelViewSet):
     serializer_class = CourseSerializers
-    queryset = Course.objects.select_related('user', 'category')
+    queryset = Course.objects.select_related('user', "category")
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = CourseFilter
-    search_fields = ['name', 'desc']
+    search_fields = ['name']
     ordering_fields = ['course_discount', 'updated_at', 'created_at']
     pagination_class = CoursePagination
     lookup_field = 'slug'
@@ -49,4 +49,4 @@ class CommentViewSet(ModelViewSet):
         return super().get_serializer_class()
 
     def get_queryset(self):
-        return Comment.objects.filter(course__slug=self.kwargs['course_slug'])
+        return Comment.objects.filter(course__slug=self.kwargs['course_slug']).select_related("user", "course")

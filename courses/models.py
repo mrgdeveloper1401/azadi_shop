@@ -18,7 +18,7 @@ class CourseCategory(CreateMixin, UpdateMixin):
         verbose_name_plural = _("categories")
 
     def __str__(self):
-        return self.name
+        return f"{self.name} {self.parent}"
 
 
 class Course(CreateMixin, UpdateMixin):
@@ -48,36 +48,11 @@ class Course(CreateMixin, UpdateMixin):
 
     @property
     def final_price(self):
-        # اگر قیمت دوره معین نشده باشد، یک استثناء در نظر میگیریم
-        if self.price is None:
-            raise ValueError("The course price cannot be None")
-
-        # گرفتن تخفیف‌های فعال برای این دوره
-        active_discounts = self.course_discount.filter(
-            is_active=True,
-            expired_date__gte=timezone.now()
-        ).order_by('-created_at')
-
-        # پیش‌فرض: قیمت نهایی برابر با قیمت اصلی دوره است
-        total_price = self.price
-
-        if active_discounts.exists():
-            # استفاده از جدیدترین تخفیف فعال
-            discount = active_discounts.first()
-
-            if discount.type == 'درصدی':
-                # اعمال تخفیف درصدی
-                discount_value = min(max(discount.value, 0), 100)
-                discount_amount = (self.price * discount_value) / 100
-                total_price = self.price - discount_amount
-
-            elif discount.type == 'مقدار':
-                # اعمال تخفیف مقداری
-                discount_amount = min(discount.value, self.price)
-                total_price = self.price - discount_amount
-
-        # قیمت نهایی نباید منفی باشد
-        return max(total_price, 0)
+        discount = self.course_discount.filter(is_active=True)
+        f = self.price
+        for d in discount:
+            f = d.calc_price(f)
+        return f
 
 
 class DiscountCourse(models.Model):
@@ -89,14 +64,25 @@ class DiscountCourse(models.Model):
         ('مقدار', 'مقدار'),
     )
 
-    type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='بدون تخفیف')
+    discount_type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='بدون تخفیف')
     value = models.PositiveIntegerField()
     is_active = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
     expired_date = models.DateTimeField()
 
+    def calc_price(self, price):
+        if self.discount_type == "درصدی":
+            return (price * self.value) / 100
+        if self.discount_type == "مقدار":
+            return price - self.value
+        else:
+            res = price
+        return max(res, 0)
+
     class Meta:
-        ordering = ("-created_at",)
+        db_table = "discount"
+        verbose_name = _('discount')
+        verbose_name_plural = _("discounts")
 
     def __str__(self):
         return self.course.name
