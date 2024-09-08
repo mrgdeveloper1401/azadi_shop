@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission
+from rest_framework.permissions import BasePermission, IsAuthenticated, SAFE_METHODS
 
 
 class IsAuthenticatedOrAdmin(BasePermission):
@@ -20,3 +20,14 @@ class IsAuthenticatedOrAdmin(BasePermission):
 
         # اجازه ویرایش یا حذف داده‌ها تنها برای مدیران
         return request.user and request.user.is_staff
+
+
+class IsOwner(BasePermission):
+    def has_permission(self, request, view):
+        if request.method in SAFE_METHODS:
+            return True
+        return request.user.is_authenticated
+
+    def has_object_permission(self, request, view, obj):
+        if obj.user == request.user:
+            return True

@@ -18,12 +18,13 @@ from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from debug_toolbar.toolbar import debug_toolbar_urls
-from shop.base import DEBUG
+from shop.base import DEBUG, MEDIA_URL, MEDIA_ROOT
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("auth/", include("users.urls", namespace="users")),
-    path("courses/", include("courses.urls", namespace="courses")),
+    path("course/", include("courses.urls", namespace="course")),
     # path("payment/", include("payment.urls", namespace="payment")),
     # path("order/", include("order.urls", namespace="order")),
 
@@ -38,3 +39,4 @@ urlpatterns = [
 ]
 if DEBUG:
     urlpatterns += debug_toolbar_urls()
+    urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

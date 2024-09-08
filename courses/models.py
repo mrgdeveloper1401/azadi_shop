@@ -1,49 +1,53 @@
 from django.db import models
 from django.utils import timezone
-from slugify import slugify
 from shop.base import AUTH_USER_MODEL
-from treebeard.mp_tree import MP_Node
+from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
 
-from core.models import CreateMixin, UpdateMixin, SoftDeleteMixin
+from core.models import CreateMixin, UpdateMixin
 
 
-class CourseCategory(MP_Node):
+class CourseCategory(CreateMixin, UpdateMixin):
     name = models.CharField(max_length=50)
-    node_order_by = ['name']
+    parent = models.ForeignKey('self', on_delete=models.PROTECT, null=True, blank=True, related_name='children')
+    icon = models.ImageField(upload_to='category_icon/%Y/%m/%d', blank=True, null=True)
 
     class Meta:
         db_table = "category"
+        verbose_name = _('category')
+        verbose_name_plural = _("categories")
 
     def __str__(self):
         return self.name
 
 
-class Course(models.Model):
-    user = models.ForeignKey(AUTH_USER_MODEL, related_name="courses", on_delete=models.CASCADE)
-    category = models.ForeignKey(CourseCategory, related_name="courses", on_delete=models.CASCADE)
-    name = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True, max_length=100, blank=True)
-    desc = models.TextField(blank=False, null=False)
-    price = models.DecimalField(decimal_places=2, max_digits=10, blank=False, null=False)
-    video = models.FileField(upload_to='videos/', blank=True, null=True)
-    image = models.ImageField(upload_to='images/', blank=True, null=True)
+class Course(CreateMixin, UpdateMixin):
+    user = models.ForeignKey(AUTH_USER_MODEL, related_name="user_course", on_delete=models.PROTECT,
+                             limit_choices_to={"is_staff": True, "is_superuser": True})
+    category = models.ForeignKey(CourseCategory, related_name="category_course", on_delete=models.PROTECT)
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(unique=True, max_length=255, allow_unicode=True)
+    description = models.TextField(blank=True, null=True)
+    price = models.DecimalField(decimal_places=2, max_digits=12)
+    video = models.FileField(upload_to='videos/%Y/%m/%d', blank=True, null=True)
+    image = models.ImageField(upload_to='course_image/%Y/%m/%d', blank=True, null=True)
     sales = models.PositiveSmallIntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(default=True)
 
     class Meta:
-        ordering = ("-created_at",)
+        db_table = 'course'
+        verbose_name = _('course')
+        verbose_name_plural = _("courses")
 
     def save(self, *args, **kwargs):
-        if not self.slug or (self.pk and Course.objects.get(pk=self.pk).name != self.name):
-            self.slug = slugify(self.name, allow_unicode=True)
+        self.slug = slugify(self.name, allow_unicode=True)
         super().save(*args, **kwargs)
 
     def __str__(self):
         return self.name
 
     @property
-    def get_total_price(self):
+    def final_price(self):
         # اگر قیمت دوره معین نشده باشد، یک استثناء در نظر میگیریم
         if self.price is None:
             raise ValueError("The course price cannot be None")
@@ -98,17 +102,19 @@ class DiscountCourse(models.Model):
         return self.course.name
 
 
-class Comment(models.Model):
-    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='ucomment')
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='ccomment')
+class Comment(CreateMixin, UpdateMixin):
+    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_comment',
+                             limit_choices_to={"is_active": True, "is_verified": True})
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_comment')
     body = models.TextField(max_length=2048)
-    admin_response = models.TextField(null=True, blank=True)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
-    public = models.BooleanField(default=False)
+    public = models.BooleanField(default=True)
+    reply_to = models.ForeignKey('self', blank=True, null=True, related_name="reply_comment",
+                                 on_delete=models.PROTECT)
 
     def __str__(self) -> str:
         return f"{self.user} - {self.course.name} - {self.body[:20]}"
 
     class Meta:
-        ordering = ['-created']
+        db_table = 'comment'
+        verbose_name = _('comment')
+        verbose_name_plural = _("comments")

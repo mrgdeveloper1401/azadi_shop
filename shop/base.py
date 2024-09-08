@@ -46,6 +46,7 @@ THIRD_PARTY_PACKAGE = [
     'debug_toolbar',
     "rest_framework_simplejwt.token_blacklist",
     "treebeard",
+    "django_filters"
 
 ]
 
