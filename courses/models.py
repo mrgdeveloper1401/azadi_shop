@@ -48,7 +48,7 @@ class Course(CreateMixin, UpdateMixin):
 
     @property
     def final_price(self):
-        discount = self.course_discount.filter(is_active=True)
+        discount = self.course_discount.all()
         f = self.price
         for d in discount:
             f = d.calc_price(f)

@@ -19,7 +19,7 @@ class CategoryListAPIView(ReadOnlyModelViewSet):
 
 class CourseViewSet(ReadOnlyModelViewSet):
     serializer_class = CourseSerializers
-    queryset = Course.objects.select_related('user', "category")
+    queryset = Course.objects.select_related('user', "category").prefetch_related("course_discount")
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = CourseFilter
     search_fields = ['name']

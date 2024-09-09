@@ -46,6 +46,8 @@ class CourseAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     list_per_page = 20
     list_display_links = ("id", "name")
+    raw_id_fields = ("user", "category")
+    list_select_related = ("user", "category")
 
 
 @admin.register(Comment)
