@@ -75,5 +75,5 @@ class DiscountCourseAdmin(admin.ModelAdmin):
     search_fields = ("course__name", "value")
     list_filter = ("is_active", "expired_date", "created_at")
     date_hierarchy = "created_at"
-    raw_id_fields = ("course",)
+    # raw_id_fields = ("course",)
     list_per_page = 20

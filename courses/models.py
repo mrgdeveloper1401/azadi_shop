@@ -1,5 +1,5 @@
 from decimal import Decimal
-
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
 from shop.base import AUTH_USER_MODEL
@@ -37,6 +37,7 @@ class Course(CreateMixin, UpdateMixin):
                               blank=True, null=True)
     sales = models.PositiveSmallIntegerField(default=0)
     is_active = models.BooleanField(default=True)
+    # is_free = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'course'
@@ -45,6 +46,8 @@ class Course(CreateMixin, UpdateMixin):
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name, allow_unicode=True)
+        # if self.price == 0:
+        #     self.is_free = True
         super().save(*args, **kwargs)
 
     @property
@@ -64,7 +67,8 @@ class Course(CreateMixin, UpdateMixin):
 
 
 class DiscountCourse(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_discount')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_discount',
+                               limit_choices_to={"is_active": True})
 
     TYPE_CHOICES = (
         ('بدون تخفیف', 'بدون تخفیف'),
@@ -86,6 +90,10 @@ class DiscountCourse(models.Model):
         else:
             res = price
         return max(res, 0)
+
+    def clean(self):
+        if DiscountCourse.objects.filter(course=self.course).exists():
+            raise ValidationError({"course": _("course already exists")})
 
     class Meta:
         db_table = "discount"
