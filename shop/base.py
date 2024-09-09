@@ -35,6 +35,7 @@ DEBUG = True
 THIRD_PARTY_APPS = [
     'users.apps.UsersConfig',
     'courses.apps.CoursesConfig',
+    "images.apps.ImagesConfig",
     # 'order.apps.OrderConfig',
     # 'payment.apps.PaymentConfig',
 ]
@@ -59,6 +60,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     *THIRD_PARTY_APPS,
     *THIRD_PARTY_PACKAGE,
+
 
 ]
 

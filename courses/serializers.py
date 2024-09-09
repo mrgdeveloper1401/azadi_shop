@@ -37,15 +37,11 @@ class CourseSerializers(serializers.ModelSerializer):
 
 
 class CategorySerializers(serializers.ModelSerializer):
-    children = serializers.SerializerMethodField()
+    # children = serializers.SerializerMethodField()
 
     class Meta:
         model = CourseCategory
-        fields = ['id', 'name', 'icon', 'children', 'created_at', 'updated_at']
-
-    def get_children(self, obj):
-        children = CourseCategory.objects.filter(parent=obj)
-        return CategorySerializers(children, many=True).data
+        fields = ['id', 'name']
 
 
 class CourseDiscountSerializers(serializers.ModelSerializer):

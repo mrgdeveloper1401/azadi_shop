@@ -1,16 +1,16 @@
 from django.db import models
-from django.utils import timezone
 from shop.base import AUTH_USER_MODEL
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
+from treebeard.mp_tree import MP_Node
 
 from core.models import CreateMixin, UpdateMixin
 
 
-class CourseCategory(CreateMixin, UpdateMixin):
-    name = models.CharField(max_length=50)
-    parent = models.ForeignKey('self', on_delete=models.PROTECT, null=True, blank=True, related_name='children')
-    icon = models.ImageField(upload_to='category_icon/%Y/%m/%d', blank=True, null=True)
+class CourseCategory(MP_Node):
+    name = models.CharField(max_length=200)
+    icon = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name='image_category',
+                             blank=True, null=True)
 
     class Meta:
         db_table = "category"
@@ -18,7 +18,7 @@ class CourseCategory(CreateMixin, UpdateMixin):
         verbose_name_plural = _("categories")
 
     def __str__(self):
-        return f"{self.name} {self.parent}"
+        return self.name
 
 
 class Course(CreateMixin, UpdateMixin):
@@ -30,7 +30,8 @@ class Course(CreateMixin, UpdateMixin):
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(decimal_places=2, max_digits=12)
     video = models.FileField(upload_to='videos/%Y/%m/%d', blank=True, null=True)
-    image = models.ImageField(upload_to='course_image/%Y/%m/%d', blank=True, null=True)
+    image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name="course_image",
+                              blank=True, null=True)
     sales = models.PositiveSmallIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 

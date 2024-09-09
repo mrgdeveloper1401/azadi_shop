@@ -1,10 +1,10 @@
 from django.contrib import admin
 from courses.models import CourseCategory, Course, Comment, DiscountCourse
 from django.utils.translation import gettext_lazy as _
+from treebeard.admin import TreeAdmin
+from treebeard.forms import movenodeform_factory
 
 
-# Register your models here.
-# simple filter in CourseAdmin
 class SalesFilter(admin.SimpleListFilter):
     title = 'Sales'
 
@@ -31,30 +31,34 @@ class SalesFilter(admin.SimpleListFilter):
 
 
 @admin.register(CourseCategory)
-class CategoryAdmin(admin.ModelAdmin):
-    pass
+class CategoryAdmin(TreeAdmin):
+    form = movenodeform_factory(CourseCategory)
+    raw_id_fields = ['icon']
 
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "category", "user", "price", "final_price", "is_active", "sales", "created_at")
+    list_display = ("id", "name", "user", "price", "final_price", "is_active", "sales", "created_at")
     list_filter = ("created_at", "updated_at", "is_active")
-    list_max_show_all = 20
     list_editable = ("is_active",)
     date_hierarchy = "created_at"
     search_fields = ("name", "user__mobile_phone")
     prepopulated_fields = {"slug": ("name",)}
     list_per_page = 20
     list_display_links = ("id", "name")
-    raw_id_fields = ("user", "category")
+    raw_id_fields = ("user", "category", "image")
     list_select_related = ("user", "category")
+
+    def get_queryset(self, request):
+        q = super().get_queryset(request)
+        q = q.prefetch_related("course_discount")
+        return q
 
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "course", "public", "created_at")
     list_editable = ("public", )
-    list_max_show_all = 30
     search_fields = ("user__mobile_phone", "course__name")
     list_filter = ("created_at", "updated_at")
     date_hierarchy = "created_at"
@@ -72,3 +76,4 @@ class DiscountCourseAdmin(admin.ModelAdmin):
     list_filter = ("is_active", "expired_date", "created_at")
     date_hierarchy = "created_at"
     raw_id_fields = ("course",)
+    list_per_page = 20

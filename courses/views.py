@@ -12,7 +12,7 @@ from courses.models import CourseCategory, Course, DiscountCourse, Comment
 from courses.filters import CourseFilter
 
 
-class CategoryListAPIView(ReadOnlyModelViewSet):
+class CategoryViewSet(ReadOnlyModelViewSet):
     queryset = CourseCategory.objects.all()
     serializer_class = CategorySerializers
 
