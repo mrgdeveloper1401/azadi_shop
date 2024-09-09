@@ -24,36 +24,17 @@ class CommentSerializers(serializers.ModelSerializer):
 
 
 class CourseSerializers(serializers.ModelSerializer):
-    user = serializers.CharField(source="user.get_full_name", read_only=True)
-    final_price = serializers.SerializerMethodField()
+    professor = serializers.CharField(source="professor.get_full_name")
 
     class Meta:
         model = Course
-        fields = ['id', 'user', 'category', 'name', 'slug', 'description', "price", 'final_price', 'sales',
-                  'video', 'image', 'created_at', 'updated_at']
-
-    def get_final_price(self, obj):
-        return obj.final_price
+        fields = ['id', 'professor', 'category', 'name', 'slug', 'description', "price", 'final_price', 'sales',
+                  'video', 'show_image_url', 'created_at', 'updated_at']
 
 
 class CategorySerializers(serializers.ModelSerializer):
-    # children = serializers.SerializerMethodField()
 
     class Meta:
         model = CourseCategory
-        fields = ['id', 'name']
+        fields = ['id', 'name', "numchild", "path", "depth"]
 
-
-class CourseDiscountSerializers(serializers.ModelSerializer):
-    course = serializers.StringRelatedField()
-
-    class Meta:
-        model = DiscountCourse
-        fields = ['id', 'course', 'type', 'value', 'is_active', 'created_at', 'expired_date']
-
-        extra_kwargs = {
-            'expired_date': {
-                'format': '%Y-%m-%dT%H:%M',  # فرمت خروجی
-                'input_formats': ['%Y-%m-%dT%H:%M']  # فرمت ورودی
-            }
-        }

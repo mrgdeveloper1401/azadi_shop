@@ -38,16 +38,16 @@ class CategoryAdmin(TreeAdmin):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "user", "price", "final_price", "is_active", "sales", "created_at")
+    list_display = ("id", "name", "professor", "price", "final_price", "is_active", "sales", "created_at")
     list_filter = ("created_at", "updated_at", "is_active")
     list_editable = ("is_active",)
     date_hierarchy = "created_at"
-    search_fields = ("name", "user__mobile_phone")
+    search_fields = ("name", "professor__get_full_name")
     prepopulated_fields = {"slug": ("name",)}
     list_per_page = 20
     list_display_links = ("id", "name")
-    raw_id_fields = ("user", "category", "image")
-    list_select_related = ("user", "category")
+    raw_id_fields = ("professor", "category", "image")
+    list_select_related = ("professor", "category")
 
     def get_queryset(self, request):
         q = super().get_queryset(request)

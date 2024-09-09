@@ -1,3 +1,6 @@
+from decimal import Decimal
+
+from django.core.validators import MinValueValidator
 from django.db import models
 from shop.base import AUTH_USER_MODEL
 from django.utils.text import slugify
@@ -22,13 +25,13 @@ class CourseCategory(MP_Node):
 
 
 class Course(CreateMixin, UpdateMixin):
-    user = models.ForeignKey(AUTH_USER_MODEL, related_name="user_course", on_delete=models.PROTECT,
-                             limit_choices_to={"is_staff": True, "is_superuser": True})
+    professor = models.ForeignKey('professors.Professor', related_name="professor_course", on_delete=models.PROTECT,
+                                  limit_choices_to={"is_active": True, })
     category = models.ForeignKey(CourseCategory, related_name="category_course", on_delete=models.PROTECT)
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, max_length=255, allow_unicode=True)
     description = models.TextField(blank=True, null=True)
-    price = models.DecimalField(decimal_places=2, max_digits=12)
+    price = models.DecimalField(decimal_places=2, max_digits=12, validators=[MinValueValidator(Decimal(0))],)
     video = models.FileField(upload_to='videos/%Y/%m/%d', blank=True, null=True)
     image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name="course_image",
                               blank=True, null=True)
@@ -43,6 +46,10 @@ class Course(CreateMixin, UpdateMixin):
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name, allow_unicode=True)
         super().save(*args, **kwargs)
+
+    @property
+    def show_image_url(self):
+        return self.image.image.url
 
     def __str__(self):
         return self.name

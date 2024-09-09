@@ -4,10 +4,9 @@ from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
 from rest_framework.viewsets import GenericViewSet
 
-from courses.permissions import IsAuthenticatedOrAdmin, IsOwner
+from courses.permissions import IsOwner
 from courses.paginations import CoursePagination
-from courses.serializers import CommentSerializers, CourseSerializers, CourseDiscountSerializers, CategorySerializers, \
-    CreatCommentSerializer
+from courses.serializers import CommentSerializers, CourseSerializers, CategorySerializers, CreatCommentSerializer
 from courses.models import CourseCategory, Course, DiscountCourse, Comment
 from courses.filters import CourseFilter
 
@@ -19,18 +18,13 @@ class CategoryViewSet(ReadOnlyModelViewSet):
 
 class CourseViewSet(ReadOnlyModelViewSet):
     serializer_class = CourseSerializers
-    queryset = Course.objects.select_related('user', "category").prefetch_related("course_discount")
+    queryset = Course.objects.select_related('professor', "category", "image").prefetch_related("course_discount")
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = CourseFilter
     search_fields = ['name']
     ordering_fields = ['course_discount', 'updated_at', 'created_at']
     pagination_class = CoursePagination
     lookup_field = 'slug'
-
-
-class DiscountCourseApiView(ListModelMixin, RetrieveModelMixin, GenericViewSet):
-    queryset = DiscountCourse.objects.select_related('course').all()
-    serializer_class = CourseDiscountSerializers
 
 
 class CommentViewSet(ModelViewSet):

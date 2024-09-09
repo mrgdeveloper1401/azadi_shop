@@ -13,7 +13,7 @@ class Image(CreateMixin, UpdateMixin):
     height = models.IntegerField(null=True, blank=True)
 
     file_hash = models.CharField(max_length=40, db_index=True, null=True, blank=True)
-    file_size = models.PositiveIntegerField(null=True)
+    file_size = models.PositiveIntegerField(null=True, blank=True)
 
     focal_point_x = models.PositiveIntegerField(null=True, blank=True)
     focal_point_y = models.PositiveIntegerField(null=True, blank=True)
@@ -25,11 +25,10 @@ class Image(CreateMixin, UpdateMixin):
         hasher = sha1()
         for c in self.image.chunks():
             hasher.update(c)
-        return hasher
+        return hasher.hexdigest()
 
-    @property
-    def show_url(self):
-        return self.image.url
+    def __str__(self):
+        return f"{self.file_hash} && {self.title}"
 
     def save(self, *args, **kwargs):
         self.file_hash = self.generate_hash

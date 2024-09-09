@@ -1,5 +1,5 @@
 from django.urls import path, include
-from courses.views import CommentViewSet, CourseViewSet, CategoryViewSet, DiscountCourseApiView
+from courses.views import CommentViewSet, CourseViewSet, CategoryViewSet
 from rest_framework_nested.routers import DefaultRouter, NestedDefaultRouter
 
 router = DefaultRouter()
@@ -14,8 +14,6 @@ urlpatterns = [
     path('v1/', include(router.urls)),
     path('v1/', include(course_router.urls)),
     # path("categories/<int:pk>/", CategoryListAPIView.as_view(), name="detail_category"),
-    # path('discount/', DiscountCourseApiView.as_view(), name='discount'),
-    # path('discount/<int:pk>/', DiscountCourseApiView.as_view(), name='detail_discount'),
     # path('', include(router.urls)),
     # path('', include('courses.admin_api.urls')),
 ]
