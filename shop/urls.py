@@ -28,6 +28,7 @@ urlpatterns = [
     # path("payment/", include("payment.urls", namespace="payment")),
     path("orders/", include("orders.urls", namespace="orders")),
     path('', include("home.urls", namespace="home")),
+    path('business/', include("business.urls", namespace="business")),
 
     # swagger ui
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

@@ -38,6 +38,7 @@ THIRD_PARTY_APPS = [
     "images.apps.ImagesConfig",
     'orders.apps.OrdersConfig',
     "home.apps.HomeConfig",
+    "business.apps.BusinessConfig",
     # 'payment.apps.PaymentConfig',
 ]
 

@@ -1,6 +1,7 @@
 from django.urls import path
 from .views import TopTeachersList, TopStudentsList, TajrobiTopLevelsList, RiaziTopLevelsList, EnasaniTopLevelsList, PrizesList, ObligationsList, ShowCourses
 
+app_name = 'business'
 urlpatterns = [
     path('api/top-teachers/', TopTeachersList.as_view(), name='top-teachers-list'),
     path('api/top-students/', TopStudentsList.as_view(), name='top-students-list'),
