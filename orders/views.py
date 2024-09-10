@@ -7,12 +7,13 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from orders.models import Cart, CartItem, Order
 from orders.serializers import CartSerializer, AddCartItemSerializer, CartItemSerializer, OrderSerialize, \
     CreateOrderSerializer, UpdateOrderItemSerializer
-from orders.permissions import IsOwner
+from orders.permissions import IsOwner, IsOwnerCartItem
 # Create your views here.
 
 
 class CartViewSet(CreateModelMixin, ListModelMixin, RetrieveModelMixin, GenericViewSet):
-    queryset = Cart.objects.prefetch_related('cart_item', 'cart_item__course')
+    queryset = Cart.objects.prefetch_related('cart_item', 'cart_item__course', "cart_item__course__professor",
+                                             "cart_item__course__image", "cart_item__course__course_discount")
     serializer_class = CartSerializer
     permission_classes = [IsOwner]
 
@@ -28,9 +29,10 @@ class CartViewSet(CreateModelMixin, ListModelMixin, RetrieveModelMixin, GenericV
 
 
 class CartItemViewSet(RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, ListModelMixin, GenericViewSet):
-    queryset = CartItem.objects.select_related('course')
+    queryset = (CartItem.objects.select_related('course', "course__professor", "course__image").
+                prefetch_related("course__course_discount"))
     serializer_class = CartItemSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsOwnerCartItem]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)

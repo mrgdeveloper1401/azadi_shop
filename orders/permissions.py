@@ -9,4 +9,5 @@ class IsOwner(permissions.IsAuthenticated):
 
 class IsOwnerCartItem(permissions.IsAuthenticated):
     def has_object_permission(self, request, view, obj):
-        pass
+        if obj.cart.user == request.user:
+            return True
