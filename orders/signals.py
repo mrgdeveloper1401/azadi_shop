@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from order.models import Cart
+from orders.models import Cart
 from users.models import UserAccount
 
 

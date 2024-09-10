@@ -36,7 +36,7 @@ THIRD_PARTY_APPS = [
     'users.apps.UsersConfig',
     'courses.apps.CoursesConfig',
     "images.apps.ImagesConfig",
-    # 'order.apps.OrderConfig',
+    'orders.apps.OrdersConfig',
     # 'payment.apps.PaymentConfig',
 ]
 
@@ -47,7 +47,8 @@ THIRD_PARTY_PACKAGE = [
     'debug_toolbar',
     "rest_framework_simplejwt.token_blacklist",
     "treebeard",
-    "django_filters"
+    "django_filters",
+    "corsheaders",
 
 ]
 
@@ -68,6 +69,7 @@ MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -142,7 +144,7 @@ AUTH_USER_MODEL = 'users.UserAccount'
 # spectacular settings
 SPECTACULAR_SETTINGS = {
     'TITLE': 'Azad project',
-    'DESCRIPTION': 'Your project description',
+    'DESCRIPTION': 'Your  description',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
@@ -162,3 +164,5 @@ if DEBUG:
             "NAME": BASE_DIR / 'db.sqlite3',
         }
     }
+
+# config package django-cors-header

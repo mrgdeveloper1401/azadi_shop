@@ -4,10 +4,10 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.mixins import RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, ListModelMixin
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
-from order.models import Cart, CartItem, Order
-from order.serializers import CartSerializer, AddCartItemSerializer, CartItemSerializer, OrderSerialize, \
+from orders.models import Cart, CartItem, Order
+from orders.serializers import CartSerializer, AddCartItemSerializer, CartItemSerializer, OrderSerialize, \
     CreateOrderSerializer, UpdateOrderItemSerializer
-from order.permissions import IsOwner
+from orders.permissions import IsOwner
 # Create your views here.
 
 

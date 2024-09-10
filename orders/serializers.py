@@ -5,7 +5,7 @@ from django.db.transaction import atomic
 
 from users.models import UserAccount
 from courses.models import Course
-from order.models import Cart, CartItem, OrderItem, Order
+from orders.models import Cart, CartItem, OrderItem, Order
 
 
 class SimpleUserSerializer(ModelSerializer):
@@ -16,9 +16,11 @@ class SimpleUserSerializer(ModelSerializer):
 
 class CourseCartItemSerialize(ModelSerializer):
     """it is shows field of the course"""
+    professor = CharField(source="professor.get_full_name")
+
     class Meta:
         model = Course
-        fields = ['id', 'name', 'price', 'get_image_url']
+        fields = ['id', 'name', "professor", 'price', "final_price", 'show_image_url']
 
 
 class CartItemSerializer(ModelSerializer):

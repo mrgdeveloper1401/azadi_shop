@@ -2,7 +2,7 @@ from django.urls import include
 from rest_framework.urls import path
 from rest_framework_nested.routers import NestedDefaultRouter, DefaultRouter
 
-from order.views import CartViewSet, CartItemViewSet, OrderViewSet
+from orders.views import CartViewSet, CartItemViewSet, OrderViewSet
 
 router = DefaultRouter()
 router.register('cart', CartViewSet)

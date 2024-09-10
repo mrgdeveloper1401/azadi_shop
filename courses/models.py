@@ -111,7 +111,7 @@ class Comment(CreateMixin, UpdateMixin):
     body = models.TextField(max_length=2048)
     public = models.BooleanField(default=True)
     reply_to = models.ForeignKey('self', blank=True, null=True, related_name="reply_comment",
-                                 on_delete=models.PROTECT)
+                                 on_delete=models.CASCADE)
 
     def __str__(self) -> str:
         return f"{self.user} - {self.course.name} - {self.body[:20]}"

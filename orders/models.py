@@ -9,9 +9,9 @@ from core.models import CreateMixin, UpdateMixin
 
 
 class Cart(CreateMixin):
-    id = models.CharField(primary_key=True, editable=False, auto_created=True, verbose_name="ID")
+    id = models.CharField(primary_key=True, editable=False, auto_created=True, verbose_name="ID", max_length=255)
     user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="cart user",
-                             blank=True, null=True)
+                             blank=True, null=True, related_name="user_cart")
 
     def __str__(self):
         return f'{self.user}'
@@ -22,7 +22,7 @@ class Cart(CreateMixin):
 
     @property
     def total_price(self):
-        price = [i.quantity * i.course.price for i in self.cart_item.all()]
+        price = [i.quantity * i.course.final_price for i in self.cart_item.all()]
         return sum(price)
 
     def save(self, *args, **kwargs):
