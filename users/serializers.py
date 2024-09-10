@@ -63,7 +63,7 @@ class UserVerifyRegisterSerializer(serializers.Serializer):
 
     def save(self, **kwargs):
         user = UserAccount.objects.get(mobile_phone=self.validated_data['user'])
-        if not user.is_active and not user.is_verified:
+        if not user.is_active or not user.is_verified:
             user.is_active = True
             user.is_verified = True
             user.save()

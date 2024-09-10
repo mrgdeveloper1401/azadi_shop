@@ -10,7 +10,7 @@ from courses.models import Course
 
 class TopTeachersList(APIView):
     def get(self, request):
-        top_teachers = Top_Teachers.objects.all()
+        top_teachers = Top_Teachers.objects.select_related("teacher")
         serializer = TopTeachersSerializer(top_teachers, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 

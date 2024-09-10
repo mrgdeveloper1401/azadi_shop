@@ -15,7 +15,14 @@ class UserAccount(AbstractUser, SoftDeleteMixin):
     mobile_phone = models.CharField(_("mobile phone"), max_length=15, unique=True,
                                     validators=[MobileValidator()])
     username = None
-
+    is_active = models.BooleanField(
+        _("active"),
+        default=False,
+        help_text=_(
+            "Designates whether this user should be treated as active. "
+            "Unselect this instead of deleting accounts."
+        ),
+    )
     USERNAME_FIELD = 'mobile_phone'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
 
