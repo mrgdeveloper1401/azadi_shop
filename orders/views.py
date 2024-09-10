@@ -55,7 +55,8 @@ class CartItemViewSet(RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, L
 
 
 class OrderViewSet(ModelViewSet):
-    queryset = (Order.objects.select_related('user').prefetch_related('order_item', 'order_item__course'))
+    queryset = (Order.objects.select_related('user').prefetch_related('order_item', 'order_item__course',
+                "order_item__course__image", "order_item__course__professor", "order_item__course__course_discount"))
 
     def create(self, request, *args, **kwargs):
         ser_data = CreateOrderSerializer(data=request.data, context={'user_id': self.request.user.id})
