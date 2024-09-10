@@ -37,6 +37,7 @@ THIRD_PARTY_APPS = [
     'courses.apps.CoursesConfig',
     "images.apps.ImagesConfig",
     'orders.apps.OrdersConfig',
+    "home.apps.HomeConfig",
     # 'payment.apps.PaymentConfig',
 ]
 
@@ -61,7 +62,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     *THIRD_PARTY_APPS,
     *THIRD_PARTY_PACKAGE,
-    "professors.apps.ProfessorsConfig"
+    "professors.apps.ProfessorsConfig",
+
 
 ]
 
