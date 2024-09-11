@@ -1,6 +1,6 @@
 from decimal import Decimal
 from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from shop.base import AUTH_USER_MODEL
 from django.utils.text import slugify
@@ -110,8 +110,11 @@ class Comment(CreateMixin, UpdateMixin):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_comment')
     body = models.TextField(max_length=2048)
     public = models.BooleanField(default=True)
-    reply_to = models.ForeignKey('self', blank=True, null=True, related_name="reply_comment",
-                                 on_delete=models.CASCADE)
+    # reply_to = models.ForeignKey('self', blank=True, null=True, related_name="reply_comment",
+    #                              on_delete=models.CASCADE)
+    rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True,
+                                              null=True,
+                                              help_text=_("Enter a score of 1 to 5"))
 
     def __str__(self) -> str:
         return f"{self.user} - {self.course.name} - {self.body[:20]}"

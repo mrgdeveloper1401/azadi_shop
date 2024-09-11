@@ -7,7 +7,7 @@ from users.models import UserAccount
 class CreatCommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ['body']
+        fields = ['body', "rating"]
 
     def create(self, validated_data):
         course = Course.objects.get(slug=self.context['course_slug'])
@@ -20,7 +20,7 @@ class CommentSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['id', 'user', 'course', 'body', 'created_at', 'updated_at', 'public']
+        fields = ['id', 'user', 'course', "rating", 'body', 'created_at', 'updated_at', 'public']
 
 
 class CourseSerializers(serializers.ModelSerializer):

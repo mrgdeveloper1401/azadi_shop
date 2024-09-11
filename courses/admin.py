@@ -5,6 +5,7 @@ from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
 
+# TODO
 class SalesFilter(admin.SimpleListFilter):
     title = 'Sales'
 
@@ -28,6 +29,34 @@ class SalesFilter(admin.SimpleListFilter):
             return queryset.filter()
         else:
             return queryset.filter()
+
+
+class RateFilter(admin.SimpleListFilter):
+    title = 'Rate'
+    parameter_name = 'rate'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('1', _("1")),
+            ('2', _("2")),
+            ('3', _("3")),
+            ('4', _("4")),
+            ('5', _("5")),
+        ]
+
+    def queryset(self, request, queryset):
+        if self.value() == '1':
+            return queryset.filter(rating__exact=1)
+        elif self.value() == '2':
+            return queryset.filter(rating__exact=2)
+        elif self.value() == '3':
+            return queryset.filter(rating__exact=3)
+        elif self.value() == '4':
+            return queryset.filter(rating__exact=4)
+        elif self.value() == '5':
+            return queryset.filter(rating__exact=5)
+        else:
+            return queryset.all()
 
 
 @admin.register(CourseCategory)
@@ -57,12 +86,12 @@ class CourseAdmin(admin.ModelAdmin):
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ("id", "user", "course", "public", "created_at")
-    list_editable = ("public", )
+    list_display = ("id", "user", "course", "rating", "public", "created_at")
+    list_editable = ("public",)
     search_fields = ("user__mobile_phone", "course__name")
-    list_filter = ("created_at", "updated_at")
+    list_filter = ("created_at", "updated_at", RateFilter)
     date_hierarchy = "created_at"
-    list_select_related = ("user", "course", "reply_to")
+    list_select_related = ("user", "course")
     raw_id_fields = ['user', "course"]
     list_per_page = 20
     list_display_links = ("id", "user", "course")
@@ -71,7 +100,7 @@ class CommentAdmin(admin.ModelAdmin):
 @admin.register(DiscountCourse)
 class DiscountCourseAdmin(admin.ModelAdmin):
     list_display = ("course", "discount_type", "value", "is_active", "expired_date", "created_at")
-    list_editable = ("is_active", )
+    list_editable = ("is_active",)
     search_fields = ("course__name", "value")
     list_filter = ("is_active", "expired_date", "created_at")
     date_hierarchy = "created_at"
