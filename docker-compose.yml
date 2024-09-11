@@ -1,21 +1,21 @@
 services:
   django_app:
-    build: .
+    build:
+      context: .
     depends_on:
       - postgres
     container_name: django_app
     restart: always
-    expose:
-      - "8000"
+    ports:
+      - "8001:8000"
     networks:
       - main
     volumes:
-      - ./static/:/home/app/static
-      - ./media/:/home/app/media
+      - .:/home/app
     command: >
       sh -c "python manage.py makemigrations --noinput && \
             python manage.py migrate --noinput && \
-            python manage.py createsuperuser --mobile_phone 09391640664 --email m.goodarzi606@gmail.com --noinput;
+            python manage.py createsuperuser --mobile_phone 09391640664 --email m.goodarzi606@gmail.com --noinput || true; \
             python manage.py collectstatic --noinput"
     environment:
       - DEBUG=${DEBUG}
@@ -38,6 +38,8 @@ services:
       - POSTGRES_DB=${DATABASE_DB}
     networks:
       - main
+    volumes:
+      - azadi-data:/var/lib/potgresql/data
 
   nginx:
     container_name: nginx
@@ -65,4 +67,5 @@ networks:
 
 volumes:
   nginx:
+  azadi-data:
 

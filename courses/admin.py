@@ -5,30 +5,30 @@ from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
 
 
-# TODO
 class SalesFilter(admin.SimpleListFilter):
     title = 'Sales'
+    parameter_name = 'sales'
 
     def lookups(self, request, model_admin):
         return [
-            ("0-50", _("Show less than 50 course sold")),
-            ("50-100", _("Show less than 100 course sold")),
-            ("100-500", _("Show range 100 to 500 course sold")),
-            ("500-1000", _("show range 500 to 1000 course sold")),
-            ("1000", _("show biggest 1000 course sold"))
+            ("0-50", _("0-50")),
+            ("50-100", _("50-100")),
+            ("100-500", _("100-500")),
+            ("500-1000", _("500-1000")),
+            ("1000", _("biggest 1000"))
         ]
 
     def queryset(self, request, queryset):
         if self.value() == "0-50":
-            return queryset.filter()
+            return queryset.filter(sales__gte=0, sales__lt=50)
         elif self.value() == "50-100":
-            return queryset.filter()
+            return queryset.filter(sales__gte=50, sales__lt=100)
         elif self.value() == "100-500":
-            return queryset.filter()
+            return queryset.filter(sales__gte=500, sales__lt=500)
         elif self.value() == "500-1000":
-            return queryset.filter()
+            return queryset.filter(sales__gte=500, sales__lt=1000)
         else:
-            return queryset.filter()
+            return queryset.all()
 
 
 class RateFilter(admin.SimpleListFilter):
@@ -63,12 +63,15 @@ class RateFilter(admin.SimpleListFilter):
 class CategoryAdmin(TreeAdmin):
     form = movenodeform_factory(CourseCategory)
     raw_id_fields = ['icon']
+    list_display = ['name', "is_public"]
+    list_per_page = 30
+    search_fields = ['name']
 
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "professor", "price", "final_price", "is_active", "sales", "created_at")
-    list_filter = ("created_at", "updated_at", "is_active")
+    list_filter = ("created_at", "updated_at", "is_active", SalesFilter)
     list_editable = ("is_active",)
     date_hierarchy = "created_at"
     search_fields = ("name", "professor__get_full_name")

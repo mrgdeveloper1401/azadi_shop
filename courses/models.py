@@ -11,9 +11,10 @@ from core.models import CreateMixin, UpdateMixin
 
 
 class CourseCategory(MP_Node):
-    name = models.CharField(max_length=200)
+    name = models.CharField(max_length=200, db_index=True)
     icon = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name='image_category',
                              blank=True, null=True)
+    is_public = models.BooleanField(default=True)
 
     class Meta:
         db_table = "category"

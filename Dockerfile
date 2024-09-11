@@ -22,7 +22,7 @@ RUN apd update && \
     apk add zlib-dev \
     apk add libxml2
 
-
+RUN adduser --disabled-password --no-create-home azadi
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 ENV PYTHONDDONOTWRITEBYTECODE=1
@@ -30,6 +30,7 @@ ENV PYTHONUNBUFFERED=1
 
 ENV DJANGO_SUPERUSER_PASSWORD=Admin.1234
 
+EXPOSE 8000
 
 ENTRYPOINT [ "gunicor" , "shop.wsgi", "-b"]
 CMD [ "0.0.0.0:8000" ]
