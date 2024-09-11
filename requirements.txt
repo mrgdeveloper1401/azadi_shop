@@ -35,6 +35,7 @@ drf-nested-routers==0.94.1
 drf-spectacular==0.27.2
 drf-spectacular-sidecar==2024.7.1
 executing==2.0.1
+gunicorn==23.0.0
 idna==3.7
 inflection==0.5.1
 ipython==8.27.0
@@ -47,6 +48,7 @@ kombu==5.4.0
 matplotlib-inline==0.1.7
 msgpack==1.1.0
 oauthlib==3.2.2
+packaging==24.1
 parso==0.8.4
 pexpect==4.9.0
 pillow==10.4.0
