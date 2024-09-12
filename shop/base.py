@@ -30,7 +30,7 @@ load_dotenv()
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 THIRD_PARTY_APPS = [
     'users.apps.UsersConfig',

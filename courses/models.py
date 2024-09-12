@@ -81,7 +81,7 @@ class DiscountCourse(models.Model):
     value = models.PositiveIntegerField()
     is_active = models.BooleanField()
     created_at = models.DateTimeField(auto_now_add=True)
-    expired_date = models.DateTimeField()
+    expired_date = models.DateTimeField(blank=True)
 
     def calc_price(self, price):
         if self.discount_type == "درصدی":
