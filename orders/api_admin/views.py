@@ -1,8 +1,8 @@
 from rest_framework.viewsets import ModelViewSet
 
-from orders.admin.serializers import AdminCartSerializer
+from orders.api_admin.serializers import AdminCartSerializer
 from orders.models import Cart, CartItem, Order, OrderItem
-from orders.admin.permissions import IsAdmin
+from orders.api_admin.permissions import IsAdmin
 
 
 class AdminCartViewSet(ModelViewSet):

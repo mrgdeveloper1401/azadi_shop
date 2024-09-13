@@ -21,9 +21,9 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 from shop.base import DEBUG, MEDIA_URL, MEDIA_ROOT
 from django.conf.urls.static import static
 
-# url order panel admin
+# url order panel api_admin
 admin_url = [
-    path('order/', include('orders.admin.urls', namespace='admin_order')),
+    path('order/', include('orders.api_admin.urls', namespace='admin_order')),
 ]
 
 urlpatterns = [
