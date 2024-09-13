@@ -21,14 +21,19 @@ from debug_toolbar.toolbar import debug_toolbar_urls
 from shop.base import DEBUG, MEDIA_URL, MEDIA_ROOT
 from django.conf.urls.static import static
 
+# url order panel admin
+admin_url = [
+    path('order/', include('orders.admin.urls', namespace='admin_order')),
+]
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("auth/", include("users.urls", namespace="users")),
     path("course/", include("courses.urls", namespace="course")),
     # path("payment/", include("payment.urls", namespace="payment")),
     path("orders/", include("orders.urls", namespace="orders")),
-    path('', include("home.urls", namespace="home")),
-    path('business/', include("business.urls", namespace="business")),
+    # path('', include("home.urls", namespace="home")),
+    # path('business/', include("business.urls", namespace="business")),
 
     # swagger ui
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
@@ -38,7 +43,8 @@ urlpatterns = [
     # api auth
     path('api-auth/', include('rest_framework.urls')),
 
-]
+] + admin_url
+
 if DEBUG:
     urlpatterns += debug_toolbar_urls()
     urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

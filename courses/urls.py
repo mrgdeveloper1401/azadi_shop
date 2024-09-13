@@ -11,8 +11,6 @@ course_router.register('comment', CommentViewSet, basename='comment')
 
 app_name = "course"
 urlpatterns = [
-    path('v1/', include(router.urls)),
-    path('v1/', include(course_router.urls)),
-    # path("categories/<int:pk>/", CategoryListAPIView.as_view(), name="detail_category"),
-    # path('', include('courses.admin_api.urls')),
+    path('', include(router.urls)),
+    path('', include(course_router.urls)),
 ]

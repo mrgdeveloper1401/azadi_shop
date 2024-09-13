@@ -30,15 +30,15 @@ load_dotenv()
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 THIRD_PARTY_APPS = [
     'users.apps.UsersConfig',
     'courses.apps.CoursesConfig',
     "images.apps.ImagesConfig",
     'orders.apps.OrdersConfig',
-    "home.apps.HomeConfig",
-    "business.apps.BusinessConfig",
+    # "home.apps.HomeConfig",
+    # "business.apps.BusinessConfig",
     # 'payment.apps.PaymentConfig',
 ]
 
@@ -163,8 +163,12 @@ INTERNAL_IPS = [
 if DEBUG:
     DATABASES = {
         'default': {
-            'ENGINE': "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / 'db.sqlite3',
+            'ENGINE': "django.db.backends.postgresql_psycopg2",
+            "NAME": 'postgres',
+            "PASSWORD": "postgres",
+            "USER": "postgres",
+            "PORT": "5432",
+            "HOST": "localhost"
         }
     }
 

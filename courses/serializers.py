@@ -1,4 +1,6 @@
 from rest_framework import serializers
+from rest_framework.generics import get_object_or_404
+from drf_spectacular.utils import extend_schema_field
 
 from courses.models import Course, CourseCategory, DiscountCourse, Comment
 from users.models import UserAccount
@@ -33,8 +35,27 @@ class CourseSerializers(serializers.ModelSerializer):
 
 
 class CategorySerializers(serializers.ModelSerializer):
+    class Meta:
+        model = CourseCategory
+        fields = '__all__'
+
+
+class CategoryTreeSerializers(serializers.ModelSerializer):
+    children = serializers.SerializerMethodField()
 
     class Meta:
         model = CourseCategory
-        fields = ['id', 'name', "numchild", "path", "depth"]
+        fields = '__all__'
 
+    def get_children(self, obj):
+        return CategorySerializers(obj.get_children(), many=True).data
+
+
+class CategoryNodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = CourseCategory
+        fields = '__all__'
+
+
+CategoryTreeSerializers.get_children = extend_schema_field(serializers.ListField(child=CategorySerializers())) \
+    (CategoryTreeSerializers.get_children)

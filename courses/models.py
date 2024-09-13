@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from treebeard.mp_tree import MP_Node
 
 from core.models import CreateMixin, UpdateMixin
+from courses.managers import CategoryManager, CourseManager
 
 
 class CourseCategory(MP_Node):
@@ -15,6 +16,8 @@ class CourseCategory(MP_Node):
     icon = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name='image_category',
                              blank=True, null=True)
     is_public = models.BooleanField(default=True)
+
+    objects = CategoryManager()
 
     class Meta:
         db_table = "category"
@@ -39,6 +42,8 @@ class Course(CreateMixin, UpdateMixin):
     sales = models.PositiveSmallIntegerField(default=0)
     is_active = models.BooleanField(default=True)
     # is_free = models.BooleanField(default=False)
+
+    objects = CourseManager()
 
     class Meta:
         db_table = 'course'

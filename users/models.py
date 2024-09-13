@@ -82,13 +82,13 @@ class UserInfo(CreateMixin, UpdateMixin):
 
 class Otp(CreateMixin):
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='user_otp')
-    code = models.PositiveSmallIntegerField(_('OTP code'), unique=True, default=generate_random_code)
+    code = models.CharField(_('OTP code'), unique=True, default=generate_random_code, max_length=12)
     expired_at = models.DateTimeField(default=now() + timedelta(minutes=2))
 
     objects = OtpManager()
 
     class Meta:
-        db_table = 'opt'
+        db_table = 'otp'
         verbose_name = _('otp')
         verbose_name_plural = _('OTPs')
 

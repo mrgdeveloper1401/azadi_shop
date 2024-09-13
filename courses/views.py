@@ -1,24 +1,33 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from rest_framework.mixins import RetrieveModelMixin, ListModelMixin
-from rest_framework.viewsets import GenericViewSet
+from rest_framework.exceptions import NotAcceptable
 
 from courses.permissions import IsOwner
 from courses.paginations import CoursePagination
-from courses.serializers import CommentSerializers, CourseSerializers, CategorySerializers, CreatCommentSerializer
-from courses.models import CourseCategory, Course, DiscountCourse, Comment
+from courses.serializers import CommentSerializers, CourseSerializers, CreatCommentSerializer, CategoryTreeSerializers, \
+    CategoryNodeSerializer
+from courses.models import CourseCategory, Course, Comment
 from courses.filters import CourseFilter
 
 
 class CategoryViewSet(ReadOnlyModelViewSet):
-    queryset = CourseCategory.objects.all()
-    serializer_class = CategorySerializers
+    queryset = CourseCategory.objects.is_publish().select_related("icon")
+
+    def get_serializer_class(self):
+        match self.action:
+            case 'list':
+                return CategoryTreeSerializers
+            case 'retrieve':
+                return CategoryNodeSerializer
+            case _:
+                raise NotAcceptable()
 
 
 class CourseViewSet(ReadOnlyModelViewSet):
     serializer_class = CourseSerializers
-    queryset = Course.objects.select_related('professor', "category", "image").prefetch_related("course_discount")
+    queryset = (Course.objects.is_active().select_related('professor', "category", "image").
+                prefetch_related("course_discount"))
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = CourseFilter
     search_fields = ['name']
@@ -36,7 +45,7 @@ class CommentViewSet(ModelViewSet):
 
     def get_serializer_context(self):
         return {"course_slug": self.kwargs['course_slug'], "request": self.request}
-    
+
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return CreatCommentSerializer
