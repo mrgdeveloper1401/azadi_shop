@@ -13,6 +13,10 @@ class AdminUserCreateSerializer(ModelSerializer):
         model = UserAccount
         fields = ("mobile_phone", "password", "confirm_password")
 
+        extra_kwargs = {
+            "password": {"write_only": True}
+        }
+
     def validate(self, attrs):
         if attrs['password'] != attrs['confirm_password']:
             raise ValidationError({"message": "Passwords do not match."})
@@ -24,7 +28,7 @@ class AdminUserCreateSerializer(ModelSerializer):
 
     def create(self, validated_data):
         del validated_data['confirm_password']
-        return UserAccount.objects.create(**validated_data)
+        return UserAccount.objects.create_user(**validated_data)
 
 
 class AdminUserSerializer(ModelSerializer):

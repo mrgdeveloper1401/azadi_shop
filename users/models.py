@@ -36,12 +36,21 @@ class UserAccount(AbstractUser, SoftDeleteMixin):
         full_name = "%s %s" % (self.first_name, self.last_name)
         return full_name.strip()
 
+    def __str__(self):
+        return self.mobile_phone
+
+    def delete(self, *args, **kwargs):
+        self.is_active = False
+        self.is_verified = False
+        self.is_superuser = False
+        self.is_staff = False
+        self.is_deleted = True
+        self.deleted_at = now()
+        return super().save(*args, **kwargs)
+
     class Meta:
         db_table = 'user'
         ordering = ("-date_joined",)
-
-    def __str__(self):
-        return self.mobile_phone
 
 
 class UserInfo(CreateMixin, UpdateMixin):

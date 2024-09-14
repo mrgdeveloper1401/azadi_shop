@@ -24,6 +24,7 @@ from django.conf.urls.static import static
 # url order panel api_admin
 admin_url = [
     path('order/', include('orders.api_admin.urls', namespace='admin_order')),
+    path('auth_admin/', include('users.api_admin.urls'))
 ]
 
 urlpatterns = [

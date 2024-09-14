@@ -1,5 +1,4 @@
-from rest_framework.viewsets import ModelViewSet,
-
+from rest_framework.viewsets import ModelViewSet
 
 from users.api_admin.serializers import AdminUserSerializer, AdminOtpSerializer, AdminUserCreateSerializer, \
     AdminUserInfoSerializer
@@ -17,6 +16,11 @@ class AdminUserCreateViewSet(ModelViewSet):
             return AdminUserCreateSerializer
         else:
             return super().get_serializer_class()
+
+    def destroy(self, request, *args, **kwargs):
+        q = self.get_object()
+        q.delete()
+        return super().destroy(request, *args, **kwargs)
 
 
 class AdminOtpViewSet(ModelViewSet):
