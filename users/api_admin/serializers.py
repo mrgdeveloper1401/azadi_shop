@@ -8,14 +8,14 @@ from users.models import UserAccount, UserInfo, Otp
 
 
 class AdminUserCreateSerializer(ModelSerializer):
-    confirm_password = CharField(write_only=True, min_length=8)
+    confirm_password = CharField(write_only=True, min_length=8, style={"input_type": "password"})
 
     class Meta:
         model = UserAccount
         fields = ("mobile_phone", "password", "confirm_password")
 
         extra_kwargs = {
-            "password": {"write_only": True}
+            "password": {"write_only": True, "style": {"input_type": "password"}},
         }
 
     def validate(self, attrs):
@@ -47,6 +47,8 @@ class AdminUserInfoSerializer(ModelSerializer):
 
 
 class AdminOtpSerializer(ModelSerializer):
+    mobile_phone = CharField(source="user.mobile_phone", read_only=True)
+
     class Meta:
         model = Otp
         fields = '__all__'
@@ -57,10 +59,16 @@ class AdminOtpCreateSerializer(ModelSerializer):
         model = Otp
         fields = ['user']
 
+    def validate(self, attrs):
+        user = attrs['user']
+        if user.is_active and user.is_verified:
+            raise ValidationError({"message": _("account is verify")})
+        if user.is_deleted:
+            raise ValidationError({"message": _("account is deleted")})
+        return attrs
+
     def create(self, validated_data):
-        code = Otp.objects.get(user=validated_data['user'])
-        if code.is_expired():
+        (code, created) = Otp.objects.get_or_create(**validated_data)
+        if code.is_expired:
             code.delete_if_expired()
-        elif code:
-            raise ValidationError({"message": _("Otp code is expired.")})
-        return Otp.objects.create(**validated_data)
+        return code
