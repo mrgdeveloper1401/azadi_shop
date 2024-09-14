@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now, timedelta
-from rest_framework.exceptions import ValidationError
+from django.core.exceptions import ValidationError
 
 from users.managers import UserManager, OtpManager
 from users.validators import MobileValidator
@@ -115,7 +115,7 @@ class UserInfo(CreateMixin, UpdateMixin):
 class Otp(CreateMixin):
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='user_otp')
     code = models.PositiveIntegerField(_('OTP code'), unique=True, default=generate_random_code)
-    expired_at = models.DateTimeField(default=now() + timedelta(minutes=2))
+    expired_at = models.DateTimeField(blank=True, null=True)
 
     objects = OtpManager()
 
@@ -130,6 +130,21 @@ class Otp(CreateMixin):
             self.delete()
             return True
         return False
+
+    def clean(self):
+        otp_code = Otp.objects.filter(user=self.user)
+        user_account = UserAccount.objects.get(mobile_phone=self)
+        if user_account.is_active and user_account.is_verified:
+            raise ValidationError({"user": "user is active and verified"})
+        elif user_account.is_deleted:
+            raise ValidationError({"user": "user is deleted"})
+        elif otp_code.exists():
+            raise ValidationError({"user": "otp code already exits"})
+        super().clean()
+
+    def save(self, *args, **kwargs):
+        self.expired_at = now() + timedelta(minutes=2)
+        return super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'otp'

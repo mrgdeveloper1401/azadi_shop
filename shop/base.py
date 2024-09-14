@@ -37,6 +37,7 @@ THIRD_PARTY_APPS = [
     'courses.apps.CoursesConfig',
     "images.apps.ImagesConfig",
     'orders.apps.OrdersConfig',
+    "professors.apps.ProfessorsConfig",
     # "home.apps.HomeConfig",
     # "business.apps.BusinessConfig",
     # 'payment.apps.PaymentConfig',
@@ -51,6 +52,8 @@ THIRD_PARTY_PACKAGE = [
     "treebeard",
     "django_filters",
     "corsheaders",
+    "django_celery_results",
+    "django_celery_beat",
 
 ]
 
@@ -63,9 +66,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     *THIRD_PARTY_APPS,
     *THIRD_PARTY_PACKAGE,
-    "professors.apps.ProfessorsConfig",
-
-
 ]
 
 MIDDLEWARE = [
@@ -172,4 +172,16 @@ if DEBUG:
         }
     }
 
-# config package django-cors-header
+# CELERY BEAT SCHEDULER
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+# REDIS CACHE
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": f"redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    }
+}

@@ -10,6 +10,7 @@ class Professor(CreateMixin, UpdateMixin):
     first_name = models.CharField(_("first name"), max_length=255)
     last_name = models.CharField(_("last_name"), max_length=255)
     email = models.EmailField(_("email"), blank=True, null=True)
+    mobile_phone = models.CharField(_("mobile phone"), max_length=15, blank=True, null=True)
     professor_contact = models.ForeignKey("ProfessorContact", on_delete=models.PROTECT, related_name="contact")
     nation_code = models.CharField(_("nation code"), max_length=11, unique=True)
     birth_date = jDateField(_("birth date"), blank=True, null=True)
@@ -46,12 +47,11 @@ class Professor(CreateMixin, UpdateMixin):
 
 class ProfessorContact(CreateMixin, UpdateMixin):
     contact_name = models.CharField(_("contact name"), max_length=100)
-    contact_mobile = models.CharField(_("contact mobile"), max_length=15, blank=True, null=True)
     contact_url = models.URLField(_("contact url"), blank=True, null=True)
     is_active = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.contact_name} {self.contact_mobile}"
+        return self.contact_name
 
     class Meta:
         db_table = 'professor_contact'

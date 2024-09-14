@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 
 from shop.base import AUTH_USER_MODEL
 from courses.models import Course
-from core.models import CreateMixin, UpdateMixin
+from core.models import CreateMixin
 
 
 class Cart(CreateMixin):
@@ -58,8 +58,7 @@ class CartItem(CreateMixin):
 
 
 class Order(CreateMixin):
-    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_order',
-                             blank=True, null=True)
+    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_order')
 
     class PaymentStatus(models.TextChoices):
         pending = 'pending', _('Pending')
