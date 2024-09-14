@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.utils.timezone import now, timedelta
+from rest_framework.exceptions import ValidationError
 
 from users.managers import UserManager, OtpManager
 from users.validators import MobileValidator
@@ -96,11 +97,6 @@ class Otp(CreateMixin):
 
     objects = OtpManager()
 
-    class Meta:
-        db_table = 'otp'
-        verbose_name = _('otp')
-        verbose_name_plural = _('OTPs')
-
     def __str__(self):
         return self.user.mobile_phone
 
@@ -112,4 +108,10 @@ class Otp(CreateMixin):
             self.delete()
             return True
         return False
+
+    class Meta:
+        db_table = 'otp'
+        verbose_name = _('otp')
+        verbose_name_plural = _('OTPs')
+
 

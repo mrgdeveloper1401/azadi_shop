@@ -1,6 +1,7 @@
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer, CharField
+from django.utils.translation import gettext_lazy as _
 
 
 from users.models import UserAccount, UserInfo, Otp
@@ -38,6 +39,8 @@ class AdminUserSerializer(ModelSerializer):
 
 
 class AdminUserInfoSerializer(ModelSerializer):
+    mobile_phone = CharField(source="user.mobile_phone", read_only=True)
+
     class Meta:
         model = UserInfo
         fields = '__all__'
@@ -47,3 +50,17 @@ class AdminOtpSerializer(ModelSerializer):
     class Meta:
         model = Otp
         fields = '__all__'
+
+
+class AdminOtpCreateSerializer(ModelSerializer):
+    class Meta:
+        model = Otp
+        fields = ['user']
+
+    def create(self, validated_data):
+        code = Otp.objects.get(user=validated_data['user'])
+        if code.is_expired():
+            code.delete_if_expired()
+        elif code:
+            raise ValidationError({"message": _("Otp code is expired.")})
+        return Otp.objects.create(**validated_data)
