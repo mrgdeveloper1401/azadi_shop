@@ -1,6 +1,6 @@
 from django.contrib.auth.models import BaseUserManager
 from django.db.models import Manager
-from django.utils.timezone import now
+from django.utils.timezone import now, timedelta
 
 
 class UserManager(BaseUserManager):
@@ -30,3 +30,9 @@ class UserManager(BaseUserManager):
 class OtpManager(Manager):
     def delete_otp(self):
         return self.filter(expired_at__lt=now()).delete()
+
+    def create_otp(self, user):
+        otp = self.model(user=user)
+        otp.expired_at = now() + timedelta(minutes=2)
+        otp.save(using=self._db)
+        return otp

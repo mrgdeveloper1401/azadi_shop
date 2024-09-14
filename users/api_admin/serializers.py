@@ -1,8 +1,7 @@
 from django.contrib.auth.password_validation import validate_password
 from rest_framework.exceptions import ValidationError
-from rest_framework.serializers import ModelSerializer, CharField, Serializer
+from rest_framework.serializers import ModelSerializer, CharField
 from django.utils.translation import gettext_lazy as _
-
 
 from users.models import UserAccount, UserInfo, Otp
 
@@ -67,8 +66,19 @@ class AdminOtpCreateSerializer(ModelSerializer):
             raise ValidationError({"message": _("account is deleted")})
         return attrs
 
-    def create(self, validated_data):
-        (code, created) = Otp.objects.get_or_create(**validated_data)
-        if code.is_expired:
-            code.delete_if_expired()
-        return code
+    def save(self, **kwargs):
+        user_account = UserAccount.objects.get(pk=self.data['user'])
+        try:
+            otp_code = Otp.objects.get(user=user_account)
+            if otp_code.is_expired():
+                otp_code.delete_if_expired()
+            self.instance = otp_code
+        except Otp.DoesNotExist:
+            self.instance = Otp.objects.create_otp(user=user_account)
+        return self.instance
+
+
+class AdminOtpPartialSerializer(ModelSerializer):
+    class Meta:
+        model = Otp
+        fields = '__all__'

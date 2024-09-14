@@ -107,13 +107,14 @@ class UserInfo(CreateMixin, UpdateMixin):
         self.user.is_superuser = False
         self.user.deleted_at = now()
         self.user.is_deleted = True
+        self.user.is_verified = False
         self.user.save()
         return super().save(*args, **kwargs)
 
 
 class Otp(CreateMixin):
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='user_otp')
-    code = models.CharField(_('OTP code'), unique=True, default=generate_random_code, max_length=12)
+    code = models.PositiveIntegerField(_('OTP code'), unique=True, default=generate_random_code)
     expired_at = models.DateTimeField(default=now() + timedelta(minutes=2))
 
     objects = OtpManager()

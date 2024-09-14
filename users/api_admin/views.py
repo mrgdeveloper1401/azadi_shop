@@ -41,3 +41,9 @@ class AdminUserInfoViewSet(ModelViewSet):
     queryset = UserInfo.objects.select_related("user")
     serializer_class = AdminUserInfoSerializer
     permission_classes = [IsAdmin]
+    
+    def destroy(self, request, *args, **kwargs):
+        q = self.get_object()
+        if q.user.is_deleted:
+            return Response({"message": "you have already deleted account"})
+        return super().destroy(request, *args, **kwargs)
