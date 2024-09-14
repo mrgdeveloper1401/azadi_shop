@@ -71,7 +71,7 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(UserInfo)
 class UserInfoAdmin(admin.ModelAdmin):
-    list_display = ["id", 'user', 'grade', 'major', 'get_active']
+    list_display = ["id", 'user', 'grade', 'major', 'get_active', "get_is_deleted", "get_is_verified", "get_deleted_at"]
     list_select_related = ['user']
     search_fields = ['user__mobile_phone']
     list_max_show_all = 30

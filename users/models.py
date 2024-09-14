@@ -82,12 +82,33 @@ class UserInfo(CreateMixin, UpdateMixin):
         return self.user.is_active
 
     @property
+    def get_is_deleted(self):
+        return self.user.is_deleted
+
+    @property
+    def get_deleted_at(self):
+        return self.user.deleted_at
+
+    @property
+    def get_is_verified(self):
+        return self.user.is_verified
+
+    @property
     def get_name(self):
         return self.user.first_name
 
     @property
     def get_last_name(self):
         return self.user.last_name
+
+    def delete(self, *args, **kwargs):
+        self.user.is_active = False
+        self.user.is_staff = False
+        self.user.is_superuser = False
+        self.user.deleted_at = now()
+        self.user.is_deleted = True
+        self.user.save()
+        return super().save(*args, **kwargs)
 
 
 class Otp(CreateMixin):
