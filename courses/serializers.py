@@ -17,12 +17,18 @@ class CreatCommentSerializer(serializers.ModelSerializer):
 
 
 class CommentSerializers(serializers.ModelSerializer):
-    user = serializers.CharField(source="user.get_full_name")
+    user = serializers.CharField(source="user.mobile_phone")
     course = serializers.CharField(source="course.name")
 
     class Meta:
         model = Comment
         fields = ['id', 'user', 'course', "rating", 'body', 'created_at', 'updated_at', 'public']
+
+
+class UpdateCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['rating', "body"]
 
 
 class CourseSerializers(serializers.ModelSerializer):

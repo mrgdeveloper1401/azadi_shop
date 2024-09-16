@@ -3,13 +3,12 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenBlacklistView
-from rest_framework_simplejwt.serializers import TokenBlacklistSerializer
+from rest_framework.throttling import UserRateThrottle
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.viewsets import GenericViewSet
 from drf_spectacular.utils import extend_schema
 
-from users.models import Otp
+
 from users.serializers import UserRegisterSerializer, UserVerifyRegisterSerializer, UserResendVerifyRegisterSerializer, \
     SendCodeMobilePhoneSerializer, VerifyCodeMobilePhoneSerializer, ResetPasswordSerializer, ForgetPasswordSerializer, \
     ForgetPasswordConfirmSerializer, ProfileSerializer

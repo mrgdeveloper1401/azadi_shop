@@ -12,7 +12,7 @@ from courses.managers import CategoryManager, CourseManager
 
 
 class CourseCategory(MP_Node):
-    name = models.CharField(max_length=200, db_index=True)
+    name = models.CharField(max_length=200, unique=True)
     icon = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name='image_category',
                              blank=True, null=True)
     is_public = models.BooleanField(default=True)
@@ -84,7 +84,7 @@ class DiscountCourse(models.Model):
 
     discount_type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='بدون تخفیف')
     value = models.PositiveIntegerField()
-    is_active = models.BooleanField()
+    is_active = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     expired_date = models.DateTimeField(blank=True)
 

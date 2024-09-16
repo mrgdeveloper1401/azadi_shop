@@ -1,18 +1,19 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
+from django_jalali.db.models import jDateField
 
 from core.models import CreateMixin, UpdateMixin
-from django_jalali.db.models import jDateField
+from users.validators import MobileValidator
+from professors.validators import NationCodeValidator
 # Create your models here.
 
 
 class Professor(CreateMixin, UpdateMixin):
     first_name = models.CharField(_("first name"), max_length=255)
     last_name = models.CharField(_("last_name"), max_length=255)
-    email = models.EmailField(_("email"), blank=True, null=True)
-    mobile_phone = models.CharField(_("mobile phone"), max_length=15, blank=True, null=True)
     professor_contact = models.ForeignKey("ProfessorContact", on_delete=models.PROTECT, related_name="contact")
-    nation_code = models.CharField(_("nation code"), max_length=11, unique=True)
+    nation_code = models.CharField(_("nation code"), max_length=11, unique=True,
+                                   validators=[NationCodeValidator()])
     birth_date = jDateField(_("birth date"), blank=True, null=True)
     certificate = models.ForeignKey("images.Image", on_delete=models.PROTECT, related_name='certificate_image',
                                     blank=True, null=True)
@@ -46,8 +47,12 @@ class Professor(CreateMixin, UpdateMixin):
 
 
 class ProfessorContact(CreateMixin, UpdateMixin):
-    contact_name = models.CharField(_("contact name"), max_length=100)
-    contact_url = models.URLField(_("contact url"), blank=True, null=True)
+    contact_name = models.CharField(_("contact name"), max_length=100,
+                                    help_text=_("The name of the connection"))
+    contact_url = models.URLField(_("contact url"))
+    email = models.EmailField(_("email"), blank=True, null=True)
+    mobile_phone = models.CharField(_("mobile phone"), max_length=11, blank=True, null=True,
+                                    validators=[MobileValidator()])
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

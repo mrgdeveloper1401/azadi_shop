@@ -13,7 +13,7 @@ from core.models import SoftDeleteMixin, CreateMixin, UpdateMixin
 # Create your models here.
 class UserAccount(AbstractUser, SoftDeleteMixin):
     is_verified = models.BooleanField(default=False)
-    mobile_phone = models.CharField(_("mobile phone"), max_length=15, unique=True,
+    mobile_phone = models.CharField(_("mobile phone"), max_length=11, unique=True,
                                     validators=[MobileValidator()])
     username = None
     is_active = models.BooleanField(

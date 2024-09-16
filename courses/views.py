@@ -6,7 +6,7 @@ from rest_framework.exceptions import NotAcceptable
 from courses.permissions import IsOwner
 from courses.paginations import CoursePagination
 from courses.serializers import CommentSerializers, CourseSerializers, CreatCommentSerializer, CategoryTreeSerializers, \
-    CategoryNodeSerializer
+    CategoryNodeSerializer, UpdateCommentSerializer
 from courses.models import CourseCategory, Course, Comment
 from courses.filters import CourseFilter
 
@@ -49,6 +49,10 @@ class CommentViewSet(ModelViewSet):
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return CreatCommentSerializer
+        elif self.request.method == 'PUT':
+            return UpdateCommentSerializer
+        elif self.request.method == 'PATCH':
+            return UpdateCommentSerializer
         return super().get_serializer_class()
 
     def get_queryset(self):
