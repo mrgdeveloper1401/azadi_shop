@@ -5,13 +5,14 @@ from django.utils.translation import gettext_lazy as _
 
 from shop.base import AUTH_USER_MODEL
 from courses.models import Course
-from core.models import CreateMixin
+from core.models import CreateMixin, UpdateMixin
 
 
-class Cart(CreateMixin):
+class Cart(CreateMixin, UpdateMixin):
     id = models.CharField(primary_key=True, editable=False, auto_created=True, verbose_name="ID", max_length=255)
     user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="cart user",
                              blank=True, null=True, related_name="user_cart")
+    # cart_complete = models.BooleanField(default=False)
 
     def __str__(self):
         return f'{self.user}'

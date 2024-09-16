@@ -80,5 +80,5 @@ class OrderViewSet(ModelViewSet):
     def get_queryset(self):
         queryset = super().get_queryset()
         if self.action == 'list':
-            queryset = queryset.filter(user=self.request.user)
+            queryset = queryset.filter(user=self.request.user, payment_status='pending')
         return queryset

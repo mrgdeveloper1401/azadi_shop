@@ -6,8 +6,17 @@ from orders.models import Cart, CartItem, Order, OrderItem
 # Register your models here.
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'created_at']
+    list_display = ['id', 'user', "items_number", 'created_at', "updated_at"]
     list_per_page = 20
+    list_select_related = ['user']
+
+    def items_number(self, obj):
+        return obj.cart_item.count()
+
+    def get_queryset(self, request):
+        q = super().get_queryset(request)
+        q = q.prefetch_related('cart_item')
+        return q
 
 
 @admin.register(CartItem)

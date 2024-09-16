@@ -2,6 +2,7 @@ from django.db import models
 from hashlib import sha1
 from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+from django.contrib.sessions.models import Session
 
 from core.models import CreateMixin, UpdateMixin
 

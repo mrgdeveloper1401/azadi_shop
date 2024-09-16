@@ -1,3 +1,4 @@
+from rest_framework.generics import get_object_or_404
 from rest_framework.serializers import ModelSerializer, IntegerField, ValidationError, Serializer, CharField
 from ulid import ULID
 from django.utils.timezone import now
@@ -110,24 +111,25 @@ class CreateOrderSerializer(Serializer):
     def generate_ulid(self):
         return str(ULID.from_datetime(now()))
 
-    # def create(self, validated_data):
-    #     cart_id = validated_data['cart_id']
-    #     user_id = self.context['user_id']
-    #     order = Order.objects.get(user_id=user_id)
+    def validate(self, attr):
+        order = Order.objects.filter(user_id=self.context['user_id']).last()
+        if order and order.payment_status == "pending":
+            raise ValidationError({"message": "You already have a pending order, "
+                                              "please complete it before creating a new one."})
+        return attr
 
-    # TODO bug fix duplicate order_item
     def save(self, **kwargs):
         with atomic():
             self.cart_id = self.generate_ulid()
             cart_id = self.validated_data['cart_id']
-            (order, created) = Order.objects.get_or_create(user_id=self.context['user_id'])
+            order = Order.objects.create(user_id=self.context['user_id'])
             cart_item = CartItem.objects.filter(cart_id=cart_id)
             order_item = [
                 OrderItem(
                     order=order,
                     course=item.course,
                     quantity=item.quantity,
-                    price=item.course.price
+                    price=item.course.final_price
                 )
                 for item in cart_item
             ]
