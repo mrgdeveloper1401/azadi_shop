@@ -6,8 +6,8 @@ from treebeard.forms import movenodeform_factory
 
 
 class SalesFilter(admin.SimpleListFilter):
-    title = 'Sales'
-    parameter_name = 'sales'
+    title = 'sale_number'
+    parameter_name = 'sale_number'
 
     def lookups(self, request, model_admin):
         return [
@@ -70,8 +70,9 @@ class CategoryAdmin(TreeAdmin):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "professor", "price", "final_price", "is_active", "sales", "created_at")
-    list_filter = ("created_at", "updated_at", "is_active", SalesFilter)
+    list_display = ("id", "name", "professor", "price", "final_price", "is_active", "is_free", "is_sale", "sale_number",
+                    "created_at")
+    list_filter = ("created_at", "updated_at", "is_active", "is_free", "is_sale", SalesFilter)
     list_editable = ("is_active",)
     date_hierarchy = "created_at"
     search_fields = ("name", "professor__get_full_name")

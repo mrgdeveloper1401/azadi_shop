@@ -39,9 +39,12 @@ class Course(CreateMixin, UpdateMixin):
     video = models.FileField(upload_to='videos/%Y/%m/%d', blank=True, null=True)
     image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name="course_image",
                               blank=True, null=True)
-    sales = models.PositiveSmallIntegerField(default=0)
+    sale_number = models.PositiveSmallIntegerField(default=0)
+    is_sale = models.BooleanField(default=True,
+                                  help_text=_("if is sale is true, this course can be sale ,otherwise this course "
+                                              "can't"))
+    is_free = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-    # is_free = models.BooleanField(default=False)
 
     objects = CourseManager()
 
@@ -49,11 +52,12 @@ class Course(CreateMixin, UpdateMixin):
         db_table = 'course'
         verbose_name = _('course')
         verbose_name_plural = _("courses")
+        ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
         self.slug = slugify(self.name, allow_unicode=True)
-        # if self.price == 0:
-        #     self.is_free = True
+        if self.price == 0:
+            self.is_free = True
         super().save(*args, **kwargs)
 
     @property

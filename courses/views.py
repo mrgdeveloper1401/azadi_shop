@@ -26,12 +26,12 @@ class CategoryViewSet(ReadOnlyModelViewSet):
 
 class CourseViewSet(ReadOnlyModelViewSet):
     serializer_class = CourseSerializers
-    queryset = (Course.objects.is_active().select_related('professor', "category", "image").
+    queryset = (Course.objects.is_active().select_related('professor__professor_image', "category", "image").
                 prefetch_related("course_discount"))
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = CourseFilter
     search_fields = ['name']
-    ordering_fields = ['course_discount', 'updated_at', 'created_at']
+    ordering_fields = ['created_at', "updated_at"]
     pagination_class = CoursePagination
     lookup_field = 'slug'
 

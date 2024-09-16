@@ -8,4 +8,5 @@ class CourseFilter(FilterSet):
         fields = {
             'name': ['iexact'],
             'price': ['gt', 'lt'],
+            "category": ['exact']
         }

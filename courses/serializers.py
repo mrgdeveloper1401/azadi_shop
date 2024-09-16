@@ -3,6 +3,7 @@ from rest_framework.generics import get_object_or_404
 from drf_spectacular.utils import extend_schema_field
 
 from courses.models import Course, CourseCategory, DiscountCourse, Comment
+from professors.models import Professor
 from users.models import UserAccount
 
 
@@ -31,13 +32,37 @@ class UpdateCommentSerializer(serializers.ModelSerializer):
         fields = ['rating', "body"]
 
 
+class SimpleProfessorSerializer(serializers.ModelSerializer):
+    professor_image = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Professor
+        fields = ["first_name", "last_name", "professor_image"]
+
+    def get_professor_image(self, obj):
+        return obj.professor_image.image_url
+
+
+class SimpleCategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = CourseCategory
+        fields = ['name']
+
+
 class CourseSerializers(serializers.ModelSerializer):
-    professor = serializers.CharField(source="professor.get_full_name")
+    professor = SimpleProfessorSerializer()
+    course_image = serializers.SerializerMethodField()
+    category = SimpleCategorySerializer()
 
     class Meta:
         model = Course
-        fields = ['id', 'professor', 'category', 'name', 'slug', 'description', "price", 'final_price', 'sales',
-                  'video', 'show_image_url', 'created_at', 'updated_at']
+        exclude = ['image']
+
+    def get_course_image(self, obj):
+        if obj.image:
+            return obj.image.image_url
+        return None
 
 
 class CategorySerializers(serializers.ModelSerializer):

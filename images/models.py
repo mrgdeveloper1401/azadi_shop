@@ -38,6 +38,10 @@ class Image(CreateMixin, UpdateMixin):
             raise ValidationError("Image already exists")
         super().save(*args, **kwargs)
 
+    @property
+    def image_url(self):
+        return self.image.url
+
     class Meta:
         db_table = "image"
         verbose_name = _("Image")
