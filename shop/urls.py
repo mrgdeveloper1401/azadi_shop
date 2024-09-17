@@ -33,7 +33,7 @@ urlpatterns = [
     path("course/", include("courses.urls", namespace="course")),
     # path("payment/", include("payment.urls", namespace="payment")),
     path("orders/", include("orders.urls", namespace="orders")),
-    # path('', include("home.urls", namespace="home")),
+    path('', include("home.urls", namespace="home")),
     # path('business/', include("business.urls", namespace="business")),
 
     # swagger ui

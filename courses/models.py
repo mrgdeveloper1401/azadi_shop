@@ -69,7 +69,7 @@ class Course(CreateMixin, UpdateMixin):
     def __str__(self):
         return self.name
 
-    @property
+    # @property
     def final_price(self):
         # discount = self.course_discount.filter(is_active=True, expired_date__gt=now())
         discount = self.course_discount.all()

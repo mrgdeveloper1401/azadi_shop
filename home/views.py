@@ -20,20 +20,20 @@ class HomePageApiView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
-        courses = Course.objects.select_related('user', 'category', 'image').annotate(
+        courses = Course.objects.select_related('professor', 'category', 'image').annotate(
             discount_amount=Subquery(
                 DiscountCourse.objects.filter(
                     course=OuterRef('pk'),
                     is_active=True,
                     expired_date__gte=timezone.now()
-                ).order_by('-created_at').values('amount')[:1]
+                ).order_by('-created_at').values('value')[:1]
             ),
             discount_type=Subquery(
                 DiscountCourse.objects.filter(
                     course=OuterRef('pk'),
                     is_active=True,
                     expired_date__gte=timezone.now()
-                ).order_by('-created_at').values('type')[:1]
+                ).order_by('-created_at').values('discount_type')[:1]
             ),
             final_price=Case(
                 When(discount_type='درصدی', then=ExpressionWrapper(
@@ -51,7 +51,7 @@ class HomePageApiView(APIView):
 
         latest_courses = courses.order_by('-created_at')[:8]
 
-        most_sold_courses = courses.order_by('-sales')[:8]
+        most_sold_courses = courses.order_by('-sale_number')[:8]
 
         tab = request.query_params.get('tab', 'all')
 
