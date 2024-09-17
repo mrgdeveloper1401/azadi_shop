@@ -1,9 +1,10 @@
 from django.utils import timezone
 from django.db.models import OuterRef, Subquery, F, DecimalField, ExpressionWrapper, Case, When, Q
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework import status
+
 from courses.models import Course, DiscountCourse
 from courses.serializers import CourseSerializers
 
@@ -17,10 +18,10 @@ class HomePageApiView(APIView):
     """
 
     serializer_class = CourseSerializers
-    permission_classes = [AllowAny]
 
     def get(self, request):
-        courses = Course.objects.select_related('professor', "professor__professor_image", 'category', 'image').annotate(
+        courses = Course.objects.select_related('professor', "professor__professor_image", 'category',
+                                                'image').annotate(
             discount_amount=Subquery(
                 DiscountCourse.objects.filter(
                     course=OuterRef('pk'),
@@ -73,3 +74,17 @@ class HomePageApiView(APIView):
         }
 
         return Response(result, status=status.HTTP_200_OK)
+
+
+class MostSoldCourseApiView(APIView):
+    def get(self, request):
+        q = (Course.objects.select_related("professor", "professor__professor_image", 'category', "image").
+             prefetch_related("course_discount")).annotate(
+            dicount=DiscountCourse.objects.filter(is_active=True, expired_date__gte=timezone.now()).
+                    order_by('-sale_number')[:8]
+        )
+        ser_data = CourseSerializers(q, many=True)
+        return Response(ser_data.data, status=status.HTTP_200_OK)
+
+    def get(self, request):
+        pass

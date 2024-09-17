@@ -1,4 +1,3 @@
-from django.db.models import F
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
@@ -28,11 +27,11 @@ class CategoryViewSet(ReadOnlyModelViewSet):
 class CourseViewSet(ReadOnlyModelViewSet):
     serializer_class = CourseSerializers
     queryset = (Course.objects.is_active().select_related('professor__professor_image', "category", "image").
-                prefetch_related("course_discount")).annotate(final_price=F("price") - F("course_discount__value"))
+                prefetch_related("course_discount"))
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = CourseFilter
     search_fields = ['name']
-    ordering_fields = ['created_at', "updated_at"]
+    ordering_fields = ['created_at', "updated_at", "sale_number"]
     pagination_class = CoursePagination
     lookup_field = 'slug'
 

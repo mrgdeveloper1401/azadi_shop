@@ -1,11 +1,8 @@
-from django.utils.timezone import now
 from rest_framework import serializers
-from rest_framework.generics import get_object_or_404
 from drf_spectacular.utils import extend_schema_field
 
-from courses.models import Course, CourseCategory, DiscountCourse, Comment
+from courses.models import Course, CourseCategory, Comment
 from professors.models import Professor
-from users.models import UserAccount
 
 
 class CreatCommentSerializer(serializers.ModelSerializer):
@@ -55,24 +52,23 @@ class CourseSerializers(serializers.ModelSerializer):
     professor = SimpleProfessorSerializer()
     course_image = serializers.SerializerMethodField()
     category = SimpleCategorySerializer()
-    # final_price = serializers.SerializerMethodField()
+    final_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
-        exclude = ['image']
+        fields = '__all__'
 
     def get_course_image(self, obj):
         if obj.image:
             return obj.image.image_url
         return None
 
-    # def get_final_price(self, obj):
-        # discount = obj.course_discount.filter(is_active=True, expired_date__gt=now())
-        # discount = obj.course_discount.all()
-        # f = obj.price
-        # for d in discount:
-        #     f = d.calc_price(f)
-        # return f
+    def get_final_price(self, obj):
+        discounts = obj.course_discount.all()
+        f = obj.price
+        for d in discounts:
+            f = d.calc_price(f)
+        return f
 
 
 class CategorySerializers(serializers.ModelSerializer):

@@ -11,6 +11,7 @@ from treebeard.mp_tree import MP_Node
 
 from core.models import CreateMixin, UpdateMixin
 from courses.managers import CategoryManager, CourseManager
+from courses.managers import DiscountManager
 
 
 class CourseCategory(MP_Node):
@@ -69,7 +70,7 @@ class Course(CreateMixin, UpdateMixin):
     def __str__(self):
         return self.name
 
-    # @property
+    @property
     def final_price(self):
         # discount = self.course_discount.filter(is_active=True, expired_date__gt=now())
         discount = self.course_discount.all()
@@ -79,7 +80,7 @@ class Course(CreateMixin, UpdateMixin):
         return f
 
 
-class DiscountCourse(models.Model):
+class DiscountCourse(CreateMixin, UpdateMixin):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_discount',
                                limit_choices_to={"is_active": True})
 
@@ -90,9 +91,14 @@ class DiscountCourse(models.Model):
 
     discount_type = models.CharField(max_length=10, choices=TYPE_CHOICES, default='بدون تخفیف')
     value = models.PositiveIntegerField()
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    expired_date = models.DateTimeField(blank=True)
+    expired_date = models.DateTimeField()
+
+    objects = DiscountManager()
+
+    def __str__(self):
+        return self.course.name
 
     def calc_price(self, price):
         if self.discount_type == "درصدی":
@@ -112,9 +118,6 @@ class DiscountCourse(models.Model):
         db_table = "discount"
         verbose_name = _('discount')
         verbose_name_plural = _("discounts")
-
-    def __str__(self):
-        return self.course.name
 
 
 class Comment(CreateMixin, UpdateMixin):

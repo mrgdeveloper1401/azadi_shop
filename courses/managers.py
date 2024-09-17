@@ -1,5 +1,6 @@
 from django.db.models import Manager
 from treebeard.mp_tree import MP_NodeManager
+from django.utils.timezone import now
 
 
 class CategoryManager(MP_NodeManager):
@@ -10,3 +11,8 @@ class CategoryManager(MP_NodeManager):
 class CourseManager(Manager):
     def is_active(self):
         return self.filter(is_active=True)
+
+
+class DiscountManager(Manager):
+    def delete_discount(self):
+        return self.filter(expired_date__lt=now()).delete()
