@@ -55,7 +55,7 @@ class CourseSerializers(serializers.ModelSerializer):
     professor = SimpleProfessorSerializer()
     course_image = serializers.SerializerMethodField()
     category = SimpleCategorySerializer()
-    final_price = serializers.SerializerMethodField()
+    # final_price = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
@@ -66,13 +66,13 @@ class CourseSerializers(serializers.ModelSerializer):
             return obj.image.image_url
         return None
 
-    def get_final_price(self, obj):
+    # def get_final_price(self, obj):
         # discount = obj.course_discount.filter(is_active=True, expired_date__gt=now())
-        discount = obj.course_discount.all()
-        f = obj.price
-        for d in discount:
-            f = d.calc_price(f)
-        return f
+        # discount = obj.course_discount.all()
+        # f = obj.price
+        # for d in discount:
+        #     f = d.calc_price(f)
+        # return f
 
 
 class CategorySerializers(serializers.ModelSerializer):

@@ -17,10 +17,10 @@ class HomePageApiView(APIView):
     """
 
     serializer_class = CourseSerializers
+    permission_classes = [AllowAny]
 
     def get(self, request):
-        courses = (Course.objects.select_related('professor__professor_image', 'category', 'image').
-            prefetch_related("course_discount").annotate(
+        courses = Course.objects.select_related('professor', "professor__professor_image", 'category', 'image').annotate(
             discount_amount=Subquery(
                 DiscountCourse.objects.filter(
                     course=OuterRef('pk'),
@@ -47,7 +47,7 @@ class HomePageApiView(APIView):
                 default=F('price'),
                 output_field=DecimalField()
             )
-        ))
+        )
 
         latest_courses = courses.order_by('-created_at')[:8]
 
