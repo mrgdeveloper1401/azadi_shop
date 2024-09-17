@@ -26,6 +26,11 @@ class CartItemAdmin(admin.ModelAdmin):
     search_fields = ['course__name']
     list_per_page = 20
 
+    def get_queryset(self, request):
+        q = super().get_queryset(request)
+        q = q.prefetch_related('cart__user')
+        return q
+
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
@@ -43,5 +48,10 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_filter = ['created_at']
     list_per_page = 20
     search_fields = ['course__name']
-    list_select_related = ['course', 'order']
+    # list_select_related = ['course', 'order']
     list_display_links = ['id', "course"]
+
+    def get_queryset(self, request):
+        q = super().get_queryset(request)
+        q = q.prefetch_related('course')
+        return q

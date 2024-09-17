@@ -15,8 +15,16 @@ class ProfessorAdmin(admin.ModelAdmin):
     list_filter = ['is_active', "created_at", "updated_at"]
     date_hierarchy = "created_at"
     list_display_links = ["first_name", "last_name"]
+    # list_select_related = ['professor_image', "professor_contact"]
 
 
 @admin.register(ProfessorContact)
 class ProfessorContactAdmin(admin.ModelAdmin):
-    pass
+    list_display = ['contact_name', "get_full_name", "contact_url", "email", "mobile_phone", "is_active"]
+    list_filter = ['is_active', "created_at", "updated_at"]
+    date_hierarchy = "created_at"
+
+    def get_queryset(self, request):
+        q = super().get_queryset(request)
+        q = q.prefetch_related('contact')
+        return q

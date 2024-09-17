@@ -31,6 +31,7 @@ class Cart(CreateMixin, UpdateMixin):
         return super().save(*args, **kwargs)
 
     class Meta:
+        ordering = ['-created_at']
         db_table = 'cart'
         verbose_name = _('cart')
         verbose_name_plural = _('carts')

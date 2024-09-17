@@ -58,6 +58,10 @@ class ProfessorContact(CreateMixin, UpdateMixin):
     def __str__(self):
         return self.contact_name
 
+    @property
+    def get_full_name(self):
+        return [i.get_full_name for i in self.contact.all()]
+
     class Meta:
         db_table = 'professor_contact'
         verbose_name = _("professor contact")

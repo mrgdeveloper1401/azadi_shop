@@ -2,6 +2,8 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
+from django.utils.timezone import now
+
 from shop.base import AUTH_USER_MODEL
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
@@ -69,6 +71,7 @@ class Course(CreateMixin, UpdateMixin):
 
     @property
     def final_price(self):
+        # discount = self.course_discount.filter(is_active=True, expired_date__gt=now())
         discount = self.course_discount.all()
         f = self.price
         for d in discount:
@@ -81,7 +84,6 @@ class DiscountCourse(models.Model):
                                limit_choices_to={"is_active": True})
 
     TYPE_CHOICES = (
-        ('بدون تخفیف', 'بدون تخفیف'),
         ('درصدی', 'درصدی'),
         ('مقدار', 'مقدار'),
     )
@@ -94,7 +96,8 @@ class DiscountCourse(models.Model):
 
     def calc_price(self, price):
         if self.discount_type == "درصدی":
-            return (price * self.value) / 100
+            calc_price = (price * self.value) / 100
+            return price - calc_price
         if self.discount_type == "مقدار":
             return price - self.value
         else:

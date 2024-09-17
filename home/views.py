@@ -1,90 +1,75 @@
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from courses.models import Course
-from rest_framework.permissions import AllowAny
-from rest_framework import status
-from courses.serializers import CourseSerializers
-from django.db.models import F, ExpressionWrapper, DecimalField, Case, When
 from django.utils import timezone
-from django.urls import reverse
-from rest_framework.test import APIRequestFactory
-
-
-class NewCourseApiView(APIView):
-    serializer_class = CourseSerializers
-    permission_classes = [AllowAny]
-
-    def get(self, request):
-        queryset = Course.objects.select_related('professor', 'category').order_by('-created_at')[:7]
-        ser_data = self.serializer_class(many=True, instance=queryset)
-        return Response(ser_data.data, status.HTTP_200_OK)
-
-
-class MoreSaleCourseApiView(APIView):
-    serializer_class = CourseSerializers
-    permission_classes = [AllowAny]
-
-    def get(self, request):
-        queryset = Course.objects.select_related('professor', 'category').order_by('-sales')[:7]
-        ser_data = self.serializer_class(many=True, instance=queryset)
-        return Response(ser_data.data, status.HTTP_200_OK)
-
-
-class AllTabCourseApiView(APIView):
-    serializers_classes = CourseSerializers
-    permission_classes = [AllowAny]
-
-    def get(self, request, format=None):
-        tab = request.query_params.get('tab', 'all')
-
-        if tab == 'پرفروش ترین':
-            courses = Course.objects.select_related('professor', 'category').order_by('-sales')  # پرفروش‌ترین‌ها
-        elif tab == 'جدیدترین':
-            courses = Course.objects.select_related('professor', 'category').order_by('-created_at')  # جدیدترین‌ها
-        elif tab == 'بیشترین تخفیف':
-            courses = Course.objects.annotate(discounted_price=ExpressionWrapper(
-                Case(
-                    When(course_discount__type='درصدی',
-                         then=F('price') - (F('price') * F('course_discount__value') / 100)),
-                    When(course_discount__type='مقدار', then=F('price') - F('course_discount__value')),
-                    default=F('price'),
-                    output_field=DecimalField()
-                ),
-                output_field=DecimalField()
-            )
-            ).filter(
-                course_discount__is_active=True,
-                course_discount__expired_date__gte=timezone.now()
-            ).order_by('-discounted_price')  # مرتب‌سازی بر اساس قیمت تخفیف‌خورده
-        else:
-            courses = Course.objects.select_related('professor', 'category').all()  # همه دوره‌ها
-
-        serializer = self.serializers_classes(courses, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+from django.db.models import OuterRef, Subquery, F, DecimalField, ExpressionWrapper, Case, When, Q
+from rest_framework.views import APIView
+from rest_framework.permissions import AllowAny
+from rest_framework.response import Response
+from rest_framework import status
+from courses.models import Course, DiscountCourse
+from courses.serializers import CourseSerializers
 
 
 class HomePageApiView(APIView):
+    """
+    ویو برای نمایش داده‌های صفحه اصلی شامل:
+    - جدیدترین دوره‌ها
+    - پرفروش‌ترین دوره‌ها
+    - تفکیک دوره‌ها براساس تب
+    """
+
+    serializer_class = CourseSerializers
     permission_classes = [AllowAny]
 
     def get(self, request):
-        factory = APIRequestFactory()
+        courses = Course.objects.select_related('user', 'category', 'image').annotate(
+            discount_amount=Subquery(
+                DiscountCourse.objects.filter(
+                    course=OuterRef('pk'),
+                    is_active=True,
+                    expired_date__gte=timezone.now()
+                ).order_by('-created_at').values('amount')[:1]
+            ),
+            discount_type=Subquery(
+                DiscountCourse.objects.filter(
+                    course=OuterRef('pk'),
+                    is_active=True,
+                    expired_date__gte=timezone.now()
+                ).order_by('-created_at').values('type')[:1]
+            ),
+            final_price=Case(
+                When(discount_type='درصدی', then=ExpressionWrapper(
+                    F('price') - (F('price') * F('discount_amount') / 100),
+                    output_field=DecimalField()
+                )),
+                When(discount_type='مقدار', then=ExpressionWrapper(
+                    F('price') - F('discount_amount'),
+                    output_field=DecimalField()
+                )),
+                default=F('price'),
+                output_field=DecimalField()
+            )
+        )
 
-        new_course_url = reverse('home:new_course')
-        new_course_request = factory.get(new_course_url)
-        new_course_response = NewCourseApiView.as_view()(new_course_request).data
+        latest_courses = courses.order_by('-created_at')[:8]
 
-        more_sale_course_url = reverse('home:more_sale_course')
-        more_sale_course_request = factory.get(more_sale_course_url)
-        more_sale_course_response = MoreSaleCourseApiView.as_view()(more_sale_course_request).data
+        most_sold_courses = courses.order_by('-sales')[:8]
 
-        all_course_url = reverse('home:all_tab_course')
-        all_course_request = factory.get(all_course_url)
-        all_course_response = AllTabCourseApiView.as_view()(all_course_request).data
+        tab = request.query_params.get('tab', 'all')
+
+        if tab == 'جدیدترین':
+            filtered_courses = latest_courses
+        elif tab == 'پرفروش‌ترین':
+            filtered_courses = most_sold_courses
+        elif tab == 'بیشترین تخفیف':
+            filtered_courses = courses.filter(
+                Q(discount_amount__isnull=False) & Q(discount_amount__gt=0)
+            ).order_by('-discount_amount')[:8]
+        else:
+            filtered_courses = courses
 
         result = {
-            'new_courses': new_course_response,
-            'most_sold_courses': more_sale_course_response,
-            'all_courses': all_course_response,
+            'latest_courses': self.serializer_class(latest_courses, many=True).data,
+            'most_sold_courses': self.serializer_class(most_sold_courses, many=True).data,
+            'filtered_courses': self.serializer_class(filtered_courses, many=True).data,
         }
 
         return Response(result, status=status.HTTP_200_OK)
