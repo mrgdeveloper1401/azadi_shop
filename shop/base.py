@@ -16,7 +16,7 @@ from shop.email_config import *
 from shop.kavenegar_config import *
 from shop.rest_framework_config import *
 from shop.uppercase_password_validator import UppercasePasswordValidator
-# from shop.celery import app
+# from shop.celery_config import *
 from shop.simple_jwt_config import SIMPLE_JWT
 from shop.liara_config import *
 
@@ -132,6 +132,8 @@ TIME_ZONE = 'Asia/Tehran'
 USE_I18N = True
 
 USE_TZ = True
+
+USE_L10N = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/

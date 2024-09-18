@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django_jalali.admin.filters import JDateFieldListFilter
 
 from orders.models import Cart, CartItem, Order, OrderItem
 
@@ -22,7 +23,7 @@ class CartAdmin(admin.ModelAdmin):
 @admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):
     list_display = ['id', 'cart', 'course', 'quantity', 'created_at']
-    list_filter = ['created_at']
+    list_filter = [('created_at', JDateFieldListFilter)]
     search_fields = ['course__name']
     list_per_page = 20
 
@@ -35,7 +36,7 @@ class CartItemAdmin(admin.ModelAdmin):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'payment_status', 'created_at']
-    list_filter = ['payment_status', 'created_at']
+    list_filter = ['payment_status', ('created_at', JDateFieldListFilter)]
     list_select_related = ['user']
     search_fields = ['user__mobile_phone']
     list_per_page = 20
@@ -45,7 +46,7 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ['id', 'course', 'order', 'created_at']
-    list_filter = ['created_at']
+    list_filter = [('created_at', JDateFieldListFilter)]
     list_per_page = 20
     search_fields = ['course__name']
     # list_select_related = ['course', 'order']

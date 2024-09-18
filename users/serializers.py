@@ -2,7 +2,6 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from django.utils.timezone import now, timedelta
 
 from users.models import UserAccount, Otp, UserInfo
 from users.validators import MobileValidator
@@ -105,8 +104,7 @@ class UserResendVerifyRegisterSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         # TODO send sms
-        return Otp.objects.create(user=validated_data['user'], code=generate_random_code(),
-                                  expired_at=now() + timedelta(minutes=2))
+        return Otp.objects.create(user=validated_data['user'], code=generate_random_code())
 
 
 class SendCodeMobilePhoneSerializer(serializers.Serializer):

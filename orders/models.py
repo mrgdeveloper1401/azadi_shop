@@ -1,11 +1,12 @@
 from django.db import models
-from django.utils import timezone
 from ulid import ULID
 from django.utils.translation import gettext_lazy as _
 
 from shop.base import AUTH_USER_MODEL
 from courses.models import Course
 from core.models import CreateMixin, UpdateMixin
+from core.datetime_config import now
+from datetime import datetime
 
 
 class Cart(CreateMixin, UpdateMixin):
@@ -19,7 +20,7 @@ class Cart(CreateMixin, UpdateMixin):
 
     @property
     def generate_ulid(self):
-        return str(ULID.from_datetime(timezone.now()))
+        return str(ULID.from_datetime(datetime.now()))
 
     @property
     def total_price(self):

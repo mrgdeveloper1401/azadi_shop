@@ -3,6 +3,7 @@ from drf_spectacular.utils import extend_schema_field
 
 from courses.models import Course, CourseCategory, Comment
 from professors.models import Professor
+from core.datetime_config import now
 
 
 class CreatCommentSerializer(serializers.ModelSerializer):
@@ -64,7 +65,7 @@ class CourseSerializers(serializers.ModelSerializer):
         return None
 
     def get_final_price(self, obj):
-        discounts = obj.course_discount.all()
+        discounts = obj.course_discount.filter(is_active=True, expired_date__gt=now)
         f = obj.price
         for d in discounts:
             f = d.calc_price(f)

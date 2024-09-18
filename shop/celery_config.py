@@ -1,8 +1,9 @@
-from __future__ import absolute_import, unicode_literals
 from celery import Celery
-
+from dotenv import load_dotenv
 from os import environ
-from shop.base import DEBUG
+
+load_dotenv()
+DEBUG = environ['DEBUG']
 
 if DEBUG:
     environ['DJANGO_SETTINGS_MODULE'] = 'shop.settings.development'
@@ -10,8 +11,9 @@ if not DEBUG:
     environ['DJANGO_SETTINGS_MODULE'] = 'shop.settings.production'
 
 app = Celery('shop')
-app.conf.enable_utc = False
-app.config_from_object('django.conf:settings', namespace='CELERY')
+app.conf.enable_utc = True
+
+app.config_from_object('shop.celery_config_redis')
 
 app.autodiscover_tasks()
 

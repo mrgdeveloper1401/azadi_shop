@@ -1,8 +1,7 @@
 from decimal import Decimal
-from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.utils.timezone import now
+from django_jalali.db.models import jDateTimeField
 
 from shop.base import AUTH_USER_MODEL
 from django.utils.text import slugify
@@ -12,6 +11,7 @@ from treebeard.mp_tree import MP_Node
 from core.models import CreateMixin, UpdateMixin
 from courses.managers import CategoryManager, CourseManager
 from courses.managers import DiscountManager
+from core.datetime_config import now
 
 
 class CourseCategory(MP_Node):
@@ -73,7 +73,7 @@ class Course(CreateMixin, UpdateMixin):
     @property
     def final_price(self):
         # discount = self.course_discount.filter(is_active=True, expired_date__gt=now())
-        discount = self.course_discount.all()
+        discount = self.course_discount.filter(is_active=True, expired_date__gt=now)
         f = self.price
         for d in discount:
             f = d.calc_price(f)
@@ -93,7 +93,7 @@ class DiscountCourse(CreateMixin, UpdateMixin):
     value = models.PositiveIntegerField()
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    expired_date = models.DateTimeField()
+    expired_date = jDateTimeField()
 
     objects = DiscountManager()
 
@@ -110,9 +110,9 @@ class DiscountCourse(CreateMixin, UpdateMixin):
             res = price
         return max(res, 0)
 
-    def clean(self):
-        if DiscountCourse.objects.filter(course=self.course).exists():
-            raise ValidationError({"course": _("course already exists")})
+    # def clean(self):
+    #     if DiscountCourse.objects.filter(course=self.course).exists():
+    #         raise ValidationError({"course": _("course already exists")})
 
     class Meta:
         db_table = "discount"

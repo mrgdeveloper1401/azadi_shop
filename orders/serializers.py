@@ -1,13 +1,12 @@
-from rest_framework.generics import get_object_or_404
 from rest_framework.serializers import ModelSerializer, IntegerField, ValidationError, Serializer, CharField
 from ulid import ULID
-from django.utils.timezone import now
 from django.db.transaction import atomic
 
 from users.models import UserAccount
 from courses.models import Course
 from orders.models import Cart, CartItem, OrderItem, Order
 from professors.models import Professor
+from core.datetime_config import now
 
 
 class SimpleUserSerializer(ModelSerializer):
@@ -109,7 +108,7 @@ class CreateOrderSerializer(Serializer):
         return data
 
     def generate_ulid(self):
-        return str(ULID.from_datetime(now()))
+        return str(ULID.from_datetime(now))
 
     def validate(self, attr):
         order = Order.objects.filter(user_id=self.context['user_id']).last()

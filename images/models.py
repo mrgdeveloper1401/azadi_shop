@@ -2,7 +2,6 @@ from django.db import models
 from hashlib import sha1
 from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from django.contrib.sessions.models import Session
 
 from core.models import CreateMixin, UpdateMixin
 
@@ -36,12 +35,17 @@ class Image(CreateMixin, UpdateMixin):
         self.file_hash = self.generate_hash
         self.file_size = self.image.size
         if Image.objects.filter(file_hash=self.file_hash).exists():
-            raise ValidationError("Image already exists")
+            raise ValidationError({"file_hash": _("image already exists")})
         super().save(*args, **kwargs)
 
     @property
     def image_url(self):
         return self.image.url
+
+    def clean(self):
+        if Image.objects.filter(file_hash=self.file_hash).exists():
+            raise ValidationError({"file_hash": _("image already exists")})
+        super().clean()
 
     class Meta:
         db_table = "image"

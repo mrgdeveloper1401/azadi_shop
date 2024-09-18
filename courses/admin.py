@@ -3,6 +3,7 @@ from courses.models import CourseCategory, Course, Comment, DiscountCourse
 from django.utils.translation import gettext_lazy as _
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
+from django_jalali.admin.filters import JDateFieldListFilter
 
 
 class SalesFilter(admin.SimpleListFilter):
@@ -72,7 +73,8 @@ class CategoryAdmin(TreeAdmin):
 class CourseAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "professor", "price", "final_price", "is_active", "is_free", "is_sale", "sale_number",
                     "created_at")
-    list_filter = ("created_at", "updated_at", "is_active", "is_free", "is_sale", SalesFilter)
+    list_filter = ("is_active", "is_free", "is_sale", SalesFilter,
+                   ("created_at", JDateFieldListFilter), ("updated_at", JDateFieldListFilter))
     list_editable = ("is_active",)
     date_hierarchy = "created_at"
     search_fields = ("name", "professor__get_full_name")
@@ -93,7 +95,7 @@ class CommentAdmin(admin.ModelAdmin):
     list_display = ("id", "user", "course", "rating", "public", "created_at")
     list_editable = ("public",)
     search_fields = ("user__mobile_phone", "course__name")
-    list_filter = ("created_at", "updated_at", RateFilter)
+    list_filter = (("created_at", JDateFieldListFilter), ("updated_at", JDateFieldListFilter), RateFilter)
     date_hierarchy = "created_at"
     list_select_related = ("user", "course")
     raw_id_fields = ['user', "course"]
@@ -106,7 +108,7 @@ class DiscountCourseAdmin(admin.ModelAdmin):
     list_display = ("course", "discount_type", "value", "is_active", "expired_date", "created_at")
     list_editable = ("is_active",)
     search_fields = ("course__name", "value")
-    list_filter = ("is_active", "expired_date", "created_at")
+    list_filter = ("is_active", ("created_at", JDateFieldListFilter), ("expired_date", JDateFieldListFilter))
     date_hierarchy = "created_at"
     raw_id_fields = ("course",)
     list_per_page = 20

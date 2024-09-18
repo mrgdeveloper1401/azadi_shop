@@ -1,9 +1,7 @@
-from django.utils.timezone import now
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.throttling import UserRateThrottle
 from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
 from rest_framework.viewsets import GenericViewSet
 from drf_spectacular.utils import extend_schema
@@ -14,6 +12,7 @@ from users.serializers import UserRegisterSerializer, UserVerifyRegisterSerializ
     ForgetPasswordConfirmSerializer, ProfileSerializer
 from users.models import UserInfo
 from users.permissions import IsOwnerProfile
+from core.datetime_config import now
 
 
 class UserRegistrationAPIView(APIView):
@@ -129,6 +128,6 @@ class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, Ge
         user.is_active = False
         user.is_verified = False
         user.is_deleted = True
-        user.deleted_at = now()
+        user.deleted_at = now
         user.save()
         return super().destroy(request, *args, **kwargs)
