@@ -1,0 +1,17 @@
+from os import environ
+from dotenv import load_dotenv
+
+load_dotenv()
+
+# S3 Settings
+LIARA_ENDPOINT = environ.get("LIARA_ENDPOINT")
+LIARA_BUCKET_NAME = environ.get("LIARA_BUCKET_NAME")
+LIARA_ACCESS_KEY = environ.get("LIARA_ACCESS_KEY")
+LIARA_SECRET_KEY = environ.get("LIARA_SECRET_KEY")
+
+# S3 Settings Based on AWS (optional)
+AWS_ACCESS_KEY_ID = LIARA_ACCESS_KEY
+AWS_SECRET_ACCESS_KEY = LIARA_SECRET_KEY
+AWS_STORAGE_BUCKET_NAME = LIARA_BUCKET_NAME
+AWS_S3_ENDPOINT_URL = LIARA_ENDPOINT
+AWS_S3_REGION_NAME = 'us-east-1'

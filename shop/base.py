@@ -18,6 +18,7 @@ from shop.rest_framework_config import *
 from shop.uppercase_password_validator import UppercasePasswordValidator
 # from shop.celery import app
 from shop.simple_jwt_config import SIMPLE_JWT
+from shop.liara_config import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -186,3 +187,12 @@ CACHES = {
     }
 }
 
+# Django-storages configuration
+STORAGES = {
+  "default": {
+      "BACKEND": "storages.backends.s3.S3Storage",
+  },
+  "staticfiles": {
+      "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+  },
+}

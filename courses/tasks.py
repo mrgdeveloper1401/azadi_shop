@@ -1,5 +1,7 @@
 from celery import shared_task
 from django.utils import timezone
+from django_celery_beat.models import PeriodicTask, IntervalSchedule
+
 from .models import DiscountCourse
 
 
