@@ -30,10 +30,10 @@ class UserManager(BaseUserManager):
 
 class OtpManager(Manager):
     def delete_otp(self):
-        return self.filter(expired_at__lt=now).delete()
+        return self.filter(expired_at__lt=now()).delete()
 
     def create_otp(self, user):
         otp = self.model(user=user)
-        otp.expired_at = after_two_minute
+        otp.expired_at = after_two_minute()
         otp.save(using=self._db)
         return otp

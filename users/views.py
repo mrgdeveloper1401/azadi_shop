@@ -128,6 +128,6 @@ class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, Ge
         user.is_active = False
         user.is_verified = False
         user.is_deleted = True
-        user.deleted_at = now
+        user.deleted_at = now()
         user.save()
         return super().destroy(request, *args, **kwargs)

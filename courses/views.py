@@ -2,6 +2,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.exceptions import NotAcceptable
+from django.db.models import Case, When, F, DecimalField, Value
 
 from courses.permissions import IsOwner
 from courses.paginations import CoursePagination
@@ -26,8 +27,20 @@ class CategoryViewSet(ReadOnlyModelViewSet):
 
 class CourseViewSet(ReadOnlyModelViewSet):
     serializer_class = CourseSerializers
-    queryset = (Course.objects.is_active().select_related('professor__professor_image', "category", "image").
-                prefetch_related("course_discount"))
+    queryset = (Course.objects.is_active()
+    .select_related('professor__professor_image', 'category', 'image')
+    .prefetch_related('course_discount')
+    .annotate(
+        discount_value=Case(
+            When(course_discount__discount_type='درصدی',
+                 then=(F('price') * F('course_discount__value') / Value(100))),
+            When(course_discount__discount_type='مقدار',
+                 then=F('course_discount__value')),
+            default=Value(0),
+            output_field=DecimalField(),
+        ),
+        final_price=F('price') - F('discount_value')
+    ))
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = CourseFilter
     search_fields = ['name']

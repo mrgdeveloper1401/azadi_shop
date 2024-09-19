@@ -25,7 +25,7 @@ class UserAccount(AbstractUser, SoftDeleteMixin):
             "Unselect this instead of deleting accounts."
         ),
     )
-    date_joined = jDateTimeField(_("date joined"), auto_now_add=True)
+    date_joined = jDateTimeField(_("date joined"), default=now())
     last_login = jDateTimeField(_("last login"), blank=True, null=True)
     USERNAME_FIELD = 'mobile_phone'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
@@ -49,7 +49,7 @@ class UserAccount(AbstractUser, SoftDeleteMixin):
         self.is_superuser = False
         self.is_staff = False
         self.is_deleted = True
-        self.deleted_at = now
+        self.deleted_at = now()
         return super().save(*args, **kwargs)
 
     class Meta:
@@ -108,7 +108,7 @@ class UserInfo(CreateMixin, UpdateMixin):
         self.user.is_active = False
         self.user.is_staff = False
         self.user.is_superuser = False
-        self.user.deleted_at = now
+        self.user.deleted_at = now()
         self.user.is_deleted = True
         self.user.is_verified = False
         self.user.save()
@@ -126,7 +126,7 @@ class Otp(CreateMixin):
         return self.user.mobile_phone
 
     def is_expired(self):
-        return now > self.expired_at
+        return now() > self.expired_at
 
     def delete_if_expired(self):
         if self.is_expired():
@@ -146,7 +146,7 @@ class Otp(CreateMixin):
         super().clean()
 
     def save(self, *args, **kwargs):
-        self.expired_at = after_two_minute
+        self.expired_at = after_two_minute()
         return super().save(*args, **kwargs)
 
     class Meta:

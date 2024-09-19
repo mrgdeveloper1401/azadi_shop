@@ -10,4 +10,4 @@ from users.random_code import generate_random_code
 def create_user_related_info(sender, instance, created, **kwargs):
     if created:
         UserInfo.objects.create(user=instance)
-        Otp.objects.create(user=instance, code=generate_random_code(), expired_at=after_two_minute)
+        Otp.objects.create(user=instance, code=generate_random_code())

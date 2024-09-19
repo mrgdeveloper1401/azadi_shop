@@ -71,7 +71,7 @@ class CategoryAdmin(TreeAdmin):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "professor", "price", "final_price", "is_active", "is_free", "is_sale", "sale_number",
+    list_display = ("id", "name", "professor", "price", "calc_final_price", "is_active", "is_free", "is_sale", "sale_number",
                     "created_at")
     list_filter = ("is_active", "is_free", "is_sale", SalesFilter,
                    ("created_at", JDateFieldListFilter), ("updated_at", JDateFieldListFilter))
@@ -83,6 +83,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_display_links = ("id", "name")
     raw_id_fields = ("professor", "category", "image")
     list_select_related = ("professor", "category")
+    readonly_fields = ['created_at']
 
     def get_queryset(self, request):
         q = super().get_queryset(request)

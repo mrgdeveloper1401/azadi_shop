@@ -6,7 +6,7 @@ from users.models import UserAccount
 from courses.models import Course
 from orders.models import Cart, CartItem, OrderItem, Order
 from professors.models import Professor
-from core.datetime_config import now
+from datetime import datetime
 
 
 class SimpleUserSerializer(ModelSerializer):
@@ -108,7 +108,7 @@ class CreateOrderSerializer(Serializer):
         return data
 
     def generate_ulid(self):
-        return str(ULID.from_datetime(now))
+        return str(ULID.from_datetime(datetime.now()))
 
     def validate(self, attr):
         order = Order.objects.filter(user_id=self.context['user_id']).last()

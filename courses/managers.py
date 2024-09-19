@@ -16,4 +16,4 @@ class CourseManager(Manager):
 
 class DiscountManager(Manager):
     def delete_discount(self):
-        return self.filter(expired_date__lt=now).delete()
+        return self.filter(expired_date__lt=now()).delete()

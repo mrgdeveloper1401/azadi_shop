@@ -77,7 +77,7 @@ class UserInfoAdmin(admin.ModelAdmin):
     list_select_related = ['user']
     search_fields = ['user__mobile_phone']
     list_max_show_all = 30
-    list_filter = [IsActiveUserInfo]
+    list_filter = [IsActiveUserInfo, ("get_deleted_at", JDateFieldListFilter)]
 
 
 @admin.register(Otp)
@@ -85,4 +85,4 @@ class OtpAdmin(admin.ModelAdmin):
     list_display = ['user', 'id', 'code', 'created_at', 'expired_at']
     list_select_related = ['user']
     search_fields = ['user__mobile_phone']
-    list_filter = [("created_at", JDateFieldListFilter)]
+    list_filter = [("created_at", JDateFieldListFilter), ("expired_at", JDateFieldListFilter)]

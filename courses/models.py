@@ -67,17 +67,22 @@ class Course(CreateMixin, UpdateMixin):
     def show_image_url(self):
         return self.image.image.url
 
+    @property
+    def calc_final_price(self):
+        discounts = self.course_discount.filter(is_active=True, expired_date__gt=now())
+        final_price = self.price
+        if discounts.exists():
+            for d in discounts:
+                if d.discount_type == 'درصدی':
+                    f = (d.value * self.price) / 100
+                else:
+                    f = self.price - d.value
+                return max(f, 0)
+        else:
+            return final_price
+
     def __str__(self):
         return self.name
-
-    @property
-    def final_price(self):
-        # discount = self.course_discount.filter(is_active=True, expired_date__gt=now())
-        discount = self.course_discount.filter(is_active=True, expired_date__gt=now)
-        f = self.price
-        for d in discount:
-            f = d.calc_price(f)
-        return f
 
 
 class DiscountCourse(CreateMixin, UpdateMixin):
@@ -99,16 +104,6 @@ class DiscountCourse(CreateMixin, UpdateMixin):
 
     def __str__(self):
         return self.course.name
-
-    def calc_price(self, price):
-        if self.discount_type == "درصدی":
-            calc_price = (price * self.value) / 100
-            return price - calc_price
-        if self.discount_type == "مقدار":
-            return price - self.value
-        else:
-            res = price
-        return max(res, 0)
 
     # def clean(self):
     #     if DiscountCourse.objects.filter(course=self.course).exists():

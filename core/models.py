@@ -2,10 +2,12 @@ from django.db import models
 from django_jalali.db.models import jDateTimeField
 from jdatetime import datetime
 
+from core.datetime_config import now
+
 
 # Create your models here.
 class CreateMixin(models.Model):
-    created_at = jDateTimeField(auto_now_add=True)
+    created_at = jDateTimeField(default=now())
 
     class Meta:
         abstract = True

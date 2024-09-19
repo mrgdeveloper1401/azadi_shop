@@ -1,10 +1,10 @@
 from jdatetime import datetime, timedelta
 from pytz import timezone
 
-now = datetime.now(timezone('Asia/Tehran'))
-after_two_minute = now + timedelta(minutes=2)
+
+def now():
+    return datetime.now(timezone('Asia/Tehran'))
 
 
-if __name__ == "__main__":
-    print(now)
-    print(after_two_minute)
+def after_two_minute():
+    return datetime.now() + timedelta(minutes=2)

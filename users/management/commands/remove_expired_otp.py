@@ -8,5 +8,5 @@ class Command(BaseCommand):
     help = 'Remove expired OTPs'
 
     def handle(self, *args, **options):
-        expire_otp = Otp.objects.filter(expired_at__lt=now).delete()
+        expire_otp = Otp.objects.filter(expired_at__lt=now()).delete()
         self.stdout.write(self.style.SUCCESS(f'Successfully removed {expire_otp} expired OTPs'))

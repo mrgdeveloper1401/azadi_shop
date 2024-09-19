@@ -8,6 +8,6 @@ class Command(BaseCommand):
     help = 'Remove expired discounts'
 
     def handle(self, *args, **options):
-        expire_discount = DiscountCourse.objects.filter(expired_date__lt=now).delete()
+        expire_discount = DiscountCourse.objects.filter(expired_date__lt=now()).delete()
         self.stdout.write(self.style.SUCCESS(f'Successfully removed {expire_discount} expired discounts'))
 
