@@ -6,6 +6,7 @@ from rest_framework.routers import DefaultRouter
 
 from users.views import UserRegistrationAPIView, UserVerifyRegisterCodeAPIView, OtpResendAPIView, SendCodeMobileApiView, \
     VerifyCodeMobileApiview, ResetPasswordAPIView, ForgetPasswordApiView, ForgetPasswordConfirmAPIView, ProfileViewSet
+# from users.tasks import schedule_otp
 
 app_name = "users"
 router = DefaultRouter()
@@ -24,5 +25,6 @@ urlpatterns = [
     path('jwt/verify/', token_verify, name='user_verify_token'),
     path('api/token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),
     # path("contact_us/", Contact_UsAPIView.as_view(), name="user_contact_us"),
+    # path('delete_otp_code/', schedule_otp, name='delete_otp'),
     path('', include(router.urls)),
 ]

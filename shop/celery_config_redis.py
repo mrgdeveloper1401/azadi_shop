@@ -9,4 +9,5 @@ timezone = 'Asia/Tehran'
 result_expires = 120
 task_always_eager = False
 worker_prefetch_multiplier = 1
-
+broker_connection_retry_on_startup = True
+enable_utc = True

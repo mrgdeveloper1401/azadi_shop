@@ -27,8 +27,7 @@ class CategoryViewSet(ReadOnlyModelViewSet):
 
 class CourseViewSet(ReadOnlyModelViewSet):
     serializer_class = CourseSerializers
-    queryset = (Course.objects.is_active()
-    .select_related('professor__professor_image', 'category', 'image')
+    queryset = (Course.objects.is_active().select_related('professor__professor_image', 'category', 'image')
     .prefetch_related('course_discount')
     .annotate(
         discount_value=Case(

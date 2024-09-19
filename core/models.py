@@ -7,7 +7,7 @@ from core.datetime_config import now
 
 # Create your models here.
 class CreateMixin(models.Model):
-    created_at = jDateTimeField(default=now())
+    created_at = jDateTimeField(auto_now_add=True)
 
     class Meta:
         abstract = True

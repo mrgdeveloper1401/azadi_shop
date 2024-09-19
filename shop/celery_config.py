@@ -2,6 +2,8 @@ from celery import Celery
 from dotenv import load_dotenv
 from os import environ
 
+from shop import base
+
 load_dotenv()
 DEBUG = environ['DEBUG']
 
@@ -11,7 +13,7 @@ if not DEBUG:
     environ['DJANGO_SETTINGS_MODULE'] = 'shop.settings.production'
 
 app = Celery('shop')
-app.conf.enable_utc = True
+
 
 app.config_from_object('shop.celery_config_redis')
 
