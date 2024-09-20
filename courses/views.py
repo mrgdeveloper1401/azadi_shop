@@ -36,8 +36,8 @@ class CourseViewSet(ReadOnlyModelViewSet):
     lookup_field = 'slug'
 
     def get_queryset(self):
-        queryset = Course.objects.is_active().select_related('professor__professor_image', 'category', 'image') \
-            .prefetch_related('course_discount') \
+        queryset = Course.objects.is_active().select_related('professor__professor_image', 'image') \
+            .prefetch_related('course_discount', "category") \
             .annotate(
             discount_value=Case(
                 When(course_discount__discount_type='درصدی',

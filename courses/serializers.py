@@ -51,23 +51,13 @@ class SimpleCategorySerializer(serializers.ModelSerializer):
 
 class CourseSerializers(serializers.ModelSerializer):
     professor = SimpleProfessorSerializer()
-    # course_image = serializers.SerializerMethodField()
-    category = SimpleCategorySerializer()
+    category = SimpleCategorySerializer(many=True)
     final_price = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
     discount_value = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
 
     class Meta:
         model = Course
         fields = '__all__'
-        # extra_fields = ['final_price', "discount_value"]
-
-    # def get_course_image(self, obj):
-    #     if obj.image:
-    #         return obj.image.image_url
-    #     return None
-
-    # def get_final_price(self, obj):
-    #     return obj.calc_final_price
 
 
 class CategorySerializers(serializers.ModelSerializer):

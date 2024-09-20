@@ -39,7 +39,7 @@ class CourseCategory(MP_Node):
 class Course(CreateMixin, UpdateMixin):
     professor = models.ForeignKey('professors.Professor', related_name="professor_course", on_delete=models.PROTECT,
                                   limit_choices_to={"is_active": True, })
-    category = models.ForeignKey(CourseCategory, related_name="category_course", on_delete=models.PROTECT)
+    category = models.ManyToManyField(CourseCategory, related_name="category_course")
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, max_length=255, allow_unicode=True)
     description = models.TextField(blank=True, null=True)
