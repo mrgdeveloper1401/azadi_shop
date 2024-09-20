@@ -1,12 +1,15 @@
+from decimal import Decimal
+
 from rest_framework.serializers import ModelSerializer, IntegerField, ValidationError, Serializer, CharField
 from ulid import ULID
 from django.db.transaction import atomic
+from datetime import datetime
+from django.utils.translation import gettext_lazy as _
 
 from users.models import UserAccount
 from courses.models import Course
 from orders.models import Cart, CartItem, OrderItem, Order
 from professors.models import Professor
-from datetime import datetime
 
 
 class SimpleUserSerializer(ModelSerializer):
@@ -24,10 +27,12 @@ class SimpleProfessorSerializer(ModelSerializer):
 class CourseCartItemSerialize(ModelSerializer):
     """it is shows field of the course"""
     professor = SimpleProfessorSerializer()
+    # final_price = DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    # discount_value = DecimalField(max_digits=12, decimal_places=2, read_only=True)
 
     class Meta:
         model = Course
-        fields = ['id', 'name', "professor", 'price', "image"]
+        fields = ['id', 'name', "professor", 'price', "calc_final_price", "show_image_url"]
 
 
 class CartItemSerializer(ModelSerializer):
@@ -63,8 +68,13 @@ class AddCartItemSerializer(ModelSerializer):
         return self.instance
 
     def validate_course_id(self, data):
+        course = Course.objects.get(pk=data)
         if not Course.objects.filter(pk=data).exists():
             raise ValidationError('course not found')
+        elif not course.is_sale:
+            raise ValidationError("course is unavailable")
+        elif course.price or course.calc_final_price == Decimal('0.00'):
+            raise ValidationError("course is free")
         return data
 
 
@@ -128,7 +138,7 @@ class CreateOrderSerializer(Serializer):
                     order=order,
                     course=item.course,
                     quantity=item.quantity,
-                    price=item.course.final_price
+                    price=item.course.price
                 )
                 for item in cart_item
             ]

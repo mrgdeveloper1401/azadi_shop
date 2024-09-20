@@ -13,7 +13,8 @@ from orders.permissions import IsOwner, IsOwnerCartItem
 
 class CartViewSet(CreateModelMixin, ListModelMixin, RetrieveModelMixin, GenericViewSet):
     queryset = Cart.objects.prefetch_related('cart_item', 'cart_item__course', "cart_item__course__professor",
-                                             "cart_item__course__image", "cart_item__course__course_discount")
+                                             "cart_item__course__image", "cart_item__course__course_discount"). \
+        select_related("user")
     serializer_class = CartSerializer
     permission_classes = [IsOwner]
 

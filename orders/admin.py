@@ -4,6 +4,12 @@ from django_jalali.admin.filters import JDateFieldListFilter
 from orders.models import Cart, CartItem, Order, OrderItem
 
 
+# inline
+class OrderItemInline(admin.TabularInline):
+    model = OrderItem
+    extra = 1
+
+
 # Register your models here.
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
@@ -37,10 +43,15 @@ class CartItemAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'payment_status', 'created_at']
     list_filter = ['payment_status', ('created_at', JDateFieldListFilter)]
-    list_select_related = ['user']
     search_fields = ['user__mobile_phone']
     list_per_page = 20
     list_display_links = ['id', "user"]
+    inlines = [OrderItemInline]
+
+    def get_queryset(self, request):
+        q = super().get_queryset(request)
+        q = q.prefetch_related('order_item').select_related('user')
+        return q
 
 
 @admin.register(OrderItem)

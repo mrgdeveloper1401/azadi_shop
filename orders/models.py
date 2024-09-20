@@ -5,7 +5,6 @@ from django.utils.translation import gettext_lazy as _
 from shop.base import AUTH_USER_MODEL
 from courses.models import Course
 from core.models import CreateMixin, UpdateMixin
-from core.datetime_config import now
 from datetime import datetime
 
 
@@ -49,7 +48,7 @@ class CartItem(CreateMixin):
 
     @property
     def item_price(self):
-        price = self.course.price * self.quantity
+        price = self.course.calc_final_price * self.quantity
         return price
 
     class Meta:
@@ -76,7 +75,7 @@ class Order(CreateMixin):
 
     @property
     def order_total_price(self):
-        price = [i.quantity * i.price for i in self.order_item.all()]
+        price = [i.get_cost for i in self.order_item.all()]
         return sum(price)
 
     class Meta:
@@ -94,6 +93,10 @@ class OrderItem(CreateMixin):
 
     def __str__(self):
         return f'{self.order} {self.course} {self.quantity}'
+
+    @property
+    def get_cost(self):
+        return self.course.calc_final_price * self.quantity
 
     class Meta:
         db_table = 'order_item'
