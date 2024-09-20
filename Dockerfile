@@ -20,7 +20,8 @@ RUN apk update && \
     apk add linux-headers && \
     apk add libjpeg && \
     apk add zlib-dev && \
-    apk add libxml2
+    apk add libxml2 && \
+    apk add supervisor
 
 RUN adduser --disabled-password --no-create-home azadi
 RUN pip install --upgrade pip

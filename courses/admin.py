@@ -67,6 +67,7 @@ class CategoryAdmin(TreeAdmin):
     list_display = ['name', "is_public"]
     list_per_page = 30
     search_fields = ['name']
+    prepopulated_fields = {"slug": ("name",)}
 
 
 @admin.register(Course)

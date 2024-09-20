@@ -27,7 +27,7 @@ class CourseCartItemSerialize(ModelSerializer):
 
     class Meta:
         model = Course
-        fields = ['id', 'name', "professor", 'price', "final_price", 'show_image_url']
+        fields = ['id', 'name', "professor", 'price', "image"]
 
 
 class CartItemSerializer(ModelSerializer):

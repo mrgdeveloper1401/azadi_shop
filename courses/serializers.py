@@ -22,7 +22,7 @@ class CommentSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Comment
-        fields = ['id', 'user', 'course', "rating", 'body', 'created_at', 'updated_at', 'public']
+        fields = "__all__"
 
 
 class UpdateCommentSerializer(serializers.ModelSerializer):
@@ -51,7 +51,7 @@ class SimpleCategorySerializer(serializers.ModelSerializer):
 
 class CourseSerializers(serializers.ModelSerializer):
     professor = SimpleProfessorSerializer()
-    course_image = serializers.SerializerMethodField()
+    # course_image = serializers.SerializerMethodField()
     category = SimpleCategorySerializer()
     final_price = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
     discount_value = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
@@ -59,12 +59,12 @@ class CourseSerializers(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = '__all__'
-        extra_fields = ['final_price', "discount_value"]
+        # extra_fields = ['final_price', "discount_value"]
 
-    def get_course_image(self, obj):
-        if obj.image:
-            return obj.image.image_url
-        return None
+    # def get_course_image(self, obj):
+    #     if obj.image:
+    #         return obj.image.image_url
+    #     return None
 
     # def get_final_price(self, obj):
     #     return obj.calc_final_price

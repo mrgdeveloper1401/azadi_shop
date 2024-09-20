@@ -1,3 +1,4 @@
+from _ast import alias
 from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -19,8 +20,12 @@ class CourseCategory(MP_Node):
     icon = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name='image_category',
                              blank=True, null=True)
     is_public = models.BooleanField(default=True)
-
+    slug = models.SlugField(max_length=200, allow_unicode=True, unique=True)
     objects = CategoryManager()
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name, allow_unicode=True)
+        return super().save(*args, **kwargs)
 
     class Meta:
         db_table = "category"
@@ -126,6 +131,7 @@ class Comment(CreateMixin, UpdateMixin):
     rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True,
                                               null=True,
                                               help_text=_("Enter a score of 1 to 5"))
+    admin_response = models.TextField(blank=True, null=True)
 
     def __str__(self) -> str:
         return f"{self.user} - {self.course.name} - {self.body[:20]}"

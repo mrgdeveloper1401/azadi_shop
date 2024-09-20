@@ -14,6 +14,7 @@ from courses.filters import CourseFilter
 
 class CategoryViewSet(ReadOnlyModelViewSet):
     queryset = CourseCategory.objects.is_publish().select_related("icon")
+    lookup_field = 'slug'
 
     def get_serializer_class(self):
         match self.action:
@@ -27,25 +28,32 @@ class CategoryViewSet(ReadOnlyModelViewSet):
 
 class CourseViewSet(ReadOnlyModelViewSet):
     serializer_class = CourseSerializers
-    queryset = (Course.objects.is_active().select_related('professor__professor_image', 'category', 'image')
-    .prefetch_related('course_discount')
-    .annotate(
-        discount_value=Case(
-            When(course_discount__discount_type='درصدی',
-                 then=(F('price') * F('course_discount__value') / Value(100))),
-            When(course_discount__discount_type='مقدار',
-                 then=F('course_discount__value')),
-            default=Value(0),
-            output_field=DecimalField(),
-        ),
-        final_price=F('price') - F('discount_value')
-    ))
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     filterset_class = CourseFilter
     search_fields = ['name']
     ordering_fields = ['created_at', "updated_at", "sale_number"]
     pagination_class = CoursePagination
     lookup_field = 'slug'
+
+    def get_queryset(self):
+        queryset = Course.objects.is_active().select_related('professor__professor_image', 'category', 'image') \
+            .prefetch_related('course_discount') \
+            .annotate(
+            discount_value=Case(
+                When(course_discount__discount_type='درصدی',
+                     then=(F('price') * F('course_discount__value') / Value(100))),
+                When(course_discount__discount_type='مقدار',
+                     then=F('course_discount__value')),
+                default=Value(0),
+                output_field=DecimalField(),
+            ),
+            final_price=F('price') - F('discount_value')
+        )
+
+        if 'category_slug' in self.kwargs:
+            queryset = queryset.filter(category__slug=self.kwargs['category_slug'])
+
+        return queryset
 
 
 class CommentViewSet(ModelViewSet):
