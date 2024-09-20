@@ -89,7 +89,7 @@ class Migration(migrations.Migration):
                         ],
                         default="pending",
                         max_length=8,
-                        verbose_name="payment status",
+                        verbose_name="payments status",
                     ),
                 ),
             ],

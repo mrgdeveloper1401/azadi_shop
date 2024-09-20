@@ -31,7 +31,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path("auth/", include("users.urls", namespace="users")),
     path("course/", include("courses.urls", namespace="course")),
-    # path("payment/", include("payment.urls", namespace="payment")),
+    path("payments/", include("payments.urls", namespace="payments")),
     path("orders/", include("orders.urls", namespace="orders")),
     # path('', include("home.urls", namespace="home")),
     # path('business/', include("business.urls", namespace="business")),

@@ -67,7 +67,7 @@ class Order(CreateMixin):
         complete = 'complete', _('Complete')
         failed = 'failed', _('Failed')
 
-    payment_status = models.CharField(_("payment status"), max_length=8, choices=PaymentStatus.choices,
+    payment_status = models.CharField(_("payments status"), max_length=8, choices=PaymentStatus.choices,
                                       default=PaymentStatus.pending)
 
     def __str__(self):
