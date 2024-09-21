@@ -43,7 +43,7 @@ class Course(CreateMixin, UpdateMixin):
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, max_length=255, allow_unicode=True)
     description = models.TextField(blank=True, null=True)
-    price = models.DecimalField(decimal_places=2, max_digits=12, validators=[MinValueValidator(Decimal(0))],)
+    price = models.DecimalField(decimal_places=2, max_digits=12, validators=[MinValueValidator(Decimal(0))], )
     video = models.FileField(upload_to='videos/%Y/%m/%d', blank=True, null=True)
     image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name="course_image",
                               blank=True, null=True)
@@ -53,7 +53,7 @@ class Course(CreateMixin, UpdateMixin):
                                               "can't"))
     is_free = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
-
+    total_like = models.PositiveIntegerField(default=0)
     objects = CourseManager()
 
     class Meta:
@@ -140,3 +140,20 @@ class Comment(CreateMixin, UpdateMixin):
         db_table = 'comment'
         verbose_name = _('comment')
         verbose_name_plural = _("comments")
+
+
+class Like(CreateMixin, UpdateMixin):
+    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='user_like',
+                             limit_choices_to={'is_active': True, "is_verified": True})
+    course = models.ForeignKey(Course, on_delete=models.PROTECT, related_name='course_like',
+                               limit_choices_to={'is_active': True})
+    dislike = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.user.mobile_phone} {self.course.name}"
+
+    class Meta:
+        db_table = 'like'
+        verbose_name = _('like')
+        verbose_name_plural = _("likes")
+        unique_together = (("user", "course"),)

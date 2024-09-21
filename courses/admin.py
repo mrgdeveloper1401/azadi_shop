@@ -1,5 +1,5 @@
 from django.contrib import admin
-from courses.models import CourseCategory, Course, Comment, DiscountCourse
+from courses.models import CourseCategory, Course, Comment, DiscountCourse, Like
 from django.utils.translation import gettext_lazy as _
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
@@ -73,10 +73,10 @@ class CategoryAdmin(TreeAdmin):
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "professor", "price", "calc_final_price", "is_active", "is_free", "is_sale",
-                    "sale_number", "created_at")
+                    "sale_number", "created_at", "total_like")
     list_filter = ("is_active", "is_free", "is_sale", SalesFilter,
                    ("created_at", JDateFieldListFilter), ("updated_at", JDateFieldListFilter))
-    list_editable = ("is_active",)
+    list_editable = ("is_active", "total_like")
     date_hierarchy = "created_at"
     search_fields = ("name", "professor__get_full_name")
     prepopulated_fields = {"slug": ("name",)}
@@ -115,3 +115,13 @@ class DiscountCourseAdmin(admin.ModelAdmin):
     date_hierarchy = "created_at"
     raw_id_fields = ("course",)
     list_per_page = 20
+
+
+@admin.register(Like)
+class LikeAdmin(admin.ModelAdmin):
+    list_display = ['user', "course", "created_at", "dislike"]
+    list_filter = ['created_at']
+    date_hierarchy = "created_at"
+    list_per_page = 30
+    list_select_related = ("user", "course")
+    list_editable = ['dislike']
