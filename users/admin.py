@@ -67,8 +67,16 @@ class UserAdmin(BaseUserAdmin):
         "groups",
         "user_permissions",
     )
-    readonly_fields = ['deleted_at', "date_joined"]
+    readonly_fields = ['deleted_at', "last_login", "date_joined"]
     list_display_links = ['id', "mobile_phone", "email"]
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        is_super = request.user.is_superuser
+        if not is_super:
+            form.base_fields['is_superuser'].disabled = True
+            form.base_fields['is_deleted'].disabled = True
+        return form
 
 
 @admin.register(UserInfo)

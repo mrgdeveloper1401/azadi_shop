@@ -41,6 +41,7 @@ THIRD_PARTY_APPS = [
     "professors.apps.ProfessorsConfig",
     'payments.apps.PaymentsConfig',
     "main_settings.apps.MainSettingsConfig",
+    # "coupons.apps.CouponsConfig",
 ]
 
 THIRD_PARTY_PACKAGE = [

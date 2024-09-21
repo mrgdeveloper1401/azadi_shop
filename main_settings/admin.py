@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.gis.admin import GISModelAdmin
 
 from main_settings.models import HeaderSite, SiteLogo, FooterAddress, Footer, FooterSocial, AboutUs, Awards, Newsletter \
-    , ProfessorImages, ContactUs, Services, Slider, TopRank
+    , SliderProfessorImages, ContactUs, Services, Slider, TopRankStudent
 
 
 # inline
@@ -47,7 +47,7 @@ class NewsletterAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(ProfessorImages)
+@admin.register(SliderProfessorImages)
 class ProfessorImagesAdmin(admin.ModelAdmin):
     filter_horizontal = ['professor_image']
 
@@ -69,7 +69,7 @@ class SliderAdmin(admin.ModelAdmin):
     list_filter = ['is_active', "created_at", "updated_at"]
 
 
-@admin.register(TopRank)
+@admin.register(TopRankStudent)
 class TopRankAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
     list_filter = ['is_active', "created_at", "updated_at"]

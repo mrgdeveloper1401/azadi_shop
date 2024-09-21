@@ -29,12 +29,11 @@ admin_url = [
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("auth/", include("users.urls", namespace="users")),
-    path("course/", include("courses.urls", namespace="course")),
-    path("payments/", include("payments.urls", namespace="payments")),
-    path("orders/", include("orders.urls", namespace="orders")),
-    # path('', include("home.urls", namespace="home")),
-    # path('business/', include("business.urls", namespace="business")),
+    path("api_auth/", include("users.urls", namespace="users")),
+    path("api_course/", include("courses.urls", namespace="course")),
+    path("api_payment/", include("payments.urls", namespace="payments")),
+    path("api_order/", include("orders.urls", namespace="orders")),
+    path('api_main_settings/', include('main_settings.urls', namespace='main_settings')),
 
     # swagger ui
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

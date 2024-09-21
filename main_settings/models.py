@@ -1,3 +1,5 @@
+from enum import property
+
 from django.db import models
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
@@ -36,7 +38,7 @@ class SiteLogo(CreateMixin, UpdateMixin):
 class Slider(CreateMixin, UpdateMixin):
     title = models.CharField(_("title"), max_length=100, unique=True)
     slug = models.SlugField(_("slug"), unique=True, allow_unicode=True)
-    slider_image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name='slider_image')
+    slider_image = models.ManyToManyField('images.Image', related_name='slider_image')
     is_active = models.BooleanField(_("is active"), default=True)
 
     def __str__(self):
@@ -95,7 +97,7 @@ class ContactUs(CreateMixin, UpdateMixin):
         verbose_name_plural = _("contact us")
 
 
-class ProfessorImages(CreateMixin, UpdateMixin):
+class SliderProfessorImages(CreateMixin, UpdateMixin):
     professor_image = models.ManyToManyField('images.Image', related_name='professor_images')
     is_active = models.BooleanField(_("is active"), default=True)
 
@@ -108,7 +110,7 @@ class ProfessorImages(CreateMixin, UpdateMixin):
         verbose_name_plural = _("professor images")
 
 
-class TopRank(CreateMixin, UpdateMixin):
+class TopRankStudent(CreateMixin, UpdateMixin):
     slug = models.SlugField(_("slug"), unique=True, allow_unicode=True)
     first_name = models.CharField(_("first name"), max_length=150)
     last_name = models.CharField(_("last name"), max_length=150)
@@ -168,7 +170,11 @@ class FooterAddress(CreateMixin, UpdateMixin):
     is_active = models.BooleanField(_("is active"), default=True)
 
     def __str__(self):
-        return f"{self.state} {self.city} {self.is_active}"
+        return f"{self.state} {self.city} {self.street} {self.postal_code}"
+
+    @property
+    def address(self):
+        return f"{self.state} {self.city} {self.street} {self.postal_code}"
 
     class Meta:
         db_table = 'footer_address'
