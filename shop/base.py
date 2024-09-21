@@ -40,6 +40,7 @@ THIRD_PARTY_APPS = [
     'orders.apps.OrdersConfig',
     "professors.apps.ProfessorsConfig",
     'payments.apps.PaymentsConfig',
+    "main_settings.apps.MainSettingsConfig",
 ]
 
 THIRD_PARTY_PACKAGE = [
@@ -63,8 +64,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.gis',
     *THIRD_PARTY_APPS,
     *THIRD_PARTY_PACKAGE,
+
 ]
 
 MIDDLEWARE = [
@@ -164,7 +167,7 @@ INTERNAL_IPS = [
 if DEBUG:
     DATABASES = {
         'default': {
-            'ENGINE': "django.db.backends.postgresql_psycopg2",
+            'ENGINE': "django.contrib.gis.db.backends.postgis",
             "NAME": 'postgres',
             "PASSWORD": "postgres",
             "USER": "postgres",
