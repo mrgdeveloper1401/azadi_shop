@@ -94,3 +94,4 @@ class OtpAdmin(admin.ModelAdmin):
     list_select_related = ['user']
     search_fields = ['user__mobile_phone']
     list_filter = [("created_at", JDateFieldListFilter), ("expired_at", JDateFieldListFilter)]
+    raw_id_fields = ['user']

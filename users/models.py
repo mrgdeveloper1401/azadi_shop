@@ -118,7 +118,7 @@ class UserInfo(CreateMixin, UpdateMixin):
 class Otp(CreateMixin):
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='user_otp')
     code = models.PositiveIntegerField(_('OTP code'), unique=True, default=generate_random_code)
-    expired_at = jDateTimeField(blank=True, null=True)
+    expired_at = jDateTimeField(blank=True)
 
     objects = OtpManager()
 

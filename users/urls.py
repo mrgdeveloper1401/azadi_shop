@@ -5,7 +5,8 @@ from rest_framework_simplejwt.views import TokenBlacklistView
 from rest_framework.routers import DefaultRouter
 
 from users.views import UserRegistrationAPIView, UserVerifyRegisterCodeAPIView, OtpResendAPIView, SendCodeMobileApiView, \
-    VerifyCodeMobileApiview, ResetPasswordAPIView, ForgetPasswordApiView, ForgetPasswordConfirmAPIView, ProfileViewSet
+    VerifyCodeMobileApiview, ResetPasswordAPIView, ForgetPasswordApiView, ForgetPasswordConfirmAPIView, ProfileViewSet \
+    ,SendOtpCodeApiView
 # from users.tasks import schedule_otp
 
 app_name = "users"
@@ -24,6 +25,7 @@ urlpatterns = [
     path("jwt/refresh/", TokenRefreshView.as_view(), name="user_refresh_token"),
     path('jwt/verify/', token_verify, name='user_verify_token'),
     path('api/token/blacklist/', TokenBlacklistView.as_view(), name='token_blacklist'),
+    path('send_otp_code/', SendOtpCodeApiView.as_view(), name='send_otp_code'),
     # path("contact_us/", Contact_UsAPIView.as_view(), name="user_contact_us"),
     # path('delete_otp_code/', schedule_otp, name='delete_otp'),
     path('', include(router.urls)),

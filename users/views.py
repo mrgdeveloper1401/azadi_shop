@@ -6,10 +6,9 @@ from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyM
 from rest_framework.viewsets import GenericViewSet
 from drf_spectacular.utils import extend_schema
 
-
 from users.serializers import UserRegisterSerializer, UserVerifyRegisterSerializer, UserResendVerifyRegisterSerializer, \
     SendCodeMobilePhoneSerializer, VerifyCodeMobilePhoneSerializer, ResetPasswordSerializer, ForgetPasswordSerializer, \
-    ForgetPasswordConfirmSerializer, ProfileSerializer
+    ForgetPasswordConfirmSerializer, ProfileSerializer, SendOtpCodeSerializer
 from users.models import UserInfo
 from users.permissions import IsOwnerProfile
 from core.datetime_config import now
@@ -61,6 +60,11 @@ class OtpResendAPIView(APIView):
 class SendCodeMobileApiView(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=SendCodeMobilePhoneSerializer,
+        responses={200: SendCodeMobilePhoneSerializer},
+        description='Send confirmation code to change mobile number'
+    )
     def post(self, request):
         ser_data = SendCodeMobilePhoneSerializer(data=request.data, context={'request': request.user})
         ser_data.is_valid(raise_exception=True)
@@ -71,6 +75,11 @@ class SendCodeMobileApiView(APIView):
 class VerifyCodeMobileApiview(APIView):
     permission_classes = [IsAuthenticated]
 
+    @extend_schema(
+        request=VerifyCodeMobilePhoneSerializer,
+        responses={200, VerifyCodeMobilePhoneSerializer},
+        description="Verification of the code to change the mobile number"
+    )
     def post(self, request):
         ser_data = VerifyCodeMobilePhoneSerializer(data=request.data, context={'request': request.user})
         ser_data.is_valid(raise_exception=True)
@@ -131,3 +140,16 @@ class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, Ge
         user.deleted_at = now()
         user.save()
         return super().destroy(request, *args, **kwargs)
+
+
+class SendOtpCodeApiView(APIView):
+    @extend_schema(
+        request=SendOtpCodeSerializer,
+        responses={201: SendOtpCodeSerializer},
+        description='send otp code to mobile phone'
+    )
+    def post(self, request, *args, **kwargs):
+        ser_data = SendOtpCodeSerializer(data=request.data)
+        ser_data.is_valid(raise_exception=True)
+        ser_data.save()
+        return Response({"message": "successfully send otp code"}, status=status.HTTP_201_CREATED)

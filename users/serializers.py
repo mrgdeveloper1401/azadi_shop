@@ -264,3 +264,18 @@ class ProfileSerializer(serializers.ModelSerializer):
             setattr(instance, key, value)
         instance.save()
         return instance
+
+
+class SendOtpCodeSerializer(serializers.Serializer):
+    mobile_phone = serializers.CharField(validators=[MobileValidator()])
+
+    def validate(self, attrs):
+        try:
+            UserAccount.objects.get(mobile_phone=attrs['mobile_phone'])
+        except UserAccount.DoesNotExist:
+            raise ValidationError({"message": _("code is send")})
+        return attrs
+
+    def create(self, validated_data):
+        user = UserAccount.objects.get(mobile_phone=validated_data['mobile_phone'])
+        return Otp.objects.create_otp(user)
