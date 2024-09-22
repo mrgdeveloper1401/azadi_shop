@@ -13,29 +13,32 @@ class OrderItemInline(admin.TabularInline):
 # Register your models here.
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', "items_number", 'created_at', "updated_at"]
+    list_display = ['id', 'user', "items_number", "total_price", 'created_at', "updated_at"]
     list_per_page = 20
     list_select_related = ['user']
-
-    def items_number(self, obj):
-        return obj.cart_item.count()
+    raw_id_fields = ['user']
+    search_fields = ['id', "user__mobile_phone"]
+    list_filter = ['created_at', "updated_at"]
 
     def get_queryset(self, request):
         q = super().get_queryset(request)
-        q = q.prefetch_related('cart_item')
+        q = q.prefetch_related('cart_item', "cart_item__course__course_discount")
         return q
 
 
 @admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):
-    list_display = ['id', 'cart', 'course', 'quantity', 'created_at']
+    list_display = ['id', 'cart', 'course', 'quantity', "item_price", 'created_at']
     list_filter = [('created_at', JDateFieldListFilter)]
     search_fields = ['course__name']
     list_per_page = 20
+    raw_id_fields = ["cart", "course"]
+    list_display_links = ['id', "cart"]
+    list_select_related = ['cart', "course"]
 
     def get_queryset(self, request):
         q = super().get_queryset(request)
-        q = q.prefetch_related('cart__user')
+        q = q.prefetch_related('course__course_discount', "cart__user")
         return q
 
 
@@ -46,7 +49,6 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ['user__mobile_phone']
     list_per_page = 20
     list_display_links = ['id', "user"]
-    inlines = [OrderItemInline]
 
     def get_queryset(self, request):
         q = super().get_queryset(request)
@@ -60,7 +62,6 @@ class OrderItemAdmin(admin.ModelAdmin):
     list_filter = [('created_at', JDateFieldListFilter)]
     list_per_page = 20
     search_fields = ['course__name']
-    # list_select_related = ['course', 'order']
     list_display_links = ['id', "course"]
 
     def get_queryset(self, request):

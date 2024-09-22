@@ -1,6 +1,6 @@
 from decimal import Decimal
-
-from rest_framework.serializers import ModelSerializer, IntegerField, ValidationError, Serializer, CharField
+from rest_framework.serializers import ModelSerializer, IntegerField, ValidationError, Serializer, CharField \
+    , SerializerMethodField
 from ulid import ULID
 from django.db.transaction import atomic
 from datetime import datetime
@@ -28,11 +28,14 @@ class CourseCartItemSerialize(ModelSerializer):
     """it is shows field of the course"""
     professor = SimpleProfessorSerializer()
     # final_price = DecimalField(max_digits=12, decimal_places=2, read_only=True)
-    # discount_value = DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    discount_value = SerializerMethodField()
 
     class Meta:
         model = Course
-        fields = ['id', 'name', "professor", 'price', "calc_final_price", "show_image_url"]
+        fields = ['id', 'name', "professor", 'price', "calc_final_price", "discount_value", "show_image_url"]
+
+    def get_discount_value(self, obj):
+        return obj.price - obj.calc_final_price
 
 
 class CartItemSerializer(ModelSerializer):

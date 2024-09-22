@@ -34,7 +34,7 @@ class Professor(CreateMixin, UpdateMixin):
     is_active = models.BooleanField(default=False)
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name} {self.education_status}"
+        return f"{self.first_name} {self.last_name}"
 
     @property
     def get_full_name(self):

@@ -21,13 +21,13 @@ class SalesFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         if self.value() == "0-50":
-            return queryset.filter(sales__gte=0, sales__lt=50)
+            return queryset.filter(sale_number__gte=0, sale_number__lt=50)
         elif self.value() == "50-100":
-            return queryset.filter(sales__gte=50, sales__lt=100)
+            return queryset.filter(sale_number__gte=50, sale_number__lt=100)
         elif self.value() == "100-500":
-            return queryset.filter(sales__gte=500, sales__lt=500)
+            return queryset.filter(sale_number__gte=500, sale_number__lt=500)
         elif self.value() == "500-1000":
-            return queryset.filter(sales__gte=500, sales__lt=1000)
+            return queryset.filter(sale_number__gte=500, sale_number__lt=1000)
         else:
             return queryset.all()
 
@@ -68,28 +68,30 @@ class CategoryAdmin(TreeAdmin):
     list_per_page = 30
     search_fields = ['name']
     prepopulated_fields = {"slug": ("name",)}
+    list_filter = ['is_public']
+    list_select_related = ['icon']
 
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "professor", "price", "calc_final_price", "is_active", "is_free", "is_sale",
-                    "sale_number", "created_at", "total_like")
+                    "sale_number", "created_at", "total_like", "comment_number")
     list_filter = ("is_active", "is_free", "is_sale", SalesFilter,
                    ("created_at", JDateFieldListFilter), ("updated_at", JDateFieldListFilter))
-    list_editable = ("is_active", "total_like")
+    list_editable = ("is_active", "total_like", "is_free", "is_sale")
     date_hierarchy = "created_at"
-    search_fields = ("name", "professor__get_full_name")
+    search_fields = ("name", "professor__first_name", "professor__last_name")
     prepopulated_fields = {"slug": ("name",)}
     list_per_page = 20
     list_display_links = ("id", "name")
     raw_id_fields = ("professor", "category", "image")
-    list_select_related = ("professor",)
+    list_select_related = ("professor", "image")
     readonly_fields = ['created_at']
     filter_horizontal = ('category',)
 
     def get_queryset(self, request):
         q = super().get_queryset(request)
-        q = q.prefetch_related("course_discount", "category")
+        q = q.prefetch_related("course_discount", "category", "course_comment")
         return q
 
 
@@ -104,6 +106,7 @@ class CommentAdmin(admin.ModelAdmin):
     raw_id_fields = ['user', "course"]
     list_per_page = 20
     list_display_links = ("id", "user", "course")
+    readonly_fields = ['rating']
 
 
 @admin.register(DiscountCourse)
@@ -120,8 +123,10 @@ class DiscountCourseAdmin(admin.ModelAdmin):
 @admin.register(Like)
 class LikeAdmin(admin.ModelAdmin):
     list_display = ['user', "course", "created_at", "dislike"]
-    list_filter = ['created_at']
+    list_filter = ['created_at', "dislike"]
     date_hierarchy = "created_at"
     list_per_page = 30
     list_select_related = ("user", "course")
     list_editable = ['dislike']
+    raw_id_fields = ['user', "course"]
+    search_fields = ['user__mobile_phone', 'course__name']

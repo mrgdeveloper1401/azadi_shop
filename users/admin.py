@@ -83,9 +83,11 @@ class UserAdmin(BaseUserAdmin):
 class UserInfoAdmin(admin.ModelAdmin):
     list_display = ["id", 'user', 'grade', 'major', 'get_active', "get_is_deleted", "get_is_verified", "get_deleted_at"]
     list_select_related = ['user']
-    search_fields = ['user__mobile_phone']
-    list_max_show_all = 30
-    list_filter = [IsActiveUserInfo, ("get_deleted_at", JDateFieldListFilter)]
+    search_fields = ["grade", "major", "user__mobile_phone"]
+    list_per_page = 100
+    list_filter = [IsActiveUserInfo]
+    list_display_links = ['id', "user"]
+    raw_id_fields = ['user']
 
 
 @admin.register(Otp)
@@ -95,3 +97,4 @@ class OtpAdmin(admin.ModelAdmin):
     search_fields = ['user__mobile_phone']
     list_filter = [("created_at", JDateFieldListFilter), ("expired_at", JDateFieldListFilter)]
     raw_id_fields = ['user']
+

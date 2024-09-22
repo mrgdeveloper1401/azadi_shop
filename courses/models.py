@@ -66,6 +66,8 @@ class Course(CreateMixin, UpdateMixin):
         self.slug = slugify(self.name, allow_unicode=True)
         if self.price == 0:
             self.is_free = True
+        elif self.is_free:
+            self.price =0
         super().save(*args, **kwargs)
 
     @property
@@ -74,7 +76,7 @@ class Course(CreateMixin, UpdateMixin):
 
     @property
     def calc_final_price(self):
-        discounts = self.course_discount.filter(is_active=True, expired_date__gt=now())
+        discounts = self.course_discount.all()
         final_price = self.price
         if discounts.exists():
             for d in discounts:
@@ -86,13 +88,17 @@ class Course(CreateMixin, UpdateMixin):
         else:
             return final_price
 
+    @property
+    def comment_number(self):
+        return self.course_comment.count()
+
     def __str__(self):
         return self.name
 
 
 class DiscountCourse(CreateMixin, UpdateMixin):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_discount',
-                               limit_choices_to={"is_active": True})
+                               limit_choices_to={"is_active": True, "is_sale": True})
 
     TYPE_CHOICES = (
         ('درصدی', 'درصدی'),
@@ -123,7 +129,8 @@ class DiscountCourse(CreateMixin, UpdateMixin):
 class Comment(CreateMixin, UpdateMixin):
     user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_comment',
                              limit_choices_to={"is_active": True, "is_verified": True})
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_comment')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_comment',
+                               limit_choices_to={"is_active": True, "is_sale": True})
     body = models.TextField(max_length=2048)
     public = models.BooleanField(default=True)
     # reply_to = models.ForeignKey('self', blank=True, null=True, related_name="reply_comment",

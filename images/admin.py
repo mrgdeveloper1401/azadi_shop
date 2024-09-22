@@ -6,4 +6,8 @@ from images.models import Image
 
 @admin.register(Image)
 class ImageAdmin(admin.ModelAdmin):
-    pass
+    list_display = ["id", 'title', "file_size"]
+    list_display_links = ['id', "title"]
+    search_fields = ['title']
+    list_per_page = 100
+    list_filter = ['created_at', "updated_at"]

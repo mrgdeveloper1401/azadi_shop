@@ -1,3 +1,4 @@
+from django.core.exceptions import ValidationError
 from django.db import models
 from ulid import ULID
 from django.utils.translation import gettext_lazy as _
@@ -6,6 +7,8 @@ from shop.base import AUTH_USER_MODEL
 from courses.models import Course
 from core.models import CreateMixin, UpdateMixin
 from datetime import datetime
+
+from users.models import UserAccount
 
 
 class Cart(CreateMixin, UpdateMixin):
@@ -23,8 +26,17 @@ class Cart(CreateMixin, UpdateMixin):
 
     @property
     def total_price(self):
-        price = [i.quantity * i.course.final_price for i in self.cart_item.all()]
+        price = [i.quantity * i.course.calc_final_price for i in self.cart_item.all()]
         return sum(price)
+
+    @property
+    def items_number(self):
+        return self.cart_item.count()
+
+    def clean(self):
+        if Cart.objects.filter(user__mobile_phone=self).exists():
+            raise ValidationError({"user": _("cart already exist")})
+        super().clean()
 
     def save(self, *args, **kwargs):
         self.id = self.generate_ulid
