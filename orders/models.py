@@ -96,7 +96,7 @@ class Order(CreateMixin):
 
     @property
     def order_total_price(self):
-        price = [i.get_cost for i in self.order_item.all()]
+        price = [i.course.calc_final_price for i in self.order_item.all()]
         return sum(price)
 
     class Meta:
@@ -110,13 +110,13 @@ class OrderItem(CreateMixin):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_order_item', blank=True,
                                null=True)
     quantity = models.PositiveSmallIntegerField(default=1)
-    price = models.DecimalField(max_digits=12, decimal_places=3)
+    # price = models.DecimalField(max_digits=12, decimal_places=3)
 
     def __str__(self):
         return f'{self.order} {self.course} {self.quantity}'
 
     @property
-    def get_cost(self):
+    def course_price(self):
         return self.course.calc_final_price * self.quantity
 
     class Meta:

@@ -44,27 +44,31 @@ class CartItemAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'payment_status', 'created_at']
+    list_display = ['id', 'user', 'payment_status', "order_total_price", 'created_at']
     list_filter = ['payment_status', ('created_at', JDateFieldListFilter)]
     search_fields = ['user__mobile_phone', "payment_status"]
     list_per_page = 20
     list_display_links = ['id', "user"]
+    date_hierarchy = 'created_at'
 
     def get_queryset(self, request):
         q = super().get_queryset(request)
-        q = q.prefetch_related('order_item').select_related('user')
+        q = (q.prefetch_related('order_item', "order_item__course", "order_item__course__course_discount").
+             select_related('user'))
         return q
 
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ['id', 'course', 'order', 'created_at']
+    list_display = ['id', 'course', 'order', "course_price", 'created_at']
     list_filter = [('created_at', JDateFieldListFilter)]
-    list_per_page = 20
-    search_fields = ['course__name']
+    search_fields = ['course__name', "order__user__mobile_phone"]
     list_display_links = ['id', "course"]
+    raw_id_fields = ['order', "course"]
+    list_per_page = 100
+    date_hierarchy = 'created_at'
 
     def get_queryset(self, request):
         q = super().get_queryset(request)
-        q = q.prefetch_related('course')
+        q = q.prefetch_related("course__course_discount")
         return q

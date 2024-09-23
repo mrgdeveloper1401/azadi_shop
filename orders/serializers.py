@@ -143,7 +143,6 @@ class CreateOrderSerializer(Serializer):
                     order=order,
                     course=item.course,
                     quantity=item.quantity,
-                    price=item.course.price
                 )
                 for item in cart_item
             ]
