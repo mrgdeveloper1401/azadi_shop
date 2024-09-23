@@ -60,8 +60,17 @@ class CartItem(CreateMixin):
 
     @property
     def item_price(self):
+        price = self.course.price * self.quantity
+        return price
+
+    @property
+    def calc_final_price(self):
         price = self.course.calc_final_price * self.quantity
         return price
+
+    @property
+    def discount_value(self):
+        return self.course.price - self.course.calc_final_price
 
     class Meta:
         db_table = 'cart_item'
@@ -97,8 +106,8 @@ class Order(CreateMixin):
 
 
 class OrderItem(CreateMixin):
-    order = models.ForeignKey(Order, on_delete=models.PROTECT, related_name='order_item')
-    course = models.ForeignKey(Course, on_delete=models.PROTECT, related_name='course_order_item', blank=True,
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_item')
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_order_item', blank=True,
                                null=True)
     quantity = models.PositiveSmallIntegerField(default=1)
     price = models.DecimalField(max_digits=12, decimal_places=3)

@@ -28,9 +28,9 @@ class CartAdmin(admin.ModelAdmin):
 
 @admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):
-    list_display = ['id', 'cart', 'course', 'quantity', "item_price", 'created_at']
+    list_display = ['id', 'cart', 'course', 'quantity', "item_price", "calc_final_price", "discount_value", 'created_at']
     list_filter = [('created_at', JDateFieldListFilter)]
-    search_fields = ['course__name']
+    search_fields = ['course__name', "cart__user__mobile_phone"]
     list_per_page = 20
     raw_id_fields = ["cart", "course"]
     list_display_links = ['id', "cart"]
@@ -46,7 +46,7 @@ class CartItemAdmin(admin.ModelAdmin):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'payment_status', 'created_at']
     list_filter = ['payment_status', ('created_at', JDateFieldListFilter)]
-    search_fields = ['user__mobile_phone']
+    search_fields = ['user__mobile_phone', "payment_status"]
     list_per_page = 20
     list_display_links = ['id', "user"]
 

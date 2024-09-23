@@ -3,12 +3,14 @@ from rest_framework.status import HTTP_201_CREATED
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework.mixins import RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, ListModelMixin
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from orders.models import Cart, CartItem, Order
 from orders.serializers import CartSerializer, AddCartItemSerializer, CartItemSerializer, OrderSerialize, \
     CreateOrderSerializer, UpdateOrderItemSerializer
 from orders.permissions import IsOwner, IsOwnerCartItem
+
+
 # Create your views here.
 
 
@@ -57,8 +59,9 @@ class CartItemViewSet(RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, L
 
 
 class OrderViewSet(ModelViewSet):
-    queryset = (Order.objects.select_related('user').prefetch_related('order_item', 'order_item__course',
-                "order_item__course__image", "order_item__course__professor", "order_item__course__course_discount"))
+    queryset = (Order.objects.prefetch_related("order_item", "order_item__course", "order_item__course__image",
+                                               "order_item__course__professor", "order_item__course__course_discount").
+                select_related('user')).filter(payment_status="pending")
 
     def create(self, request, *args, **kwargs):
         ser_data = CreateOrderSerializer(data=request.data, context={'user_id': self.request.user.id})
@@ -75,8 +78,8 @@ class OrderViewSet(ModelViewSet):
         return OrderSerialize
 
     def get_permissions(self):
-        if self.request.method in ['PUT', 'PATCH', 'DELETE']:
-            return [IsAdminUser()]
+        if self.request.method in ['PUT', 'PATCH']:
+            return [IsOwner(), IsAdminUser()]
         return [IsOwner()]
 
     def get_queryset(self):

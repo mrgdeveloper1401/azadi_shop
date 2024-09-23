@@ -1,6 +1,6 @@
 from decimal import Decimal
 from rest_framework.serializers import ModelSerializer, IntegerField, ValidationError, Serializer, CharField \
-    , SerializerMethodField
+    ,SerializerMethodField
 from ulid import ULID
 from django.db.transaction import atomic
 from datetime import datetime
@@ -71,12 +71,13 @@ class AddCartItemSerializer(ModelSerializer):
         return self.instance
 
     def validate_course_id(self, data):
-        course = Course.objects.get(pk=data)
-        if not Course.objects.filter(pk=data).exists():
+        try:
+            course = Course.objects.get(pk=data)
+        except Course.DoesNotExist:
             raise ValidationError('course not found')
-        elif not course.is_sale:
+        if not course.is_sale:
             raise ValidationError("course is unavailable")
-        elif course.price or course.calc_final_price == Decimal('0.00'):
+        if course.price == Decimal('0.00') or course.calc_final_price == Decimal('0.00'):
             raise ValidationError("course is free")
         return data
 
@@ -99,11 +100,12 @@ class OrderItemSerializer(ModelSerializer):
 
     class Meta:
         model = OrderItem
-        fields = '__all__'
+        exclude = ['price']
 
 
 class OrderSerialize(ModelSerializer):
     order_item = OrderItemSerializer(many=True, read_only=True)
+    user = CharField(source="user.mobile_phone")
 
     class Meta:
         model = Order
