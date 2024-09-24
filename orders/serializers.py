@@ -100,7 +100,7 @@ class OrderItemSerializer(ModelSerializer):
 
     class Meta:
         model = OrderItem
-        exclude = ['price']
+        fields = '__all__'
 
 
 class OrderSerialize(ModelSerializer):
