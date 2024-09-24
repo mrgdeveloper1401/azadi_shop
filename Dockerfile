@@ -12,6 +12,8 @@ RUN apk update && \
     apk add postgresql-client && \
     apk add gdal && \
     apk add gdal-dev && \
+    apk add geos && \
+    apk add geos-dev && \
     apk add build-base && \
     apk add gcc && \
     apk add musl-dev && \

@@ -1,7 +1,8 @@
 from shop.base import *
 import os
 
-os.environ.setdefault('GDAL_LIBRARY_PATH', '/usr/lib/libgdal.so')
+os.environ.get('GDAL_LIBRARY_PATH', '/usr/lib/libgdal.so')
+
 
 DEBUG = False
 
@@ -9,7 +10,7 @@ ALLOWED_HOSTS = ["*"]
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.postgresql',
         'NAME': os.environ.get('DATABASE_DB'),
         'USER': os.environ.get('DATABASE_USER'),
         'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
