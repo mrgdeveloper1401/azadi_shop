@@ -58,6 +58,17 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_DATABASES=${REDIS_DATABASES}
 
+  nginx:
+    container_name: nginx
+    image: nginx:1.27.1-alpine
+    restart: always
+    command:
+      - ["nginx", "-g", "daemon off"]
+    ports:
+      - 8080:80
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+
 networks:
   main:
 
@@ -65,4 +76,4 @@ volumes:
   djangp-static:
   azadi-data:
   supervisor:
-#  nginx:
+  nginx:

@@ -19,6 +19,7 @@ from shop.uppercase_password_validator import UppercasePasswordValidator
 # from shop.celery_config import *
 from shop.simple_jwt_config import SIMPLE_JWT
 from shop.liara_config import *
+from core.datetime_config import now
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -31,7 +32,7 @@ load_dotenv()
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 THIRD_PARTY_APPS = [
     'users.apps.UsersConfig',
@@ -55,6 +56,7 @@ THIRD_PARTY_PACKAGE = [
     "corsheaders",
     "django_celery_results",
     "django_celery_beat",
+    "django_logging"
 
 ]
 
@@ -81,6 +83,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_logging.middleware.RequestLogMiddleware',
 ]
 
 ROOT_URLCONF = 'shop.urls'
@@ -199,4 +202,32 @@ STORAGES = {
   "staticfiles": {
       "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
   },
+}
+
+# logging in django
+log_file = BASE_DIR / "logs"
+res = log_file / f"logs_{now().strftime('%Y-%m-%d')}"
+DJANGO_LOGGING = {
+    "AUTO_INITIALIZATION_ENABLE": True,
+    "INITIALIZATION_MESSAGE_ENABLE": True,
+    "LOG_FILE_LEVELS": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+    "LOG_DIR": f"{res}",
+    "LOG_FILE_FORMATS": {
+        "DEBUG": 1,
+        "INFO": 1,
+        "WARNING": 1,
+        "ERROR": 1,
+        "CRITICAL": 1,
+    },
+    "LOG_CONSOLE_LEVEL": "DEBUG",
+    "LOG_CONSOLE_FORMAT": 1,
+    "LOG_CONSOLE_COLORIZE": True,
+    "LOG_DATE_FORMAT": "%Y-%m-%d %H:%M:%S",
+    "LOG_EMAIL_NOTIFIER": {
+        "ENABLE": False,
+        "NOTIFY_ERROR": False,
+        "NOTIFY_CRITICAL": False,
+        "LOG_FORMAT": 1,
+        "USE_TEMPLATE": True,
+    },
 }
