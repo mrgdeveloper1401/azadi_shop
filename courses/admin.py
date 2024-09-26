@@ -78,7 +78,7 @@ class CourseAdmin(admin.ModelAdmin):
                     "sale_number", "created_at", "total_like", "comment_number")
     list_filter = ("is_active", "is_free", "is_sale", SalesFilter,
                    ("created_at", JDateFieldListFilter), ("updated_at", JDateFieldListFilter))
-    list_editable = ("is_active", "total_like", "is_free", "is_sale")
+    list_editable = ("is_active", "total_like", "is_free", "is_sale", "price")
     date_hierarchy = "created_at"
     search_fields = ("name", "professor__first_name", "professor__last_name")
     prepopulated_fields = {"slug": ("name",)}

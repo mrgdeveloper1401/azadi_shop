@@ -10,7 +10,7 @@ ALLOWED_HOSTS = ["*"]
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'NAME': os.environ.get('DATABASE_DB'),
         'USER': os.environ.get('DATABASE_USER'),
         'PASSWORD': os.environ.get('DATABASE_PASSWORD'),
@@ -20,7 +20,14 @@ DATABASES = {
 }
 
 CORS_ALLOWED_ORIGINS = [
-    'https://localhost:8000',
-    "https://127.0.0.1:8000",
+    'http://localhost:8001',
+    'http://localhost:8002',
+    'http://localhost:8003',
+    'http://localhost:8004',
+    'http://localhost:8005',
+    'http://127.0.0.1:8001',
+    'http://127.0.0.1:8002',
+    'http://127.0.0.1:8003',
+    'http://127.0.0.1:8004',
+    'http://127.0.0.1:8005',
 ]
-

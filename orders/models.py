@@ -1,8 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from ulid import ULID
+from uuid import uuid4
 from django.utils.translation import gettext_lazy as _
-
 from shop.base import AUTH_USER_MODEL
 from courses.models import Course
 from core.models import CreateMixin, UpdateMixin
@@ -90,7 +90,7 @@ class Order(CreateMixin):
 
     payment_status = models.CharField(_("payments status"), max_length=8, choices=PaymentStatus.choices,
                                       default=PaymentStatus.pending)
-
+    order_number = models.CharField(_("order number"), blank=True, null=True, max_length=30)
     def __str__(self):
         return f'{self.user} {self.payment_status} {self.created_at}'
 
@@ -98,6 +98,17 @@ class Order(CreateMixin):
     def order_total_price(self):
         price = [i.course.calc_final_price for i in self.order_item.all()]
         return sum(price)
+
+    @property
+    def create_order_number(self):
+        text = 'shop'
+        u4 = f'{uuid4().int}'
+        return f'{text}_{u4[:11]}'
+
+    def save(self, *args, **kwargs):
+        if self.payment_status == 'complete':
+            self.order_number = self.create_order_number
+        return super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'order'

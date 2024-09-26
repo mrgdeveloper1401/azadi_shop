@@ -2,6 +2,7 @@ from decimal import Decimal
 from rest_framework.serializers import ModelSerializer, IntegerField, ValidationError, Serializer, CharField \
     ,SerializerMethodField
 from ulid import ULID
+from uuid import uuid4
 from django.db.transaction import atomic
 from datetime import datetime
 from django.utils.translation import gettext_lazy as _
@@ -155,3 +156,12 @@ class UpdateOrderItemSerializer(ModelSerializer):
     class Meta:
         model = Order
         fields = ['payment_status']
+
+
+class CompleteOrderSerialize(ModelSerializer):
+    user = CharField(source='user.mobile_phone')
+    order_item = OrderItemSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Order
+        fields = ['id', "user", "payment_status", "order_item", "order_total_price", "order_number"]

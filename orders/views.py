@@ -1,13 +1,13 @@
-from django.db.models import F
+from django.db.models import F, Q
 from rest_framework.status import HTTP_201_CREATED
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet, ModelViewSet
+from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelViewSet
 from rest_framework.mixins import RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, ListModelMixin
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 
 from orders.models import Cart, CartItem, Order
 from orders.serializers import CartSerializer, AddCartItemSerializer, CartItemSerializer, OrderSerialize, \
-    CreateOrderSerializer, UpdateOrderItemSerializer
+    CreateOrderSerializer, UpdateOrderItemSerializer, CompleteOrderSerialize
 from orders.permissions import IsOwner, IsOwnerCartItem
 
 
@@ -87,3 +87,12 @@ class OrderViewSet(ModelViewSet):
         if self.action == 'list':
             queryset = queryset.filter(user=self.request.user, payment_status='pending')
         return queryset
+
+
+class CompleteOrderViewSet(ReadOnlyModelViewSet):
+    queryset = ((Order.objects.filter(Q(payment_status='complete') | Q(payment_status='failed')).
+                prefetch_related("order_item", "order_item__course", "order_item__course__image",
+                                 "order_item__course__professor", "order_item__course__course_discount")).
+                select_related('user'))
+    serializer_class = CompleteOrderSerialize
+    permission_classes = [IsOwner]

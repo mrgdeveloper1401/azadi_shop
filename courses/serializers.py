@@ -54,10 +54,16 @@ class CourseSerializers(serializers.ModelSerializer):
     category = SimpleCategorySerializer(many=True)
     final_price = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
     discount_value = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = Course
-        fields = '__all__'
+        exclude = ['image']
+
+    def get_image_url(self, obj):
+        if obj.image:
+            return obj.image.image_url
+        return None
 
 
 class CategorySerializers(serializers.ModelSerializer):

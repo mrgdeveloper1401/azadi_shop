@@ -4,17 +4,20 @@ from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from core.models import CreateMixin, UpdateMixin
+from images.validators import validate_image_size
 
 
 class Image(CreateMixin, UpdateMixin):
     title = models.CharField(max_length=128, null=True, blank=True)
-    image = models.ImageField(width_field="width", height_field="height", upload_to="images/%Y/%m/%d")
+    image = models.ImageField(width_field="width", height_field="height", upload_to="images/%Y/%m/%d",
+                              validators=[validate_image_size],
+                              help_text=_("max size is 15 MG"))
 
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
 
     file_hash = models.CharField(max_length=40, db_index=True, null=True, blank=True)
-    file_size = models.PositiveIntegerField(null=True, blank=True)
+    file_size = models.PositiveIntegerField(null=True, blank=True, help_text=_("file size as xx.b"))
 
     focal_point_x = models.PositiveIntegerField(null=True, blank=True)
     focal_point_y = models.PositiveIntegerField(null=True, blank=True)

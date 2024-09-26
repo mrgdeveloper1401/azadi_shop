@@ -1,13 +1,12 @@
-from _ast import alias
 from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django_jalali.db.models import jDateTimeField
-
 from shop.base import AUTH_USER_MODEL
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from treebeard.mp_tree import MP_Node
+from django_ckeditor_5.fields import CKEditor5Field
 
 from core.models import CreateMixin, UpdateMixin
 from courses.managers import CategoryManager, CourseManager
@@ -42,7 +41,7 @@ class Course(CreateMixin, UpdateMixin):
     category = models.ManyToManyField(CourseCategory, related_name="category_course")
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, max_length=255, allow_unicode=True)
-    description = models.TextField(blank=True, null=True)
+    description = CKEditor5Field(blank=True, null=True)
     price = models.DecimalField(decimal_places=2, max_digits=12, validators=[MinValueValidator(Decimal(0))], )
     video = models.FileField(upload_to='videos/%Y/%m/%d', blank=True, null=True)
     image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name="course_image",

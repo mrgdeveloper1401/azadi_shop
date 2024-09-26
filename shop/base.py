@@ -11,15 +11,18 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
 from pathlib import Path
+
+from celery.schedules import crontab
 from dotenv import load_dotenv
 from shop.email_config import *
-from shop.kavenegar_config import *
+from shop.media_sms_config import *
 from shop.rest_framework_config import *
 from shop.uppercase_password_validator import UppercasePasswordValidator
-# from shop.celery_config import *
 from shop.simple_jwt_config import SIMPLE_JWT
 from shop.liara_config import *
 from core.datetime_config import now
+from shop.chash_config import SESSION_ENGINE, CACHES
+from shop.ckeditor_config import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -56,7 +59,8 @@ THIRD_PARTY_PACKAGE = [
     "corsheaders",
     "django_celery_results",
     "django_celery_beat",
-    "django_logging"
+    "django_logging",
+    "django_ckeditor_5"
 
 ]
 
@@ -172,7 +176,7 @@ if DEBUG:
     DATABASES = {
         'default': {
             'ENGINE': "django.contrib.gis.db.backends.postgis",
-            "NAME": 'postgres',
+            "NAME": 'azadi',
             "PASSWORD": "postgres",
             "USER": "postgres",
             "PORT": "5432",
@@ -183,25 +187,14 @@ if DEBUG:
 # CELERY BEAT SCHEDULER
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
-# REDIS CACHE
-# CACHES = {
-#     "default": {
-#         "BACKEND": "django_redis.cache.RedisCache",
-#         "LOCATION": f"redis://127.0.0.1:6379/1",
-#         "OPTIONS": {
-#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-#         },
-#     }
-# }
-
 # Django-storages configuration
 STORAGES = {
-  "default": {
-      "BACKEND": "storages.backends.s3.S3Storage",
-  },
-  "staticfiles": {
-      "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-  },
+    "default": {
+        "BACKEND": "storages.backends.s3.S3Storage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
 }
 
 # logging in django
@@ -230,4 +223,11 @@ DJANGO_LOGGING = {
         "LOG_FORMAT": 1,
         "USE_TEMPLATE": True,
     },
+}
+
+CELERY_BEAT_SCHEDULE = {
+    'delete_otp_code': {
+        'task': "users.tasks.delete_otp_code",
+        'schedule': crontab(minute='*/2'),
+    }
 }
