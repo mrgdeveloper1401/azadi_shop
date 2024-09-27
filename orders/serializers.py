@@ -1,4 +1,6 @@
 from decimal import Decimal
+
+from django.db.models import Q
 from rest_framework.serializers import ModelSerializer, IntegerField, ValidationError, Serializer, CharField \
     ,SerializerMethodField
 from ulid import ULID
@@ -70,6 +72,15 @@ class AddCartItemSerializer(ModelSerializer):
         except CartItem.DoesNotExist:
             self.instance = CartItem.objects.create(cart_id=cart.id, course_id=course_id)
         return self.instance
+
+    def validate(self, attrs):
+        orders = Order.objects.filter(user=self.context['user']).filter(Q(payment_status='complete') |
+                                                                        Q(payment_status='pending'))
+        check_order = orders.values_list('order_item__course__pk', flat=True)
+        course_id = attrs.get('course_id')
+        if course_id in check_order:
+            raise ValidationError("you already have this course")
+        return attrs
 
     def validate_course_id(self, data):
         try:

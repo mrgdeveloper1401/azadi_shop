@@ -44,12 +44,13 @@ class CartItemAdmin(admin.ModelAdmin):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', 'payment_status', "order_total_price", 'created_at']
+    list_display = ['id', 'user', 'payment_status', 'order_number', "order_total_price", 'created_at']
     list_filter = ['payment_status', ('created_at', JDateFieldListFilter)]
-    search_fields = ['user__mobile_phone', "payment_status"]
+    search_fields = ['user__mobile_phone', "payment_status", "order_number"]
     list_per_page = 20
     list_display_links = ['id', "user"]
     date_hierarchy = 'created_at'
+    readonly_fields = ['order_number']
 
     def get_queryset(self, request):
         q = super().get_queryset(request)

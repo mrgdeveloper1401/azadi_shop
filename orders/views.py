@@ -90,9 +90,19 @@ class OrderViewSet(ModelViewSet):
 
 
 class CompleteOrderViewSet(ReadOnlyModelViewSet):
-    queryset = ((Order.objects.filter(Q(payment_status='complete') | Q(payment_status='failed')).
-                prefetch_related("order_item", "order_item__course", "order_item__course__image",
-                                 "order_item__course__professor", "order_item__course__course_discount")).
-                select_related('user'))
     serializer_class = CompleteOrderSerialize
     permission_classes = [IsOwner]
+
+    def get_queryset(self):
+        return (
+            Order.objects.filter(user=self.request.user)
+            .filter(Q(payment_status='complete') | Q(payment_status='failed'))
+            .prefetch_related(
+                "order_item",
+                "order_item__course",
+                "order_item__course__image",
+                "order_item__course__professor",
+                "order_item__course__course_discount"
+            )
+            .select_related('user')
+        )
