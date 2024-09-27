@@ -41,7 +41,7 @@ class Course(CreateMixin, UpdateMixin):
     category = models.ManyToManyField(CourseCategory, related_name="category_course")
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, max_length=255, allow_unicode=True)
-    description = CKEditor5Field(blank=True, null=True)
+    description = CKEditor5Field('Text', blank=True, null=True, config_name='extends')
     price = models.DecimalField(decimal_places=2, max_digits=12, validators=[MinValueValidator(Decimal(0))], )
     video = models.FileField(upload_to='videos/%Y/%m/%d', blank=True, null=True)
     image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name="course_image",
@@ -137,7 +137,7 @@ class Comment(CreateMixin, UpdateMixin):
     rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True,
                                               null=True,
                                               help_text=_("Enter a score of 1 to 5"))
-    admin_response = models.TextField(blank=True, null=True)
+    admin_response = CKEditor5Field(blank=True, null=True, config_name='extends')
 
     def __str__(self) -> str:
         return f"{self.user} - {self.course.name} - {self.body[:20]}"
