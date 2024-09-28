@@ -14,32 +14,23 @@ from pathlib import Path
 
 from celery.schedules import crontab
 from dotenv import load_dotenv
-# from shop.email_config import *
-from shop.media_sms_config import *
-from shop.rest_framework_config import *
+from jdatetime import timedelta
+
 from shop.uppercase_password_validator import UppercasePasswordValidator
-from shop.simple_jwt_config import SIMPLE_JWT
-from shop.liara_config import *
 from core.datetime_config import now
-from shop.chash_config import SESSION_ENGINE, CACHES
-from shop.ckeditor_config import *
+from shop.ckeditor_config import CKEDITOR_5_CONFIGS, customColorPalette
 from dj_database_url import config
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
+load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
-
-ALLOWED_HOSTS = ['*']
-
-# SECURITY WARNING: keep the secret key used in production secret!
-load_dotenv()
-SECRET_KEY = os.environ.get('LIARA_SECRET_KEY')
-
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 THIRD_PARTY_APPS = [
     'users.apps.UsersConfig',
@@ -81,11 +72,6 @@ INSTALLED_APPS = [
     *THIRD_PARTY_PACKAGE,
 
 ]
-
-# liara database
-DATABASES = {
-    'default': config(default=os.environ.get('LIARA_DATABASE_URL'))
-}
 
 
 MIDDLEWARE = [
@@ -180,19 +166,6 @@ SPECTACULAR_SETTINGS = {
     # OTHER SETTINGS
 }
 
-# database config
-# if DEBUG:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': "django.contrib.gis.db.backends.postgis",
-#             "NAME": 'azadi',
-#             "PASSWORD": "postgres",
-#             "USER": "postgres",
-#             "PORT": "5432",
-#             "HOST": "localhost"
-#         }
-#     }
-
 # CELERY BEAT SCHEDULER
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 
@@ -234,9 +207,83 @@ DJANGO_LOGGING = {
     },
 }
 
-CELERY_BEAT_SCHEDULE = {
-    'delete_otp_code': {
-        'task': "users.tasks.delete_otp_code",
-        'schedule': crontab(minute='*/2'),
+# CELERY_BEAT_SCHEDULE = {
+#     'delete_otp_code': {
+#         'task': "users.tasks.delete_otp_code",
+#         'schedule': crontab(minute='*/2'),
+#     }
+# }
+
+# rest framework config
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '25/minute',
+        'user': '1000/day'
     }
 }
+
+# REDIS CACHE
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": f"redis://127.0.0.1:6379/1",
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#         },
+#     }
+# }
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": [
+            "redis://127.0.0.1:6379",
+            # 'redis://redis:6379/1',
+        ],
+        "TIMEOUT": 1200,
+    }
+}
+# SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
+# email config
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_USE_SSL = False
+EMAIL_PORT = 587
+EMAIL_HOST_USER = config("EMAIL_HOST_USER", cast=str)
+DEFAULT_FROM_EMAIL = config("EMAIL_HOST_USER", cast=str)
+EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", cast=str)
+
+# simple jwt config
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    "AUTH_HEADER_TYPES": 'JWT',
+}
+if DEBUG:
+    SIMPLE_JWT['SIGNING_KEY'] = config("SECRET_KEY", cast=str)
+else:
+    SIMPLE_JWT['SIGNING_KEY'] = config('LIARA_SECRET_KEY', cast=str)
+
+# liara config
+# S3 Settings
+LIARA_ENDPOINT = config("LIARA_ENDPOINT", cast=str)
+LIARA_BUCKET_NAME = config("LIARA_BUCKET_NAME", cast=str)
+LIARA_ACCESS_KEY = config("LIARA_ACCESS_KEY", cast=str)
+LIARA_SECRET_KEY = config("LIARA_SECRET_KEY", cast=str)
+
+# S3 Settings Based on AWS (optional)
+AWS_ACCESS_KEY_ID = LIARA_ACCESS_KEY
+AWS_SECRET_ACCESS_KEY = LIARA_SECRET_KEY
+AWS_STORAGE_BUCKET_NAME = LIARA_BUCKET_NAME
+AWS_S3_ENDPOINT_URL = LIARA_ENDPOINT
+AWS_S3_REGION_NAME = 'us-east-1'

@@ -2,14 +2,15 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
-from shop.base import DEBUG
+from decouple import config
 
 
 def main():
     """Run administrative tasks."""
-    if DEBUG:
+    debug_mode = config("DEBUG", default=True, cast=str)
+    if debug_mode:
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.development')
-    if not DEBUG:
+    else:
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.production')
     try:
         from django.core.management import execute_from_command_line

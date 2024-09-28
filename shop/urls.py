@@ -14,18 +14,19 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from decouple import config
 from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from debug_toolbar.toolbar import debug_toolbar_urls
-from shop.base import DEBUG, MEDIA_URL, MEDIA_ROOT
+from shop.base import MEDIA_URL, MEDIA_ROOT
 from django.conf.urls.static import static
 
 # url order panel api_admin
-admin_url = [
-    path('order/', include('orders.api_admin.urls', namespace='admin_order')),
-    path('auth_admin/', include('users.api_admin.urls'))
-]
+# admin_url = [
+#     path('order/', include('orders.api_admin.urls', namespace='admin_order')),
+#     path('auth_admin/', include('users.api_admin.urls'))
+# ]
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -47,6 +48,7 @@ urlpatterns = [
 
 ]
 
-if DEBUG:
+debug_mode = config("DEBUG", default=True, cast=str)
+if debug_mode:
     urlpatterns += debug_toolbar_urls()
     urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

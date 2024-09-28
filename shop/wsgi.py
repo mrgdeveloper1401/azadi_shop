@@ -10,11 +10,13 @@ https://docs.djangoproject.com/en/4.2/howto/deployment/wsgi/
 import os
 
 from django.core.wsgi import get_wsgi_application
-from shop.base import DEBUG
+from decouple import config
 
-if DEBUG:
+debug_mode = config('DEBUG', default=True, cast=bool)
+print(debug_mode)
+if debug_mode:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.development')
-if not DEBUG:
+else:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.production')
 
 application = get_wsgi_application()

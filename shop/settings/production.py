@@ -1,13 +1,12 @@
 from shop.base import *
-import os
+import dj_database_url
 
-os.environ.get('GDAL_LIBRARY_PATH', '/usr/lib/libgdal.so')
 
-SECRET_KEY = os.environ.get('LIARA_SECRET_KEY')
+os.environ.setdefault('GDAL_LIBRARY_PATH', '/usr/lib/libgdal.so')
 
-DEBUG = os.environ.get('DEBUG')
+SECRET_KEY = config('DEBUG', default=True, cast=str)
 
-ALLOWED_HOSTS = ["azadi-shop.liara.run"]
+ALLOWED_HOSTS = ["*"]
 
 # DATABASES = {
 #     'default': {
@@ -20,8 +19,20 @@ ALLOWED_HOSTS = ["azadi-shop.liara.run"]
 #     }
 # }
 
+DATABASES = {
+    'default': dj_database_url.config(default=config('LIARA_DATABASE_URL', cast=str))
+}
 
-CORS_ORIGIN_ALLOW_ALL = True
+
+# cors allowed origin config
+CORS_ALLOWED_ORIGINS = [
+    '0.0.0.0:3000',
+    "0.0.0.0:3001"
+    "0.0.0.0:5000",
+    "0.0.0.0:5001",
+    "0.0.0.0:8000",
+    "0.0.0.0:8001",
+]
 
 # ssl config
 SESSION_COOKIE_SECURE = True

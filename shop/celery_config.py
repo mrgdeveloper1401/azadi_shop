@@ -1,15 +1,14 @@
 from celery import Celery
-from dotenv import load_dotenv
+from decouple import config
 from os import environ
 
 
-load_dotenv()
-DEBUG = environ['DEBUG']
+DEBUG = config('DEBUG', default=True, cast=str)
 
 if DEBUG:
-    environ['DJANGO_SETTINGS_MODULE'] = 'shop.settings.development'
+    environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.development')
 if not DEBUG:
-    environ['DJANGO_SETTINGS_MODULE'] = 'shop.settings.production'
+    environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.production')
 
 app = Celery('shop')
 app.config_from_object('shop.celery_config_redis')
