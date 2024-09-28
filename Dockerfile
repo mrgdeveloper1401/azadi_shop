@@ -33,6 +33,7 @@ RUN adduser --disabled-password azadi
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 RUN chmod +x /home/app/start.sh
+RUN python manage.py collectstatic --noinput
 ENV PYTHONDDONOTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV GDAL_LIBRARY_PATH=/usr/lib/libgdal.so

@@ -14,7 +14,7 @@ from pathlib import Path
 
 from celery.schedules import crontab
 from dotenv import load_dotenv
-from shop.email_config import *
+# from shop.email_config import *
 from shop.media_sms_config import *
 from shop.rest_framework_config import *
 from shop.uppercase_password_validator import UppercasePasswordValidator
@@ -23,6 +23,7 @@ from shop.liara_config import *
 from core.datetime_config import now
 from shop.chash_config import SESSION_ENGINE, CACHES
 from shop.ckeditor_config import *
+from dj_database_url import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -30,12 +31,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = False
+
+ALLOWED_HOSTS = ['*']
+
 # SECURITY WARNING: keep the secret key used in production secret!
 load_dotenv()
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('LIARA_SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
 
 THIRD_PARTY_APPS = [
     'users.apps.UsersConfig',
@@ -60,7 +64,7 @@ THIRD_PARTY_PACKAGE = [
     "django_celery_results",
     "django_celery_beat",
     "django_logging",
-    "django_ckeditor_5"
+    "django_ckeditor_5",
 
 ]
 
@@ -70,6 +74,7 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    "whitenoise.runserver_nostatic",
     'django.contrib.staticfiles',
     'django.contrib.gis',
     *THIRD_PARTY_APPS,
@@ -77,9 +82,16 @@ INSTALLED_APPS = [
 
 ]
 
+# liara database
+DATABASES = {
+    'default': config(default=os.environ.get('LIARA_DATABASE_URL'))
+}
+
+
 MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
@@ -148,7 +160,10 @@ USE_L10N = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+# STATICFILES_DIRS = [
+#     BASE_DIR / "static"
+# ]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -165,24 +180,18 @@ SPECTACULAR_SETTINGS = {
     # OTHER SETTINGS
 }
 
-# debug toolbar
-INTERNAL_IPS = [
-    # ...
-    "127.0.0.1",
-    # ...
-]
-
-if DEBUG:
-    DATABASES = {
-        'default': {
-            'ENGINE': "django.contrib.gis.db.backends.postgis",
-            "NAME": 'azadi',
-            "PASSWORD": "postgres",
-            "USER": "postgres",
-            "PORT": "5432",
-            "HOST": "localhost"
-        }
-    }
+# database config
+# if DEBUG:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': "django.contrib.gis.db.backends.postgis",
+#             "NAME": 'azadi',
+#             "PASSWORD": "postgres",
+#             "USER": "postgres",
+#             "PORT": "5432",
+#             "HOST": "localhost"
+#         }
+#     }
 
 # CELERY BEAT SCHEDULER
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
@@ -193,8 +202,8 @@ STORAGES = {
         "BACKEND": "storages.backends.s3.S3Storage",
     },
     "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    }
 }
 
 # logging in django

@@ -14,10 +14,8 @@ services:
       - .:/home/app
       - djangp-static:/home/app/static
       - supervisor:/etc/supervisor/conf.d
-    # command: >
-    #   sh -c "python manage.py makemigrations --noinput &&
-    #   python manage.py migrate --noinput &&
-    #   python manage.py createsuperuser --mobile_phone 09391640664 --email m.goodarzi606@gmail.com --noinput"
+    command: sh -c "python manage.py makemigrations && \
+      python manage.py migrate"
 
     environment:
       - DEBUG=${DEBUG}

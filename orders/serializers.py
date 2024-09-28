@@ -2,12 +2,10 @@ from decimal import Decimal
 
 from django.db.models import Q
 from rest_framework.serializers import ModelSerializer, IntegerField, ValidationError, Serializer, CharField \
-    ,SerializerMethodField
+    , SerializerMethodField
 from ulid import ULID
-from uuid import uuid4
 from django.db.transaction import atomic
 from datetime import datetime
-from django.utils.translation import gettext_lazy as _
 
 from users.models import UserAccount
 from courses.models import Course
