@@ -4,7 +4,9 @@ import dj_database_url
 
 # os.environ.setdefault('GDAL_LIBRARY_PATH', '/usr/lib/libgdal.so')
 
-SECRET_KEY = config('DEBUG', default=True, cast=str)
+# SECRET_KEY = config('LIARA_PRO_SECRET_KEY', cast=str)
+SECRET_KEY = config("DEPLOY_SECRET_KEY", cast=str)
+
 
 ALLOWED_HOSTS = ["azadi-shop.liara.run"]
 
@@ -42,3 +44,10 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 SECURE_REFERRER_POLICY = "strict-origin"
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
+CORS_ALLOWED_ORIGINS = [
+    'https://azadi-shop.liara.run'
+]
+
+# # simple jwt config
+SIMPLE_JWT['SIGNING_KEY'] = config('LIARA_SECRET_KEY', cast=str)

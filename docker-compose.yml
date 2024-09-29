@@ -2,8 +2,6 @@ services:
   django_app:
     build:
       context: .
-    depends_on:
-      - postgres
     container_name: django_app
     restart: always
     ports:
@@ -12,36 +10,41 @@ services:
       - main
     volumes:
       - .:/home/app
-      - djangp-static:/home/app/static
-      - supervisor:/etc/supervisor/conf.d
-    command: sh -c "python manage.py makemigrations && \
-      python manage.py migrate"
+      - supervisor:/etc/supervisor
+#    command: sh -c "python manage.py makemigrations && \
+#      python manage.py migrate && \
+#      python manage.py collectstatic --noinput"
 
     environment:
       - DEBUG=${DEBUG}
-      - SECRET_KEY=${SECRET_KEY}
-      - DATABASE_USER=${DATABASE_USER}
-      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
-      - DATABASE_NAME=${DATABASE_DB}
-      - DATABASE_HOST=${DATABASE_HOST}
-      - DATABASE_PORT=${DATABASE_PORT}
+      - SECRET_KEY=${DEPLOY_SECRET_KEY}
+#      - DATABASE_USER=${DATABASE_USER}
+#      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+#      - DATABASE_NAME=${DATABASE_DB}
+#      - DATABASE_HOST=${DATABASE_HOST}
+#      - DATABASE_PORT=${DATABASE_PORT}
+      - LIARA_ENDPOINT=${LIARA_ENDPOINT}
+      - LIARA_BUCKET_NAME=${LIARA_BUCKET_NAME}
+      - LIARA_ACCESS_KEY=${LIARA_ACCESS_KEY}
+      - LIARA_SECRET_KEY=${LIARA_SECRET_KEY}
+      - DATABASE_URL=${DATABASE_URL}
 
-  postgres:
-    container_name: postgres_db
-    image: postgres:16.4-alpine
-    restart: always
-    expose:
-      - "5432"
-    ports:
-      - "5434:5432"
-    environment:
-      - POSTGRES_USER=${DATABASE_USER}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-      - POSTGRES_DB=${DATABASE_DB}
-    networks:
-      - main
-    volumes:
-      - azadi-data:/var/lib/postgresql/data
+#  postgres:
+#    container_name: postgres_db
+#    image: postgres:16.4-alpine
+#    restart: always
+#    expose:
+#      - "5432"
+#    ports:
+#      - "5434:5432"
+#    environment:
+#      - POSTGRES_USER=${DATABASE_USER}
+#      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+#      - POSTGRES_DB=${DATABASE_DB}
+#    networks:
+#      - main
+#    volumes:
+#      - azadi-data:/var/lib/postgresql/data
 
   redis:
     container_name: redis
@@ -57,19 +60,18 @@ services:
   nginx:
     container_name: nginx
     image: nginx:1.27.1-alpine
-    restart: always
-    command:
-      - ["nginx", "-g", "daemon off"]
+    restart: on-failure
     ports:
       - 8080:80
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    command: ["nginx", "-g", "daemon off;"]
 
 networks:
   main:
 
 volumes:
-  djangp-static:
+  django-static:
   azadi-data:
   supervisor:
   nginx:

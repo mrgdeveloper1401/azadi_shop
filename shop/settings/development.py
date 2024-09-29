@@ -4,7 +4,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-SECRET_KEY = config('SECRET_KEY', default=True, cast=str)
+SECRET_KEY = config('SECRET_KEY', cast=str)
 
 # debug toolbar
 INTERNAL_IPS = [
@@ -56,3 +56,6 @@ DJANGO_LOGGING = {
         "USE_TEMPLATE": True,
     },
 }
+
+# simple jwt config
+SIMPLE_JWT['SIGNING_KEY'] = config("SECRET_KEY", cast=str)

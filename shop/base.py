@@ -54,6 +54,7 @@ THIRD_PARTY_PACKAGE = [
     "django_celery_results",
     "django_celery_beat",
     "django_ckeditor_5",
+    "storages"
 
 ]
 
@@ -239,10 +240,6 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     "AUTH_HEADER_TYPES": 'JWT',
 }
-if DEBUG:
-    SIMPLE_JWT['SIGNING_KEY'] = config("SECRET_KEY", cast=str)
-else:
-    SIMPLE_JWT['SIGNING_KEY'] = config('LIARA_SECRET_KEY', cast=str)
 
 # liara config
 # S3 Settings
