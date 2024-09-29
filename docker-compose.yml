@@ -18,33 +18,33 @@ services:
     environment:
       - DEBUG=${DEBUG}
       - SECRET_KEY=${DEPLOY_SECRET_KEY}
-#      - DATABASE_USER=${DATABASE_USER}
-#      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
-#      - DATABASE_NAME=${DATABASE_DB}
-#      - DATABASE_HOST=${DATABASE_HOST}
-#      - DATABASE_PORT=${DATABASE_PORT}
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_NAME=${DATABASE_DB}
+      - DATABASE_HOST=${DATABASE_HOST}
+      - DATABASE_PORT=${DATABASE_PORT}
       - LIARA_ENDPOINT=${LIARA_ENDPOINT}
       - LIARA_BUCKET_NAME=${LIARA_BUCKET_NAME}
       - LIARA_ACCESS_KEY=${LIARA_ACCESS_KEY}
       - LIARA_SECRET_KEY=${LIARA_SECRET_KEY}
       - DATABASE_URL=${DATABASE_URL}
 
-#  postgres:
-#    container_name: postgres_db
-#    image: postgres:16.4-alpine
-#    restart: always
-#    expose:
-#      - "5432"
-#    ports:
-#      - "5434:5432"
-#    environment:
-#      - POSTGRES_USER=${DATABASE_USER}
-#      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-#      - POSTGRES_DB=${DATABASE_DB}
-#    networks:
-#      - main
-#    volumes:
-#      - azadi-data:/var/lib/postgresql/data
+  postgres:
+    container_name: postgres_db
+    image: postgres:16.4-alpine
+    restart: always
+    expose:
+      - "5432"
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_DB}
+    networks:
+      - main
+    volumes:
+      - azadi-data:/var/lib/postgresql/data
 
   redis:
     container_name: redis

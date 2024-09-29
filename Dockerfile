@@ -38,7 +38,6 @@ ENV PYTHONUNBUFFERED=1
 ENV GDAL_LIBRARY_PATH=/usr/lib/libgdal.so
 ENV PROJ_LIB=/usr/share/proj
 
-EXPOSE 80
 
 ENTRYPOINT [ "gunicorn", "shop.wsgi", "-b"]
 CMD ["0.0.0.0:8000"]
