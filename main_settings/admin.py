@@ -32,7 +32,7 @@ class SiteLogoAdmin(admin.ModelAdmin):
 
 @admin.register(FooterAddress)
 class FooterAddressAdmin(GISModelAdmin):
-    list_display = ['state', "city", "street", "postal_code", "location", "is_active"]
+    list_display = ['state', "city", "street", "postal_code", "is_active"]
     list_editable = ['is_active']
     list_filter = ['is_active']
     search_fields = ['state', "city", "postal_code"]

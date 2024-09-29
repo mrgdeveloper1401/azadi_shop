@@ -1,6 +1,5 @@
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer, SerializerMethodField
-from django.utils.translation import gettext_lazy as _
 
 from main_settings.models import Footer, FooterAddress, TopRankStudent, Slider, Services, FooterSocial, Awards, AboutUs, \
     ContactUs, SiteLogo, Newsletter, HeaderSite, SliderProfessorImages, SliderProfessorImages

@@ -11,11 +11,11 @@ import os
 from decouple import config
 from django.core.asgi import get_asgi_application
 
-debug_mode = config('DEBUG', default=True, cast=str)
+debug_mode = config('DEBUG', default=True, cast=bool)
 
 if debug_mode:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.development')
-else:
+if not debug_mode:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.production')
 
 application = get_asgi_application()

@@ -3,7 +3,7 @@ from decouple import config
 from os import environ
 
 
-DEBUG = config('DEBUG', default=True, cast=str)
+DEBUG = config('DEBUG', default=True, cast=bool)
 
 if DEBUG:
     environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.development')

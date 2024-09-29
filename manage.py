@@ -4,13 +4,14 @@ import os
 import sys
 from decouple import config
 
+debug_mode = config("DEBUG", default=True, cast=bool)
+
 
 def main():
     """Run administrative tasks."""
-    debug_mode = config("DEBUG", default=True, cast=str)
     if debug_mode:
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.development')
-    else:
+    if not debug_mode:
         os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.production')
     try:
         from django.core.management import execute_from_command_line

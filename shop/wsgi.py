@@ -13,10 +13,10 @@ from django.core.wsgi import get_wsgi_application
 from decouple import config
 
 debug_mode = config('DEBUG', default=True, cast=bool)
-print(debug_mode)
+
 if debug_mode:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.development')
-else:
+if not debug_mode:
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.production')
 
 application = get_wsgi_application()

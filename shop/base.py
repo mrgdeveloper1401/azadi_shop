@@ -19,7 +19,6 @@ from jdatetime import timedelta
 from shop.uppercase_password_validator import UppercasePasswordValidator
 from core.datetime_config import now
 from shop.ckeditor_config import CKEDITOR_5_CONFIGS, customColorPalette
-from dj_database_url import config
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -31,7 +30,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
-
+# print(DEBUG)
 THIRD_PARTY_APPS = [
     'users.apps.UsersConfig',
     'courses.apps.CoursesConfig',
@@ -54,7 +53,6 @@ THIRD_PARTY_PACKAGE = [
     "corsheaders",
     "django_celery_results",
     "django_celery_beat",
-    "django_logging",
     "django_ckeditor_5",
 
 ]
@@ -73,7 +71,6 @@ INSTALLED_APPS = [
 
 ]
 
-
 MIDDLEWARE = [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
@@ -85,7 +82,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'django_logging.middleware.RequestLogMiddleware',
+
 ]
 
 ROOT_URLCONF = 'shop.urls'
@@ -179,33 +176,6 @@ STORAGES = {
     }
 }
 
-# logging in django
-log_file = BASE_DIR / "logs"
-res = log_file / f"logs_{now().strftime('%Y-%m-%d')}"
-DJANGO_LOGGING = {
-    "AUTO_INITIALIZATION_ENABLE": True,
-    "INITIALIZATION_MESSAGE_ENABLE": True,
-    "LOG_FILE_LEVELS": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-    "LOG_DIR": f"{res}",
-    "LOG_FILE_FORMATS": {
-        "DEBUG": 1,
-        "INFO": 1,
-        "WARNING": 1,
-        "ERROR": 1,
-        "CRITICAL": 1,
-    },
-    "LOG_CONSOLE_LEVEL": "DEBUG",
-    "LOG_CONSOLE_FORMAT": 1,
-    "LOG_CONSOLE_COLORIZE": True,
-    "LOG_DATE_FORMAT": "%Y-%m-%d %H:%M:%S",
-    "LOG_EMAIL_NOTIFIER": {
-        "ENABLE": False,
-        "NOTIFY_ERROR": False,
-        "NOTIFY_CRITICAL": False,
-        "LOG_FORMAT": 1,
-        "USE_TEMPLATE": True,
-    },
-}
 
 # CELERY_BEAT_SCHEDULE = {
 #     'delete_otp_code': {
@@ -246,7 +216,7 @@ CACHES = {
         "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "LOCATION": [
             "redis://127.0.0.1:6379",
-            # 'redis://redis:6379/1',
+            'redis://redis:6379/1',
         ],
         "TIMEOUT": 1200,
     }

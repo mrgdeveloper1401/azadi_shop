@@ -3,7 +3,7 @@ from enum import property
 from django.db import models
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
-from django.contrib.gis.db.models import PointField
+# from django.contrib.gis.db.models import PointField
 
 from core.models import CreateMixin, UpdateMixin
 from users.validators import MobileValidator
@@ -166,7 +166,7 @@ class FooterAddress(CreateMixin, UpdateMixin):
     state = models.CharField(_("state"), max_length=150)
     street = models.TextField(_("street"))
     postal_code = models.CharField(_("postal code"), max_length=10, unique=True)
-    location = PointField(_("location"))
+    # location = PointField(_("location"))
     is_active = models.BooleanField(_("is active"), default=True)
 
     def __str__(self):
