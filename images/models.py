@@ -35,10 +35,12 @@ class Image(CreateMixin, UpdateMixin):
         return f"{self.file_hash} && {self.title}"
 
     def save(self, *args, **kwargs):
-        self.file_hash = self.generate_hash
-        self.file_size = self.image.size
-        if Image.objects.filter(file_hash=self.file_hash).exists():
-            raise ValidationError({"file_hash": _("image already exists")})
+        print("pk image", self.pk)
+        if self.pk is None:
+            self.file_hash = self.generate_hash
+            self.file_size = self.image.size
+            if Image.objects.filter(file_hash=self.file_hash).exists():
+                raise ValidationError({"file_hash": _("image already exists")})
         super().save(*args, **kwargs)
 
     @property

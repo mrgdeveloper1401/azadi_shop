@@ -2,7 +2,6 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
 from django.core.exceptions import ValidationError
-from django_jalali.db.models import jDateTimeField
 
 from users.managers import UserManager, OtpManager
 from users.validators import MobileValidator
@@ -25,8 +24,6 @@ class UserAccount(AbstractUser, SoftDeleteMixin):
             "Unselect this instead of deleting accounts."
         ),
     )
-    date_joined = jDateTimeField(_("date joined"), default=now())
-    last_login = jDateTimeField(_("last login"), blank=True, null=True)
     USERNAME_FIELD = 'mobile_phone'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
 
@@ -118,7 +115,7 @@ class UserInfo(CreateMixin, UpdateMixin):
 class Otp(CreateMixin):
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='user_otp')
     code = models.PositiveIntegerField(_('OTP code'), unique=True, default=generate_random_code)
-    expired_at = jDateTimeField(blank=True)
+    expired_at = models.DateTimeField(blank=True, null=True)
 
     objects = OtpManager()
 

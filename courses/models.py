@@ -1,17 +1,14 @@
 from decimal import Decimal
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django_jalali.db.models import jDateTimeField
-from shop.base import AUTH_USER_MODEL
+# from django_jalali.db.models import jDateTimeField
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from treebeard.mp_tree import MP_Node
-from django_ckeditor_5.fields import CKEditor5Field
 
 from core.models import CreateMixin, UpdateMixin
 from courses.managers import CategoryManager, CourseManager
 from courses.managers import DiscountManager
-from core.datetime_config import now
 
 
 class CourseCategory(MP_Node):
@@ -41,7 +38,8 @@ class Course(CreateMixin, UpdateMixin):
     category = models.ManyToManyField(CourseCategory, related_name="category_course")
     name = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, max_length=255, allow_unicode=True)
-    description = CKEditor5Field('Text', blank=True, null=True, config_name='extends')
+    # description = CKEditor5Field('Text', blank=True, null=True, config_name='extends')
+    description = models.TextField(blank=True, null=True)
     price = models.DecimalField(decimal_places=2, max_digits=12, validators=[MinValueValidator(Decimal(0))], )
     video = models.FileField(upload_to='videos/%Y/%m/%d', blank=True, null=True)
     image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name="course_image",
@@ -66,7 +64,7 @@ class Course(CreateMixin, UpdateMixin):
         if self.price == 0:
             self.is_free = True
         elif self.is_free:
-            self.price =0
+            self.price = 0
         super().save(*args, **kwargs)
 
     @property
@@ -108,7 +106,7 @@ class DiscountCourse(CreateMixin, UpdateMixin):
     value = models.PositiveIntegerField()
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    expired_date = jDateTimeField()
+    expired_date = models.DateTimeField()
 
     objects = DiscountManager()
 
@@ -126,7 +124,7 @@ class DiscountCourse(CreateMixin, UpdateMixin):
 
 
 class Comment(CreateMixin, UpdateMixin):
-    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user_comment',
+    user = models.ForeignKey('users.UserAccount', on_delete=models.CASCADE, related_name='user_comment',
                              limit_choices_to={"is_active": True, "is_verified": True})
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_comment',
                                limit_choices_to={"is_active": True, "is_sale": True})
@@ -137,7 +135,8 @@ class Comment(CreateMixin, UpdateMixin):
     rating = models.PositiveSmallIntegerField(validators=[MinValueValidator(1), MaxValueValidator(5)], blank=True,
                                               null=True,
                                               help_text=_("Enter a score of 1 to 5"))
-    admin_response = CKEditor5Field(blank=True, null=True, config_name='extends')
+    # admin_response = CKEditor5Field(blank=True, null=True, config_name='extends')
+    admin_response = models.TextField(blank=True, null=True)
 
     def __str__(self) -> str:
         return f"{self.user} - {self.course.name} - {self.body[:20]}"
@@ -149,7 +148,7 @@ class Comment(CreateMixin, UpdateMixin):
 
 
 class Like(CreateMixin, UpdateMixin):
-    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.PROTECT, related_name='user_like',
+    user = models.ForeignKey('users.UserAccount', on_delete=models.PROTECT, related_name='user_like',
                              limit_choices_to={'is_active': True, "is_verified": True})
     course = models.ForeignKey(Course, on_delete=models.PROTECT, related_name='course_like',
                                limit_choices_to={'is_active': True})

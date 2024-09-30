@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django_jalali.admin.filters import JDateFieldListFilter
+# from django_jalali.admin.filters import JDateFieldListFilter
 
 from orders.models import Cart, CartItem, Order, OrderItem
 
@@ -29,7 +29,7 @@ class CartAdmin(admin.ModelAdmin):
 @admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):
     list_display = ['id', 'cart', 'course', 'quantity', "item_price", "calc_final_price", "discount_value", 'created_at']
-    list_filter = [('created_at', JDateFieldListFilter)]
+    list_filter = ['created_at']
     search_fields = ['course__name', "cart__user__mobile_phone"]
     list_per_page = 20
     raw_id_fields = ["cart", "course"]
@@ -45,12 +45,13 @@ class CartItemAdmin(admin.ModelAdmin):
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
     list_display = ['id', 'user', 'payment_status', 'order_number', "order_total_price", 'created_at']
-    list_filter = ['payment_status', ('created_at', JDateFieldListFilter)]
+    list_filter = ['payment_status', 'created_at']
     search_fields = ['user__mobile_phone', "payment_status", "order_number"]
     list_per_page = 20
     list_display_links = ['id', "user"]
     date_hierarchy = 'created_at'
     readonly_fields = ['order_number']
+    raw_id_fields = ['user']
 
     def get_queryset(self, request):
         q = super().get_queryset(request)
@@ -62,7 +63,7 @@ class OrderAdmin(admin.ModelAdmin):
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
     list_display = ['id', 'course', 'order', "course_price", 'created_at']
-    list_filter = [('created_at', JDateFieldListFilter)]
+    list_filter = ['created_at']
     search_fields = ['course__name', "order__user__mobile_phone"]
     list_display_links = ['id', "course"]
     raw_id_fields = ['order', "course"]

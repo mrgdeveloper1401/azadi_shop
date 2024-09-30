@@ -1,6 +1,6 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-from django_jalali.db.models import jDateTimeField
+# from django_jalali.db.models import jDateTimeField
 
 from core.models import CreateMixin, UpdateMixin
 # Create your models here.

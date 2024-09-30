@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 from django.contrib.admin import SimpleListFilter
-from django_jalali.admin.filters import JDateFieldListFilter
+# from django_jalali.admin.filters import JDateFieldListFilter
 
 from users.models import UserAccount, UserInfo, Otp
 
@@ -59,8 +59,7 @@ class UserAdmin(BaseUserAdmin):
     )
     list_display = ("id", "mobile_phone", "email", "first_name", "last_name", "is_staff", 'is_superuser', 'is_active',
                     "is_verified", "is_deleted", "deleted_at")
-    list_filter = ("is_staff", "is_superuser", "is_active", 'is_verified', "groups",
-                   ("date_joined", JDateFieldListFilter))
+    list_filter = ("is_staff", "is_superuser", "is_active", 'is_verified', "groups", "date_joined")
     search_fields = ("mobile_phone", "first_name", "last_name", "email")
     ordering = ("mobile_phone",)
     filter_horizontal = (
@@ -95,6 +94,6 @@ class OtpAdmin(admin.ModelAdmin):
     list_display = ['user', 'id', 'code', 'created_at', 'expired_at']
     list_select_related = ['user']
     search_fields = ['user__mobile_phone']
-    list_filter = [("created_at", JDateFieldListFilter), ("expired_at", JDateFieldListFilter)]
+    list_filter = ["created_at", "expired_at"]
     raw_id_fields = ['user']
 

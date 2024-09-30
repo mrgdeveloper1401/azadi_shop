@@ -1,8 +1,9 @@
 from shop.base import *
 
-DEBUG = True
+# from shop.ckeditor_config import CKEDITOR_5_CONFIGS, customColorPalette
 
-ALLOWED_HOSTS = []
+
+ALLOWED_HOSTS = ['*']
 
 SECRET_KEY = config('SECRET_KEY', cast=str)
 
@@ -13,19 +14,20 @@ INTERNAL_IPS = [
     # ...
 ]
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': "django.db.backends.postgresql",
-#         "NAME": "azadi",
-#         "PORT": "5432",
-#         "USER": "postgres",
-#         "PASSWORD": "postgres",
-#         "HOST": "localhost",
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': "django.db.backends.postgresql",
+        "NAME": "azadi",
+        "PORT": "5432",
+        "USER": "postgres",
+        "PASSWORD": "postgres",
+        "HOST": "localhost",
+    }
+}
 
 INSTALLED_APPS += [
     "django_logging",
+    # "django_ckeditor_5",
 ]
 MIDDLEWARE += ['django_logging.middleware.RequestLogMiddleware']
 
@@ -59,3 +61,19 @@ DJANGO_LOGGING = {
 
 # simple jwt config
 SIMPLE_JWT['SIGNING_KEY'] = config("SECRET_KEY", cast=str)
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": [
+            "redis://localhost:6379/0",
+        ],
+        "TIMEOUT": 1200,
+    }
+}
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
+STORAGES['staticfiles'] = {
+    # "BACKEND": "django.core.files.storage.FileSystemStorage",
+    "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+}
