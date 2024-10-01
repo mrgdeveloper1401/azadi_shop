@@ -40,17 +40,18 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SIMPLE_JWT['SIGNING_KEY'] = config('LIARA_PRO_SECRET_KEY', cast=str)
 
 CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": [
-            # config('LIARA_PUBLIC_REDIS_URL', cast=str)
-            config("LIARA_REDIS_URL", cast=str)
-        ],
-        "TIMEOUT": 1200,
+    'default': {
+        'BACKEND': 'django_redis.cache.RedisCache',
+        'LOCATION': config("LIARA_REDIS_URL"),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
     }
 }
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+
+SESSION_REDIS_TTL = 60 * 15
 
 STORAGES['staticfiles'] = {
     'BACKEND': "whitenoise.storage.CompressedManifestStaticFilesStorage"

@@ -31,6 +31,36 @@ INSTALLED_APPS += [
 ]
 MIDDLEWARE += ['django_logging.middleware.RequestLogMiddleware']
 
+
+# simple jwt config
+SIMPLE_JWT['SIGNING_KEY'] = config("SECRET_KEY", cast=str)
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/0",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+            "PICKLE_VERSION": -1,
+            "SOCKET_CONNECT_TIMEOUT": 10,
+            "SOCKET_TIMEOUT": 5,
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+            "IGNORE_EXCEPTIONS": True,
+            "CONNECTION_POOL_KWARGS": {'max_connections': 100, "retry_on_timeout": True},
+            "PARSER_CLASS": "redis.connection.HiredisParser",
+            # "SERIALIZER": "django_redis.serializers.msgpack.MSGPackSerializer",
+        }
+    }
+}
+
+SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = True
+DJANGO_REDIS_LOGGER = 'azadi_redis_logger'
+
+STORAGES['staticfiles'] = {
+    # "BACKEND": "django.core.files.storage.FileSystemStorage",
+    "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
+}
+
 # logging in django
 log_file = BASE_DIR / "logs"
 res = log_file / f"logs_{now().strftime('%Y-%m-%d')}"
@@ -57,23 +87,11 @@ DJANGO_LOGGING = {
         "LOG_FORMAT": 1,
         "USE_TEMPLATE": True,
     },
-}
-
-# simple jwt config
-SIMPLE_JWT['SIGNING_KEY'] = config("SECRET_KEY", cast=str)
-CACHES = {
-    "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": [
-            "redis://localhost:6379/0",
-        ],
-        "TIMEOUT": 1200,
+    "LOGGERS": {
+        "azadi_redis_logger": {
+            "level": "ERROR",
+            "handlers": ["console", "file"],
+            "propagate": True,
+        }
     }
-}
-
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-
-STORAGES['staticfiles'] = {
-    # "BACKEND": "django.core.files.storage.FileSystemStorage",
-    "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
 }

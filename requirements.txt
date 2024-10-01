@@ -76,7 +76,6 @@ python-crontab==3.2.0
 python-dateutil==2.9.0.post0
 python-decouple==3.8
 python-dotenv==1.0.1
-python-slugify==8.0.4
 python-ulid==2.7.0
 python3-openid==3.2.0
 pytz==2024.1
