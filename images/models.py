@@ -16,7 +16,7 @@ class Image(CreateMixin, UpdateMixin):
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
 
-    file_hash = models.CharField(max_length=40, null=True, blank=True, unique=True)
+    file_hash = models.CharField(max_length=40, null=True, blank=True)
     file_size = models.PositiveIntegerField(null=True, blank=True, help_text=_("file size as xx.b"))
 
     focal_point_x = models.PositiveIntegerField(null=True, blank=True)
@@ -34,13 +34,13 @@ class Image(CreateMixin, UpdateMixin):
     def __str__(self):
         return f"{self.file_hash} && {self.title}"
 
-    def save(self, *args, **kwargs):
-        if not self.pk or self.pk is None:
-            if Image.objects.filter(file_hash=self.file_hash).exists():
-                raise ValidationError(_("image hash already exists"))
-        self.file_hash = self.generate_hash
-        self.file_size = self.image.size
-        super().save(*args, **kwargs)
+    # def save(self, *args, **kwargs):
+    #     if not self.pk or self.pk is None:
+    #         if Image.objects.filter(file_hash=self.file_hash).exists():
+    #             raise ValidationError(_("image hash already exists"))
+    #     self.file_hash = self.generate_hash
+    #     self.file_size = self.image.size
+    #     super().save(*args, **kwargs)
 
     @property
     def image_url(self):
