@@ -1,6 +1,6 @@
 from django.db import models
 from hashlib import sha1
-from rest_framework.exceptions import ValidationError
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from core.models import CreateMixin, UpdateMixin
@@ -16,7 +16,7 @@ class Image(CreateMixin, UpdateMixin):
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
 
-    file_hash = models.CharField(max_length=40, db_index=True, null=True, blank=True)
+    file_hash = models.CharField(max_length=40, null=True, blank=True, unique=True)
     file_size = models.PositiveIntegerField(null=True, blank=True, help_text=_("file size as xx.b"))
 
     focal_point_x = models.PositiveIntegerField(null=True, blank=True)
@@ -35,22 +35,17 @@ class Image(CreateMixin, UpdateMixin):
         return f"{self.file_hash} && {self.title}"
 
     def save(self, *args, **kwargs):
-        print("pk image", self.pk)
-        if self.pk is None:
-            self.file_hash = self.generate_hash
-            self.file_size = self.image.size
+        if not self.pk or self.pk is None:
             if Image.objects.filter(file_hash=self.file_hash).exists():
-                raise ValidationError({"file_hash": _("image already exists")})
+                raise ValidationError(_("image hash already exists"))
+        self.file_hash = self.generate_hash
+        self.file_size = self.image.size
         super().save(*args, **kwargs)
 
     @property
     def image_url(self):
         return self.image.url
 
-    def clean(self):
-        if Image.objects.filter(file_hash=self.file_hash).exists():
-            raise ValidationError({"file_hash": _("image already exists")})
-        super().clean()
 
     class Meta:
         db_table = "image"
