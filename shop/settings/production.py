@@ -43,16 +43,32 @@ CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
         'LOCATION': config("LIARA_REDIS_URL"),
+        "TIMEOUT": 750,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+            "PICKLE_VERSION": -1,
+            "SOCKET_CONNECT_TIMEOUT": 10,
+            "SOCKET_TIMEOUT": 10,
+            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
+            "IGNORE_EXCEPTIONS": True,
+            "CONNECTION_POOL_KWARGS": {'max_connections': 100, "retry_on_timeout": True},
+            "PARSER_CLASS": "redis.connection.HiredisParser",
+
         }
     }
 }
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-
+DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = True
 SESSION_REDIS_TTL = 60 * 15
 
 STORAGES['staticfiles'] = {
     'BACKEND': "whitenoise.storage.CompressedManifestStaticFilesStorage"
 }
+
+# MIDDLEWARE += [
+#     "django.middleware.cache.UpdateCacheMiddleware",
+#     "django.middleware.common.CommonMiddleware",
+#     "django.middleware.cache.FetchFromCacheMiddleware",
+# ]
+
