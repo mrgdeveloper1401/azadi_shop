@@ -1,5 +1,6 @@
 from shop.base import *
 import dj_database_url
+from shop.settings.development import log_dir
 
 # os.environ.setdefault('GDAL_LIBRARY_PATH', '/usr/lib/libgdal.so')
 
@@ -52,7 +53,7 @@ CACHES = {
             "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
             "IGNORE_EXCEPTIONS": True,
             "CONNECTION_POOL_KWARGS": {'max_connections': 100, "retry_on_timeout": True},
-            "PARSER_CLASS": "redis.connection.HiredisParser",
+            "PARSER_CLASS": "redis.connection._HiredisParser",
 
         }
     }
@@ -66,9 +67,62 @@ STORAGES['staticfiles'] = {
     'BACKEND': "whitenoise.storage.CompressedManifestStaticFilesStorage"
 }
 
-# MIDDLEWARE += [
-#     "django.middleware.cache.UpdateCacheMiddleware",
-#     "django.middleware.common.CommonMiddleware",
-#     "django.middleware.cache.FetchFromCacheMiddleware",
-# ]
+MIDDLEWARE += [
+    "django.middleware.cache.UpdateCacheMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.cache.FetchFromCacheMiddleware",
+]
 
+# with logging django
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{"
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{"
+        }
+    },
+    "filters": {
+        "require_debug_true": {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
+    "handlers": {
+        "info_file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(BASE_DIR / log_dir / 'info_file.log')
+        },
+        "error_file": {
+            "level": "ERROR",
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(BASE_DIR / log_dir / 'error_file.log')
+        },
+        "warning_file": {
+            "level": "WARNING",
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(BASE_DIR / log_dir / 'warning_file.log')
+        },
+        "critical_file": {
+            "level": "CRITICAL",
+            "class": "logging.FileHandler",
+            "formatter": "verbose",
+            "filename": os.path.join(BASE_DIR / log_dir / 'critical_file.log')
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "info_file", "warning_file", "critical_file", "error_file"],
+            'propagate': True,
+        }
+    }
+
+}
