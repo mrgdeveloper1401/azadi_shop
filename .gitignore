@@ -139,3 +139,5 @@ GitHub.sublime-settings
 .idea
 azadi-shop.zip
 ./staticfiles
+general_log_django
+logs

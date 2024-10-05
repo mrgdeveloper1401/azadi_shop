@@ -1,0 +1,8 @@
+-r base.txt
+colorlog==6.8.2
+dj-logging==1.2.1
+django-debug-toolbar==4.4.6
+django-jalali==7.1.0
+hiredis==3.0.0
+redis==5.1.1
+django_redis==5.4.0

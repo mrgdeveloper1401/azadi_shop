@@ -56,8 +56,6 @@ MIDDLEWARE = [
     # debug toolbar
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
-    # whitenoise
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     # cors-header
     "corsheaders.middleware.CorsMiddleware",
@@ -128,9 +126,7 @@ USE_L10N = True
 
 STATIC_URL = 'static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-# STATICFILES_DIRS = [
-#     BASE_DIR / "static"
-# ]
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -154,16 +150,11 @@ CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3.S3Storage",
+    },
+    'staticfiles': {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"
     }
 }
-
-
-# CELERY_BEAT_SCHEDULE = {
-#     'delete_otp_code': {
-#         'task': "users.tasks.delete_otp_code",
-#         'schedule': crontab(minute='*/2'),
-#     }
-# }
 
 # rest framework config
 REST_FRAMEWORK = {
@@ -176,21 +167,10 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '25/minute',
+        'anon': '20/minute',
         'user': '1000/day'
     }
 }
-
-
-# email config
-# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-# EMAIL_HOST = 'smtp.gmail.com'
-# EMAIL_USE_TLS = True
-# EMAIL_USE_SSL = False
-# EMAIL_PORT = 587
-# EMAIL_HOST_USER = config("EMAIL_HOST_USER", cast=str)
-# DEFAULT_FROM_EMAIL = config("EMAIL_HOST_USER", cast=str)
-# EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", cast=str)
 
 # simple jwt config
 SIMPLE_JWT = {

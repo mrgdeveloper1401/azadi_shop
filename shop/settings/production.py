@@ -1,7 +1,6 @@
 from shop.base import *
 import dj_database_url
-
-# os.environ.setdefault('GDAL_LIBRARY_PATH', '/usr/lib/libgdal.so')
+import os
 
 SECRET_KEY = config('DEPLOY_SECRET_KEY', cast=str)
 
@@ -9,10 +8,7 @@ ALLOWED_HOSTS = ["*"]
 
 
 DATABASES = {
-    # private url
     'default': dj_database_url.config(default=config('DATABASE_URL', cast=str))
-    # public url
-    # 'default': dj_database_url.config(default=config('PUBLIC_DATABASE_URL', cast=str))
 }
 
 # cors allowed origin config
@@ -61,10 +57,6 @@ CACHES = {
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = True
 SESSION_REDIS_TTL = 750
-
-STORAGES['staticfiles'] = {
-    'BACKEND': "whitenoise.storage.CompressedManifestStaticFilesStorage"
-}
 
 MIDDLEWARE += [
     "django.middleware.cache.UpdateCacheMiddleware",
