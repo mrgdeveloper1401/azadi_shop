@@ -1,12 +1,9 @@
 from shop.base import *
-import os
-
-# from shop.ckeditor_config import CKEDITOR_5_CONFIGS, customColorPalette
-
 
 ALLOWED_HOSTS = []
 
 SECRET_KEY = config('SECRET_KEY', cast=str)
+
 
 # debug toolbar
 INTERNAL_IPS = [
@@ -28,10 +25,14 @@ DATABASES = {
 
 INSTALLED_APPS += [
     "django_logging",
+    'debug_toolbar',
     # "django_ckeditor_5",
 ]
 MIDDLEWARE += [
+    # debug toolbar
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django_logging.middleware.RequestLogMiddleware',
+    # chash with django redis
     "django.middleware.cache.UpdateCacheMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.cache.FetchFromCacheMiddleware",
@@ -41,22 +42,17 @@ MIDDLEWARE += [
 
 # simple jwt config
 SIMPLE_JWT['SIGNING_KEY'] = config("SECRET_KEY", cast=str)
-# print(SIMPLE_JWT)
+
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/0",
-        'TIMEOUT': 750,
+        "LOCATION": "redis://127.0.0.1:6379/2",
+        "TIMEOUT": 300,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "PICKLE_VERSION": -1,
-            "SOCKET_CONNECT_TIMEOUT": 10,
+            "SOCKET_CONNECT_TIMEOUT": 5,
             "SOCKET_TIMEOUT": 5,
-            "COMPRESSOR": "django_redis.compressors.zlib.ZlibCompressor",
-            "IGNORE_EXCEPTIONS": True,
-            "CONNECTION_POOL_KWARGS": {'max_connections': 100, "retry_on_timeout": True},
-            # "PARSER_CLASS": "redis.connection._HiredisParser",
-            # "SERIALIZER": "django_redis.serializers.msgpack.MSGPackSerializer",
+            "IGNORE_EXCEPTIONS": False,
         }
     }
 }
@@ -95,58 +91,6 @@ DJANGO_LOGGING = {
             "level": "ERROR",
             "handlers": ["console", "file"],
             "propagate": True,
-        }
-    }
-}
-
-# with logging django
-log_dir = os.path.join(BASE_DIR / 'general_log_django')
-os.makedirs(log_dir, exist_ok=True)
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "color": {
-            "()": "colorlog.ColoredFormatter",
-            "format": "%(log_color)s%(levelname)s %(reset)s%(asctime)s %(module)s %(process)d %(thread)d %(message)s",
-            "datefmt": "%Y-%m-%d %H:%M:%S",
-        },
-    },
-    "handlers": {
-        "console": {
-            "level": "DEBUG",
-            "class": "logging.StreamHandler",
-            "formatter": "color",
-        },
-        "info_file": {
-            "level": "INFO",
-            "class": "logging.FileHandler",
-            "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / 'info_file.log')
-        },
-        "error_file": {
-            "level": "ERROR",
-            "class": "logging.FileHandler",
-            "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / 'error_file.log')
-        },
-        "warning_file": {
-            "level": "WARNING",
-            "class": "logging.FileHandler",
-            "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / 'warning_file.log')
-        },
-        "critical_file": {
-            "level": "CRITICAL",
-            "class": "logging.FileHandler",
-            "formatter": "color",
-            "filename": os.path.join(BASE_DIR / log_dir / 'critical_file.log')
-        },
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console", "info_file", "warning_file", "critical_file", "error_file"],
-            'propagate': True,
         }
     }
 }

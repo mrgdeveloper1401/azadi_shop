@@ -1,13 +1,13 @@
-from django_celery_beat.models import PeriodicTask, IntervalSchedule
 from celery import shared_task
+from django.utils.timezone import now
 
 from users.models import Otp
-from core.datetime_config import now, after_two_minute
+# from core.datetime_config import after_two_minute
 
 
 @shared_task
 def delete_otp_code():
-    return Otp.objects.filter(expired_at__lt=now()).delete()
+    Otp.objects.filter(expired_at__lt=now()).delete()
 
 
 # def schedule_otp(request):

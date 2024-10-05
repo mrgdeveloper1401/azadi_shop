@@ -1,7 +1,7 @@
 from django.core.management.base import BaseCommand
 
 from users.models import Otp
-from core.datetime_config import now
+from django.utils.timezone import now
 
 
 class Command(BaseCommand):

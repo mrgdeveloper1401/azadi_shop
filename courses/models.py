@@ -95,7 +95,7 @@ class Course(CreateMixin, UpdateMixin):
 
 class DiscountCourse(CreateMixin, UpdateMixin):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_discount',
-                               limit_choices_to={"is_active": True, "is_sale": True})
+                               limit_choices_to={"is_active": True, "is_sale": True, 'is_free': False})
 
     TYPE_CHOICES = (
         ('درصدی', 'درصدی'),

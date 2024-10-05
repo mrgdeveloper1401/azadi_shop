@@ -274,6 +274,8 @@ class SendOtpCodeSerializer(serializers.Serializer):
             UserAccount.objects.get(mobile_phone=attrs['mobile_phone'])
         except UserAccount.DoesNotExist:
             raise ValidationError({"message": _("code is send")})
+        if Otp.objects.filter(user__mobile_phone=attrs['mobile_phone']).exists():
+            raise ValidationError({"message": _("you already code please try again 2 minute")})
         return attrs
 
     def create(self, validated_data):
