@@ -11,7 +11,7 @@ from users.serializers import UserRegisterSerializer, UserVerifyRegisterSerializ
     ForgetPasswordConfirmSerializer, ProfileSerializer, SendOtpCodeSerializer
 from users.models import UserInfo
 from users.permissions import IsOwnerProfile
-from core.datetime_config import now
+from django.utils.timezone import now
 
 
 class UserRegistrationAPIView(APIView):

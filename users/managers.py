@@ -1,7 +1,8 @@
 from django.contrib.auth.models import BaseUserManager
 from django.db.models import Manager
 
-from core.datetime_config import now, after_two_minute
+from core.datetime_config import after_two_minute
+from django.utils.timezone import now
 
 
 class UserManager(BaseUserManager):

@@ -1,10 +1,9 @@
 from shop.base import *
 import dj_database_url
-from shop.settings.development import log_dir
 
 # os.environ.setdefault('GDAL_LIBRARY_PATH', '/usr/lib/libgdal.so')
 
-SECRET_KEY = config('LIARA_PRO_SECRET_KEY', cast=str)
+SECRET_KEY = config('DEPLOY_SECRET_KEY', cast=str)
 
 ALLOWED_HOSTS = ["*"]
 
@@ -18,7 +17,7 @@ DATABASES = {
 
 # cors allowed origin config
 CORS_ALLOWED_ORIGINS = [
-    "https://azadi-shop.liara.run",
+    "https://charming-swartz-6sjspwzht.liara.run",
 ]
 
 
@@ -38,12 +37,12 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 
 # # simple jwt config
-SIMPLE_JWT['SIGNING_KEY'] = config('LIARA_PRO_SECRET_KEY', cast=str)
+SIMPLE_JWT['SIGNING_KEY'] = config('DEPLOY_SECRET_KEY', cast=str)
 
 CACHES = {
     'default': {
         'BACKEND': 'django_redis.cache.RedisCache',
-        'LOCATION': config("LIARA_REDIS_URL"),
+        'LOCATION': config("LIARA_REDIS_URL", cast=str),
         "TIMEOUT": 750,
         'OPTIONS': {
             'CLIENT_CLASS': 'django_redis.client.DefaultClient',
@@ -61,7 +60,7 @@ CACHES = {
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = True
-SESSION_REDIS_TTL = 60 * 15
+SESSION_REDIS_TTL = 750
 
 STORAGES['staticfiles'] = {
     'BACKEND': "whitenoise.storage.CompressedManifestStaticFilesStorage"
@@ -74,47 +73,52 @@ MIDDLEWARE += [
 ]
 
 # with logging django
+log_dir = os.path.join(BASE_DIR / 'general_log_django')
+os.makedirs(log_dir, exist_ok=True)
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
     "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
-            "style": "{"
+        "color": {
+            "()": "colorlog.ColoredFormatter",
+            "format": "%(log_color)s%(levelname)s %(reset)s%(asctime)s %(module)s %(process)d %(thread)d %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
-        "simple": {
-            "format": "{levelname} {message}",
-            "style": "{"
-        }
     },
-    "filters": {
-        "require_debug_true": {
+    'filters': {
+        'require_debug_true': {
             "()": "django.utils.log.RequireDebugTrue",
         },
     },
     "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "color",
+            "filters": ["require_debug_true"],
+        },
         "info_file": {
             "level": "INFO",
             "class": "logging.FileHandler",
-            "formatter": "verbose",
+            "formatter": "color",
             "filename": os.path.join(BASE_DIR / log_dir / 'info_file.log')
         },
         "error_file": {
             "level": "ERROR",
             "class": "logging.FileHandler",
-            "formatter": "verbose",
+            "formatter": "color",
             "filename": os.path.join(BASE_DIR / log_dir / 'error_file.log')
         },
         "warning_file": {
             "level": "WARNING",
             "class": "logging.FileHandler",
-            "formatter": "verbose",
+            "formatter": "color",
             "filename": os.path.join(BASE_DIR / log_dir / 'warning_file.log')
         },
         "critical_file": {
             "level": "CRITICAL",
             "class": "logging.FileHandler",
-            "formatter": "verbose",
+            "formatter": "color",
             "filename": os.path.join(BASE_DIR / log_dir / 'critical_file.log')
         },
     },
@@ -124,5 +128,4 @@ LOGGING = {
             'propagate': True,
         }
     }
-
 }

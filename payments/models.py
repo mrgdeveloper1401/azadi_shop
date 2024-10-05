@@ -1,10 +1,10 @@
 from django.db import models
-from orders.models import Order
+# from orders.models import Order
 from django.utils.translation import gettext_lazy as _
 
 from core.models import CreateMixin, UpdateMixin
 from shop.base import AUTH_USER_MODEL
-from core.datetime_config import now
+from django.utils.timezone import now
 
 
 # Create your models here.
@@ -30,4 +30,3 @@ class Payment(CreateMixin, UpdateMixin):
         db_table = 'payments'
         verbose_name = _("payments")
         verbose_name_plural = _("payments")
-

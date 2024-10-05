@@ -1,7 +1,7 @@
 from django.db.models import Manager
 from treebeard.mp_tree import MP_NodeManager
 
-from core.datetime_config import now
+from django.utils.timezone import now
 
 
 class CategoryManager(MP_NodeManager):

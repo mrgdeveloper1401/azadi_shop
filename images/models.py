@@ -1,6 +1,6 @@
 from django.db import models
 from hashlib import sha1
-from django.core.exceptions import ValidationError
+# from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from core.models import CreateMixin, UpdateMixin
@@ -45,7 +45,6 @@ class Image(CreateMixin, UpdateMixin):
     @property
     def image_url(self):
         return self.image.url
-
 
     class Meta:
         db_table = "image"

@@ -6,8 +6,8 @@ from django.db.models import Case, When, F, DecimalField, Value
 
 from courses.permissions import IsOwner
 from courses.paginations import CoursePagination
-from courses.serializers import CommentSerializers, CourseSerializers, CreatCommentSerializer, CategoryTreeSerializers, \
-    CategoryNodeSerializer, UpdateCommentSerializer
+from courses.serializers import (CommentSerializers, CourseSerializers, CreatCommentSerializer, CategoryTreeSerializers,
+                                 CategoryNodeSerializer, UpdateCommentSerializer)
 from courses.models import CourseCategory, Course, Comment
 from courses.filters import CourseFilter
 

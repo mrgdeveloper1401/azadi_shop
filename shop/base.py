@@ -1,16 +1,8 @@
-import os
 from pathlib import Path
-
-from celery.schedules import crontab
-from dotenv import load_dotenv
-from jdatetime import timedelta
-
-from shop.uppercase_password_validator import UppercasePasswordValidator
-from core.datetime_config import now
+from datetime import timedelta
 from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
@@ -18,15 +10,16 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
-# print(DEBUG)
+
 THIRD_PARTY_APPS = [
     'users.apps.UsersConfig',
-    'courses.apps.CoursesConfig',
-    "images.apps.ImagesConfig",
-    'orders.apps.OrdersConfig',
-    "professors.apps.ProfessorsConfig",
-    'payments.apps.PaymentsConfig',
-    "main_settings.apps.MainSettingsConfig",
+    # 'courses.apps.CoursesConfig',
+    # "images.apps.ImagesConfig",
+    # 'orders.apps.OrdersConfig',
+    # "professors.apps.ProfessorsConfig",
+    # 'payments.apps.PaymentsConfig',
+    # "main_settings.apps.MainSettingsConfig",
+    # "core.apps.CoreConfig",
     # "coupons.apps.CouponsConfig",
 ]
 
@@ -60,10 +53,13 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # debug toolbar
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    # whitenoise
     "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
+    # cors-header
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -131,7 +127,7 @@ USE_L10N = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = BASE_DIR / 'static'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 # STATICFILES_DIRS = [
 #     BASE_DIR / "static"
 # ]
@@ -187,14 +183,14 @@ REST_FRAMEWORK = {
 
 
 # email config
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False
-EMAIL_PORT = 587
-EMAIL_HOST_USER = config("EMAIL_HOST_USER", cast=str)
-DEFAULT_FROM_EMAIL = config("EMAIL_HOST_USER", cast=str)
-EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", cast=str)
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_USE_TLS = True
+# EMAIL_USE_SSL = False
+# EMAIL_PORT = 587
+# EMAIL_HOST_USER = config("EMAIL_HOST_USER", cast=str)
+# DEFAULT_FROM_EMAIL = config("EMAIL_HOST_USER", cast=str)
+# EMAIL_HOST_PASSWORD = config("EMAIL_HOST_PASSWORD", cast=str)
 
 # simple jwt config
 SIMPLE_JWT = {

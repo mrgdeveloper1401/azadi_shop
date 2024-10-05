@@ -3,7 +3,7 @@ from drf_spectacular.utils import extend_schema_field
 
 from courses.models import Course, CourseCategory, Comment
 from professors.models import Professor
-from core.datetime_config import now
+# from django.utils.timezone import now
 
 
 class CreatCommentSerializer(serializers.ModelSerializer):

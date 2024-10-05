@@ -1,10 +1,7 @@
 from django.utils import timezone as django_timezone
 from pytz import timezone
-
-
-def now():
-    return django_timezone.now()
+from datetime import timedelta
 
 
 def after_two_minute():
-    return now() + django_timezone.timedelta(minutes=2)
+    return django_timezone.now() + timedelta(minutes=2)

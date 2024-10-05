@@ -5,9 +5,9 @@ from users.models import Otp
 from core.datetime_config import now, after_two_minute
 
 
-@shared_task()
+@shared_task
 def delete_otp_code():
-    Otp.objects.filter(expired_at__lt=now()).delete()
+    return Otp.objects.filter(expired_at__lt=now()).delete()
 
 
 # def schedule_otp(request):

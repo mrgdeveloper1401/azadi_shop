@@ -7,7 +7,8 @@ from users.managers import UserManager, OtpManager
 from users.validators import MobileValidator
 from users.random_code import generate_random_code
 from core.models import SoftDeleteMixin, CreateMixin, UpdateMixin
-from core.datetime_config import after_two_minute, now
+from core.datetime_config import after_two_minute
+from django.utils.timezone import now
 
 
 # Create your models here.

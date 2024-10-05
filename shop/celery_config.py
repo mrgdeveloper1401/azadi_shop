@@ -17,5 +17,8 @@ app.autodiscover_tasks()
 
 @app.task(bind=True)
 def debug_task(self):
-    with open('celery_log.log', 'a') as f:
-        print('Request: {0!r}'.format(self.request), file=f)
+    if DEBUG:
+        with open('celery_log.log', 'a') as f:
+            print('Request: {0!r}'.format(self.request), file=f)
+    if not DEBUG:
+        print(f'Request: {self.request!r}')

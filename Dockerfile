@@ -33,11 +33,12 @@ COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 RUN adduser --disabled-password azadi
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
+RUN ./manage.py collectstatic --noinput
 ENV PYTHONDDONOTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 ENV GDAL_LIBRARY_PATH=/usr/lib/libgdal.so
 ENV PROJ_LIB=/usr/share/proj
 
-
+#EXPOSE 8000
 ENTRYPOINT [ "gunicorn", "shop.wsgi", "-b"]
 CMD ["0.0.0.0:8000"]

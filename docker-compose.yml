@@ -18,60 +18,17 @@ services:
     environment:
       - DEBUG=${DEBUG}
       - SECRET_KEY=${DEPLOY_SECRET_KEY}
-      - DATABASE_USER=${DATABASE_USER}
-      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
-      - DATABASE_NAME=${DATABASE_DB}
-      - DATABASE_HOST=${DATABASE_HOST}
-      - DATABASE_PORT=${DATABASE_PORT}
       - LIARA_ENDPOINT=${LIARA_ENDPOINT}
       - LIARA_BUCKET_NAME=${LIARA_BUCKET_NAME}
       - LIARA_ACCESS_KEY=${LIARA_ACCESS_KEY}
       - LIARA_SECRET_KEY=${LIARA_SECRET_KEY}
       - DATABASE_URL=${DATABASE_URL}
+      - LIARA_REDIS_URL=${LIARA_REDIS_URL}
 
-  postgres:
-    container_name: postgres_db
-    image: postgres:16.4-alpine
-    restart: always
-    expose:
-      - "5432"
-    ports:
-      - "5434:5432"
-    environment:
-      - POSTGRES_USER=${DATABASE_USER}
-      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
-      - POSTGRES_DB=${DATABASE_DB}
-    networks:
-      - main
-    volumes:
-      - azadi-data:/var/lib/postgresql/data
-
-  redis:
-    container_name: redis
-    image: redis:7.4-alpine
-    restart: always
-    expose:
-      - "6379"
-    environment:
-      - REDIS_PASSWORD=${REDIS_PASSWORD}
-      - REDIS_PORT=${REDIS_PORT}
-      - REDIS_DATABASES=${REDIS_DATABASES}
-
-  nginx:
-    container_name: nginx
-    image: nginx:1.27.1-alpine
-    restart: on-failure
-    ports:
-      - 8080:80
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-    command: ["nginx", "-g", "daemon off;"]
 
 networks:
   main:
 
 volumes:
   django-static:
-  azadi-data:
   supervisor:
-  nginx:
