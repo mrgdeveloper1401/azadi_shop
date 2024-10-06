@@ -94,3 +94,6 @@ DJANGO_LOGGING = {
         }
     }
 }
+
+# for upload with object storage
+AWS_S3_SECURE_URLS = False

@@ -10,18 +10,22 @@ RUN apk update && \
     apk add py3-pip && \
     apk add postgresql && \
     apk add postgresql-contrib && \
+    apk add postgresql-libs && \
     apk add postgis && \
     apk add supervisor && \
+    apk add celery && \
     apk add nginx
 
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
-RUN adduser --disabled-password azadi
+COPY supervisor/conf.d /etc/supervisor/conf.d
+RUN adduser -D -H azadi
 RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-RUN ./manage.py collectstatic --noinput
+RUN pip install -r /home/app/requirements/production.txt
+RUN /home/app/manage.py collectstatic --noinput
+RUN chmod +x /home/app/start.sh
 ENV PYTHONDDONOTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 #EXPOSE 8000
 ENTRYPOINT [ "gunicorn", "shop.wsgi", "-b"]
-CMD ["0.0.0.0:8000"]
+CMD ["/home/app/start.sh"]

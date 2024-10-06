@@ -52,6 +52,7 @@ class UserVerifyRegisterSerializer(serializers.Serializer):
     def validate(self, attrs):
         try:
             get_code = Otp.objects.get(code=attrs['code'])
+            # get_code = Otp.objects.filter()
         except Exception as e:
             raise ValidationError({'message': "code is wrong"})
 
@@ -272,12 +273,23 @@ class SendOtpCodeSerializer(serializers.Serializer):
     def validate(self, attrs):
         try:
             UserAccount.objects.get(mobile_phone=attrs['mobile_phone'])
-        except UserAccount.DoesNotExist:
+        except Otp.DoesNotExist:
             raise ValidationError({"message": _("code is send")})
-        if Otp.objects.filter(user__mobile_phone=attrs['mobile_phone']).exists():
-            raise ValidationError({"message": _("you already code please try again 2 minute")})
+        otp = Otp.objects.filter(user__mobile_phone=attrs['mobile_phone']).last()
+        if otp:
+            if otp.is_expired():
+                otp.delete_if_expired()
+            else:
+                raise ValidationError({"message": _("OTP is still valid. Please wait.")})
         return attrs
 
-    def create(self, validated_data):
-        user = UserAccount.objects.get(mobile_phone=validated_data['mobile_phone'])
-        return Otp.objects.create_otp(user)
+    def save(self, **kwargs):
+        user = UserAccount.objects.get(mobile_phone=self.validated_data['mobile_phone'])
+        try:
+            Otp.objects.get(user__mobile_phone=self.validated_data['mobile_phone'])
+        except Otp.DoesNotExist:
+            Otp.objects.create(user=user)
+    # def create(self, validated_data):
+    #     user = UserAccount.objects.get(mobile_phone=validated_data['mobile_phone'])
+    #     return Otp.objects.create_otp(user)
+

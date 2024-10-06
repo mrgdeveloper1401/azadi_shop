@@ -60,12 +60,15 @@ CACHES = {
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = True
-SESSION_REDIS_TTL = 900
+SESSION_REDIS_TTL = 300
 
 MIDDLEWARE += [
-    "django.middleware.cache.UpdateCacheMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.cache.FetchFromCacheMiddleware",
+    # "django.middleware.cache.UpdateCacheMiddleware",
+    # "django.middleware.common.CommonMiddleware",
+    # "django.middleware.cache.FetchFromCacheMiddleware",
     # cors-header
     "corsheaders.middleware.CorsMiddleware",
 ]
+
+# for upload object storage
+AWS_S3_SECURE_URLS = True
