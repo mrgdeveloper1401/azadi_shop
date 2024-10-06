@@ -169,7 +169,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    "AUTH_HEADER_TYPES": 'JWT',
+    "AUTH_HEADER_TYPES": 'Bearer',
 }
 
 # liara config
@@ -188,7 +188,7 @@ AWS_S3_REGION_NAME = 'us-east-1'
 AWS_S3_FILE_OVERWRITE = False
 AWS_SERVICE_NAME = 's3'
 # AWS_S3_VERIFY = False
-AWS_S3_SECURE_URLS = False
+AWS_S3_SECURE_URLS = True
 
 # with logging django
 log_dir = os.path.join(BASE_DIR / 'general_log_django')

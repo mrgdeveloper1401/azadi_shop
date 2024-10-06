@@ -1,6 +1,5 @@
 from shop.base import *
 import dj_database_url
-import os
 
 SECRET_KEY = config('DEPLOY_SECRET_KEY', cast=str)
 
@@ -42,7 +41,7 @@ CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": config('LIARA_REDIS_URL', cast=str),
-        'TIMEOUT': 900,
+        'TIMEOUT': 300,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "SOCKET_CONNECT_TIMEOUT": 10,

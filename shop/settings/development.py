@@ -14,7 +14,7 @@ INTERNAL_IPS = [
 
 DATABASES = {
     'default': {
-        'ENGINE': "django.db.backends.postgresql",
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
         "NAME": "azadidb",
         "PORT": "5432",
         "USER": "postgres",
@@ -33,9 +33,9 @@ MIDDLEWARE += [
     "debug_toolbar.middleware.DebugToolbarMiddleware",
     'django_logging.middleware.RequestLogMiddleware',
     # chash with django redis
-    "django.middleware.cache.UpdateCacheMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.cache.FetchFromCacheMiddleware",
+    # "django.middleware.cache.UpdateCacheMiddleware",
+    # "django.middleware.common.CommonMiddleware",
+    # "django.middleware.cache.FetchFromCacheMiddleware",
     # whitenoise
     "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
