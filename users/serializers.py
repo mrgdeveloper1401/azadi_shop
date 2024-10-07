@@ -2,7 +2,6 @@ from django.contrib.auth.password_validation import validate_password
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from django_jalali.serializers.serializerfield import JDateField, JDateTimeField
 
 from users.models import UserAccount, Otp, UserInfo
 from users.validators import MobileValidator
@@ -232,8 +231,6 @@ class ForgetPasswordConfirmSerializer(serializers.Serializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    last_login = JDateTimeField()
-    date_joined = JDateTimeField()
 
     class Meta:
         model = UserAccount

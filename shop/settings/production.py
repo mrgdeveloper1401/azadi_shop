@@ -1,6 +1,10 @@
 from shop.base import *
 import dj_database_url
 
+
+GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH')
+GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH')
+
 SECRET_KEY = config('DEPLOY_SECRET_KEY', cast=str)
 
 ALLOWED_HOSTS = ["*"]
@@ -10,7 +14,15 @@ INSTALLED_APPS += [
 ]
 
 DATABASES = {
-    'default': dj_database_url.config(default=config('DATABASE_URL', cast=str))
+    # 'default': dj_database_url.config(default=config('DATABASE_URL', cast=str))
+    'default': {
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'PORT': "5432",
+        "HOST": "silly-driscoll-wjcnkcf7m-db",
+        "USER": "root",
+        "PASSWORD": "SLTjjqEQXLI5kNYuPURU9mlt",
+        'NAME': "postgres"
+    }
 }
 
 # cors allowed origin config
