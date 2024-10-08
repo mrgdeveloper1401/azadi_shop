@@ -1,3 +1,5 @@
+from uuid import uuid4
+
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
@@ -49,6 +51,18 @@ class UserAccount(AbstractUser, SoftDeleteMixin):
         self.is_deleted = True
         self.deleted_at = now()
         return super().save(*args, **kwargs)
+    
+    def save(self, *args, **kwargs):
+        if self.is_deleted:
+            self.deleted_at = now()
+        if not self.is_deleted:
+            self.deleted_at = None
+        return super().save(*args, **kwargs)
+
+    def clean(self):
+        if self.is_deleted and (self.is_active or self.is_verified):
+            raise ValidationError({'is_active': _("You cannot choose both")})
+        return super().clean()
 
     class Meta:
         db_table = 'user'
@@ -117,6 +131,7 @@ class Otp(CreateMixin):
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='user_otp')
     code = models.PositiveIntegerField(_('OTP code'), unique=True, default=generate_random_code)
     expired_at = models.DateTimeField(blank=True, null=True)
+    request_user = models.UUIDField(default=uuid4, editable=False, unique=True)
 
     objects = OtpManager()
 
@@ -132,16 +147,16 @@ class Otp(CreateMixin):
             return True
         return False
 
-    def clean(self):
-        otp_code = Otp.objects.filter(user=self.user)
-        user_account = UserAccount.objects.get(mobile_phone=self)
-        if user_account.is_active and user_account.is_verified:
-            raise ValidationError({"user": "user is active and verified"})
-        elif user_account.is_deleted:
-            raise ValidationError({"user": "user is deleted"})
-        elif otp_code.exists():
-            raise ValidationError({"user": "otp code already exits"})
-        super().clean()
+    # def clean(self):
+    #     otp_code = Otp.objects.filter(user=self.user)
+    #     user_account = UserAccount.objects.get(mobile_phone=self)
+    #     if user_account.is_active and user_account.is_verified:
+    #         raise ValidationError({"user": "user is active and verified"})
+    #     elif user_account.is_deleted:
+    #         raise ValidationError({"user": "user is deleted"})
+    #     elif otp_code.exists():
+    #         raise ValidationError({"user": "otp code already exits"})
+    #     super().clean()
 
     def save(self, *args, **kwargs):
         self.expired_at = after_two_minute()

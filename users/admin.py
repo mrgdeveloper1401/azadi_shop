@@ -91,7 +91,7 @@ class UserInfoAdmin(admin.ModelAdmin):
 
 @admin.register(Otp)
 class OtpAdmin(admin.ModelAdmin):
-    list_display = ['user', 'id', 'code', 'created_at', 'expired_at']
+    list_display = ['user', 'id', 'code', 'request_user', 'created_at', 'expired_at']
     list_select_related = ['user']
     search_fields = ['user__mobile_phone']
     list_filter = ["created_at", "expired_at"]

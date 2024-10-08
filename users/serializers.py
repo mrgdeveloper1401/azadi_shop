@@ -33,8 +33,11 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         return user
 
     def validate(self, data):
+        user = UserAccount.objects.filter(mobile_phone=data['mobile_phone']).last()
         if data['password'] != data['confirm_password']:
             raise serializers.ValidationError(_("Passwords do not same."))
+        if user.is_deleted:
+            raise serializers.ValidationError(_("user is deleted!"))
         try:
             validate_password(data['password'])
         except ValidationError as e:
@@ -47,10 +50,11 @@ class UserVerifyRegisterSerializer(serializers.Serializer):
     verify user register with mobile phone
     """
     code = serializers.IntegerField()
+    request_user = serializers.UUIDField(write_only=True)
 
     def validate(self, attrs):
         try:
-            get_code = Otp.objects.get(code=attrs['code'])
+            get_code = Otp.objects.get(code=attrs['code'], request_user=attrs['request_user'])
             # get_code = Otp.objects.filter()
         except Exception as e:
             raise ValidationError({'message': "code is wrong"})
@@ -133,12 +137,13 @@ class VerifyCodeMobilePhoneSerializer(serializers.Serializer):
     """
     code = serializers.IntegerField()
     new_phone = serializers.CharField(validators=[MobileValidator()])
+    request_user = serializers.UUIDField(write_only=True)
 
     def validate(self, attrs):
         try:
-            get_code = Otp.objects.get(code=attrs['code'])
+            get_code = Otp.objects.get(code=attrs['code'], request_user=attrs['request_user'])
         except Otp.DoesNotExist:
-            raise ValidationError({"message": _("otp query code dose not exist")})
+            raise ValidationError({"message": _("otp code is wrong")})
 
         if get_code.is_expired():
             get_code.delete_if_expired()
@@ -150,6 +155,7 @@ class VerifyCodeMobilePhoneSerializer(serializers.Serializer):
     def create(self, validated_data):
         user = UserAccount.objects.get(mobile_phone=self.context['request'].mobile_phone)
         user.mobile_phone = validated_data['new_phone']
+        user.is_verified = False
         user.save()
         Otp.objects.get(code=validated_data['code']).delete()
         return {"message": "successfully change mobile phone"}
@@ -183,12 +189,21 @@ class ForgetPasswordSerializer(serializers.Serializer):
     mobile_phone = serializers.CharField(validators=[MobileValidator()])
 
     def validate(self, attrs):
+        # get user
+        user = UserAccount.objects.filter(mobile_phone=attrs['mobile_phone']).last()
+
         if not UserAccount.objects.filter(mobile_phone=attrs['mobile_phone']).exists():
-            # if user is exited or not exited we show this message
-            # when code is send tp mobile , if user is existing on database
-            raise ValidationError({"message": _("we send code this mobile phone")})
-        if Otp.objects.filter(user__mobile_phone=attrs['mobile_phone']).exists():
-            raise ValidationError({"message": _('you have already code please try agin 2 minute')})
+            raise ValidationError({"message": _("you must register account!")})
+        if user.is_deleted:
+            raise ValidationError({"message": _("you deleted account!")})
+        if not user.is_active or not user.is_verified:
+            raise ValidationError({"message": _("you must verify and active account!")})
+        latest_code = Otp.objects.filter(user__mobile_phone=attrs['mobile_phone']).last()
+        if latest_code:
+            if latest_code.is_expired():
+                latest_code.delete_if_expired()
+            else:
+                raise ValidationError({"message": _('you have already code please try agin 2 minute')})
         attrs['user'] = UserAccount.objects.get(mobile_phone=attrs['mobile_phone'])
         return attrs
 
@@ -204,20 +219,29 @@ class ForgetPasswordConfirmSerializer(serializers.Serializer):
     code = serializers.IntegerField()
     new_password = serializers.CharField(write_only=True, min_length=8)
     confirm_password = serializers.CharField(write_only=True, min_length=8)
+    request_user = serializers.UUIDField(write_only=True)
 
     def validate(self, attrs):
+        # validate new_password and confirm_password
         if attrs['new_password'] != attrs['confirm_password']:
             raise ValidationError({"message": _("password must be same")})
+
+        # validate password
         try:
             validate_password(attrs['new_password'])
         except Exception as e:
             raise ValidationError({"message": e})
+
+        # get otp code
         try:
-            code = Otp.objects.get(code=attrs['code'])
+            code = Otp.objects.get(code=attrs['code'], request_user=attrs['request_user'])
         except Otp.DoesNotExist:
-            raise ValidationError({"message": _("otp query code dose not exist")})
+            raise ValidationError({"message": _("code is wrong")})
+
+        # validate code is expired
         if code.is_expired():
             code.delete_if_expired()
+            raise ValidationError({"message": _("code has expired, please try again")})
 
         attrs['user'] = code.user
         return attrs
@@ -227,6 +251,7 @@ class ForgetPasswordConfirmSerializer(serializers.Serializer):
         user = validated_data['user']
         user.set_password(validated_data['new_password'])
         user.save()
+        Otp.objects.filter(user=validated_data['user']).delete()
         return {"message": _("successfully change password")}
 
 
@@ -289,4 +314,3 @@ class SendOtpCodeSerializer(serializers.Serializer):
     # def create(self, validated_data):
     #     user = UserAccount.objects.get(mobile_phone=validated_data['mobile_phone'])
     #     return Otp.objects.create_otp(user)
-

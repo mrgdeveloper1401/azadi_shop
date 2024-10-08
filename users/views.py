@@ -127,7 +127,8 @@ class ForgetPasswordConfirmAPIView(APIView):
 
 
 class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
-    queryset = UserInfo.objects.select_related('user').filter(user__is_active=True, user__is_verified=True)
+    queryset = UserInfo.objects.select_related('user').filter(user__is_active=True, user__is_verified=True,
+                                                              user__is_deleted=False)
     serializer_class = ProfileSerializer
     permission_classes = [IsOwnerProfile]
 
