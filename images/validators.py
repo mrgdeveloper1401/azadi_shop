@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 def validate_image_size(value):
-    max_size = 15
+    max_size = 5
     if value.size > max_size * 1024 * 1024:
         raise ValidationError(_(f"File can't be larger than {max_size} MB"))
     return value

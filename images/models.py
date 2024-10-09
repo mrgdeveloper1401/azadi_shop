@@ -1,5 +1,6 @@
 from django.db import models
 from hashlib import sha1
+from base64 import b64encode
 # from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
@@ -11,7 +12,7 @@ class Image(CreateMixin, UpdateMixin):
     title = models.CharField(max_length=128, null=True, blank=True)
     image = models.ImageField(width_field="width", height_field="height", upload_to="images/%Y/%m/%d",
                               validators=[validate_image_size],
-                              help_text=_("max size is 15 MG"))
+                              help_text=_("max size is 5 MG"))
 
     width = models.IntegerField(null=True, blank=True)
     height = models.IntegerField(null=True, blank=True)
@@ -23,6 +24,7 @@ class Image(CreateMixin, UpdateMixin):
     focal_point_y = models.PositiveIntegerField(null=True, blank=True)
     focal_point_width = models.PositiveIntegerField(null=True, blank=True)
     focal_point_height = models.PositiveIntegerField(null=True, blank=True)
+    image_base64 = models.TextField(_("تبدیل به فورمت base64"), blank=True, null=True)
 
     @property
     def generate_hash(self):
@@ -31,20 +33,30 @@ class Image(CreateMixin, UpdateMixin):
             hasher.update(c)
         return hasher.hexdigest()
 
+    @property
+    def encode_image(self):
+        encode_b64 = b64encode(self.image.read())
+        return encode_b64.decode("utf-8")
+
     def __str__(self):
         return f"{self.file_hash} && {self.title}"
-
-    # def save(self, *args, **kwargs):
-    #     if not self.pk or self.pk is None:
-    #         if Image.objects.filter(file_hash=self.file_hash).exists():
-    #             raise ValidationError(_("image hash already exists"))
-    #     self.file_hash = self.generate_hash
-    #     self.file_size = self.image.size
-    #     super().save(*args, **kwargs)
 
     @property
     def image_url(self):
         return self.image.url
+
+    def show_image_base64(self):
+        d = 'data:image/png;base64,{}'.format(self.image_base64)
+        return d
+
+    def save(self, *args, **kwargs):
+        self.image_base64 = self.encode_image
+    #     if not self.pk or self.pk is None:
+    #         if Image.objects.filter(file_hash=self.file_hash).exists():
+    #             raise ValidationError(_("image hash already exists"))
+        self.file_hash = self.generate_hash
+        self.file_size = self.image.size
+        return super().save(*args, **kwargs)
 
     class Meta:
         db_table = "image"

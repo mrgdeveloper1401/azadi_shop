@@ -21,6 +21,7 @@ THIRD_PARTY_APPS = [
     'payments.apps.PaymentsConfig',
     "main_settings.apps.MainSettingsConfig",
     "core.apps.CoreConfig",
+    "blogs.apps.BlogsConfig",
     # "coupons.apps.CouponsConfig",
 ]
 
@@ -67,7 +68,7 @@ ROOT_URLCONF = 'shop.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
