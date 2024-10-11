@@ -1,4 +1,5 @@
-from django.db.models import F, Q
+from django.db.models import Q
+from rest_framework.exceptions import PermissionDenied
 from rest_framework.status import HTTP_201_CREATED
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ModelViewSet, ReadOnlyModelViewSet
@@ -9,6 +10,7 @@ from orders.models import Cart, CartItem, Order
 from orders.serializers import CartSerializer, AddCartItemSerializer, CartItemSerializer, OrderSerialize, \
     CreateOrderSerializer, UpdateOrderItemSerializer, CompleteOrderSerialize
 from orders.permissions import IsOwner, IsOwnerCartItem
+from users.permissions import IsVerifiedUser
 
 
 # Create your views here.
@@ -19,11 +21,17 @@ class CartViewSet(CreateModelMixin, ListModelMixin, RetrieveModelMixin, GenericV
                                              "cart_item__course__image", "cart_item__course__course_discount"). \
         select_related("user")
     serializer_class = CartSerializer
-    permission_classes = [IsOwner]
+    permission_classes = [IsOwner, IsVerifiedUser]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
+    
+    # def get_permissions(self):
+    #     if self.request.method == 'POST':
+    #         if not self.request.user.is_verified:
+    #             raise PermissionDenied("you must verify account")
+    #     return super().get_permissions()
+    
     def get_queryset(self):
         user = self.request.user
         queryset = super().get_queryset()
@@ -36,7 +44,7 @@ class CartItemViewSet(RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, L
     queryset = (CartItem.objects.select_related('course', "course__professor", "course__image").
                 prefetch_related("course__course_discount"))
     serializer_class = CartItemSerializer
-    permission_classes = [IsOwnerCartItem]
+    permission_classes = [IsOwnerCartItem, IsVerifiedUser]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
@@ -80,7 +88,7 @@ class OrderViewSet(ModelViewSet):
     def get_permissions(self):
         if self.request.method in ['PUT', 'PATCH']:
             return [IsOwner(), IsAdminUser()]
-        return [IsOwner()]
+        return [IsOwner(), IsVerifiedUser()]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -91,7 +99,7 @@ class OrderViewSet(ModelViewSet):
 
 class CompleteOrderViewSet(ReadOnlyModelViewSet):
     serializer_class = CompleteOrderSerialize
-    permission_classes = [IsOwner]
+    permission_classes = [IsOwner, IsVerifiedUser]
 
     def get_queryset(self):
         return (

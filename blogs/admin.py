@@ -1,6 +1,6 @@
 from django.contrib import admin
-from treebeard.admin import TreeAdmin
-from treebeard.forms import movenodeform_factory
+# from treebeard.admin import TreeAdmin
+# from treebeard.forms import movenodeform_factory
 
 from blogs.models import CategoryNode, Post, BlogPostImage
 
@@ -12,15 +12,21 @@ class PostImageInline(admin.TabularInline):
 
 
 # Register your models here.
-class CategoryNodeAdmin(TreeAdmin):
-    form = movenodeform_factory(CategoryNode)
+@admin.register(CategoryNode)
+class CategoryNodeAdmin(admin.ModelAdmin):
+    # form = movenodeform_factory(CategoryNode)
     prepopulated_fields = {'category_slug': ("category_name",)}
-    list_filter = ['created_at', "updated_at"]
+    list_filter = ['created_at', "updated_at", "is_active"]
     date_hierarchy = 'created_at'
     search_fields = ['category_name']
+    list_display = ['category_name', "parent", "is_active"]
 
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.prefetch_related('parent').select_related('parent')
+        return qs
 
-admin.site.register(CategoryNode, CategoryNodeAdmin)
+# admin.site.register(CategoryNode, CategoryNodeAdmin)
 
 
 @admin.register(Post)

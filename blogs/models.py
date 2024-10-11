@@ -1,19 +1,29 @@
 from django.db import models
+from django.utils.text import slugify
 from treebeard.mp_tree import MP_Node
 from django.utils.translation import gettext_lazy as _
 
 from core.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 
 
-class CategoryNode(MP_Node, CreateMixin, UpdateMixin):
+class CategoryNode(CreateMixin, UpdateMixin):
     category_name = models.CharField(max_length=50, unique=True)
     category_slug = models.SlugField(max_length=50, unique=True, allow_unicode=True)
+    parent = models.ForeignKey('self', on_delete=models.PROTECT, related_name='children',
+                               blank=True, null=True, verbose_name=_("دسته بندی والد"))
+    is_active = models.BooleanField(default=True)
 
     def __str__(self):
         return self.category_name
 
-    class MPTTMeta:
-        order_insertion_by = ['category_name']
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.category_name, allow_unicode=True)
+        return super().save(*args, **kwargs)
+
+    class Meta:
+        db_table = 'blog_category'
+        verbose_name = _("category")
+        verbose_name_plural = _("categories")
 
 
 class Post(CreateMixin, UpdateMixin, SoftDeleteMixin):

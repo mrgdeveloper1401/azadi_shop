@@ -287,3 +287,5 @@ db.sqlite3
 azadi-shop.zip
 #general_log_django
 logs
+templates
+

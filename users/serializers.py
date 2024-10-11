@@ -36,7 +36,7 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         user = UserAccount.objects.filter(mobile_phone=data['mobile_phone']).last()
         if data['password'] != data['confirm_password']:
             raise serializers.ValidationError(_("Passwords do not same."))
-        if user.is_deleted:
+        if user and user.is_deleted:
             raise serializers.ValidationError(_("user is deleted!"))
         try:
             validate_password(data['password'])
@@ -196,8 +196,9 @@ class ForgetPasswordSerializer(serializers.Serializer):
             raise ValidationError({"message": _("you must register account!")})
         if user.is_deleted:
             raise ValidationError({"message": _("you deleted account!")})
-        if not user.is_active or not user.is_verified:
-            raise ValidationError({"message": _("you must verify and active account!")})
+        # if not user.is_active or not user.is_verified:
+        if not user.is_active:
+            raise ValidationError({"message": _("you must active account!")})
         latest_code = Otp.objects.filter(user__mobile_phone=attrs['mobile_phone']).last()
         if latest_code:
             if latest_code.is_expired():
@@ -274,7 +275,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserInfo
-        fields = ('grade', "major", "user")
+        fields = ('grade', "major", "user", "gpa")
 
     def update(self, instance, validated_data):
         user_data = validated_data.pop('user', None)
@@ -291,6 +292,7 @@ class ProfileSerializer(serializers.ModelSerializer):
 
 class SendOtpCodeSerializer(serializers.Serializer):
     mobile_phone = serializers.CharField(validators=[MobileValidator()])
+    request_user = serializers.UUIDField(read_only=True)
 
     def validate(self, attrs):
         try:

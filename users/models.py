@@ -1,5 +1,6 @@
 from uuid import uuid4
 
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
@@ -51,7 +52,7 @@ class UserAccount(AbstractUser, SoftDeleteMixin):
         self.is_deleted = True
         self.deleted_at = now()
         return super().save(*args, **kwargs)
-    
+
     def save(self, *args, **kwargs):
         if self.is_deleted:
             self.deleted_at = now()
@@ -85,6 +86,8 @@ class UserInfo(CreateMixin, UpdateMixin):
     user = models.OneToOneField(UserAccount, on_delete=models.CASCADE, related_name='user_info')
     grade = models.CharField(max_length=10, choices=GRADE_CHOICES, default='دهم')
     major = models.CharField(max_length=10, choices=MAJOR_CHOICES, default='تجربی')
+    gpa = models.FloatField(_("معدل"), validators=[MinValueValidator(0), MaxValueValidator(20)],
+                            blank=True, null=True)
 
     class Meta:
         db_table = 'user_info'
@@ -166,5 +169,3 @@ class Otp(CreateMixin):
         db_table = 'otp'
         verbose_name = _('otp')
         verbose_name_plural = _('OTPs')
-
-

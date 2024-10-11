@@ -84,7 +84,7 @@ class VerifyCodeMobileApiview(APIView):
         ser_data = VerifyCodeMobilePhoneSerializer(data=request.data, context={'request': request.user})
         ser_data.is_valid(raise_exception=True)
         ser_data.save()
-        return Response({"message": "successfully verify code"}, status=status.HTTP_200_OK)
+        return Response({"message": "successfully change mobile please verify this mobile"}, status=status.HTTP_200_OK)
 
 
 class ResetPasswordAPIView(APIView):
@@ -106,6 +106,7 @@ class ForgetPasswordApiView(APIView):
     @extend_schema(
         request=ForgetPasswordSerializer,
         responses={200: ForgetPasswordSerializer},
+        description="for recovery password, user must be enter mobile phone"
     )
     def post(self, request):
         ser_data = ForgetPasswordSerializer(data=request.data)
@@ -127,7 +128,7 @@ class ForgetPasswordConfirmAPIView(APIView):
 
 
 class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
-    queryset = UserInfo.objects.select_related('user').filter(user__is_active=True, user__is_verified=True,
+    queryset = UserInfo.objects.select_related('user').filter(user__is_active=True,
                                                               user__is_deleted=False)
     serializer_class = ProfileSerializer
     permission_classes = [IsOwnerProfile]

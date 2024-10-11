@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.utils.timezone import now
 
 from courses.models import Like, DiscountCourse
+from orders.models import Order, OrderItem
 
 
 @receiver(post_save, sender=Like)
@@ -22,3 +23,10 @@ def handle_like_dislike(sender, instance, created, **kwargs):
 def delete_discount_course(sender, instance, **kwargs):
     if instance.expired_date < now():
         instance.delete()
+
+
+# @receiver(post_save, sender=Order)
+# def add_sale_number(sender, instance, created, **kwargs):
+#     if created:
+#         if instance.payment_status == 'complete':
+#             order_item = instance.order_items.all()

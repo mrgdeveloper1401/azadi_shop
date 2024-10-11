@@ -6,7 +6,7 @@ from blogs.paginations import BlogPagination
 
 
 class CategoryNodeViewSet(ReadOnlyModelViewSet):
-    queryset = CategoryNode.objects.all()
+    queryset = CategoryNode.objects.prefetch_related('parent').select_related('parent')
     serializer_class = CategoryNodeSerializer
     lookup_field = 'category_slug'
 

@@ -4,9 +4,17 @@ from blogs.models import CategoryNode, Post, BlogPostImage
 
 
 class CategoryNodeSerializer(ModelSerializer):
+    children = SerializerMethodField()
+
     class Meta:
         model = CategoryNode
         exclude = ['created_at', "updated_at"]
+        # fields = '__all__'
+
+    def get_children(self, obj):
+        if obj.parent:
+            return [i.category_name for i in obj.children.all()]
+        return []
 
 
 class SimpleCategorySerializer(CategoryNodeSerializer):

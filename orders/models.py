@@ -13,8 +13,8 @@ from users.models import UserAccount
 
 class Cart(CreateMixin, UpdateMixin):
     id = models.CharField(primary_key=True, editable=False, auto_created=True, verbose_name="ID", max_length=255)
-    user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, verbose_name="cart user",
-                             blank=True, null=True, related_name="user_cart")
+    user = models.ForeignKey('users.UserAccount', on_delete=models.CASCADE, verbose_name="cart user",
+                             related_name="user_cart")
     # cart_complete = models.BooleanField(default=False)
 
     def __str__(self):
@@ -36,7 +36,9 @@ class Cart(CreateMixin, UpdateMixin):
     def clean(self):
         if Cart.objects.filter(user__mobile_phone=self).exists():
             raise ValidationError({"user": _("cart already exist")})
-        super().clean()
+        if not self.user:
+            raise ValidationError({'user': _("you must choose a user")})
+        return super().clean()
 
     def save(self, *args, **kwargs):
         self.id = self.generate_ulid
@@ -91,6 +93,7 @@ class Order(CreateMixin):
     payment_status = models.CharField(_("payments status"), max_length=8, choices=PaymentStatus.choices,
                                       default=PaymentStatus.pending)
     order_number = models.CharField(_("order number"), blank=True, null=True, max_length=30)
+
     def __str__(self):
         return f'{self.user} {self.payment_status} {self.created_at}'
 
@@ -108,6 +111,10 @@ class Order(CreateMixin):
     def save(self, *args, **kwargs):
         if self.payment_status == 'complete':
             self.order_number = self.create_order_number
+            for item in self.order_item.all():
+                if item.course:
+                    item.course.sale_number += 1
+                    item.course.save()
         return super().save(*args, **kwargs)
 
     class Meta:

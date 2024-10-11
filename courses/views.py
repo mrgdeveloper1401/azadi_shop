@@ -10,6 +10,7 @@ from courses.serializers import (CommentSerializers, CourseSerializers, CreatCom
                                  CategoryNodeSerializer, UpdateCommentSerializer)
 from courses.models import CourseCategory, Course, Comment
 from courses.filters import CourseFilter
+from users.permissions import IsVerifiedUser
 
 
 class CategoryViewSet(ReadOnlyModelViewSet):
@@ -58,7 +59,7 @@ class CourseViewSet(ReadOnlyModelViewSet):
 
 class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializers
-    permission_classes = [IsOwner]
+    permission_classes = [IsOwner, IsVerifiedUser]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
