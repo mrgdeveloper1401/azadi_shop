@@ -18,16 +18,16 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
         'PORT': "5432",
-        "HOST": "quirky-williamson-rconete2a-db",
+        "HOST": "trusting-ardinghelli-b2z7dtoje-db",
         "USER": "root",
-        "PASSWORD": "Qdv9Z05Q6whxppz5DwqeqpVi",
+        "PASSWORD": "uv5MlphP6a5hERnehMn6sa89",
         'NAME': "postgres"
     }
 }
 
 # cors allowed origin config
 CORS_ALLOWED_ORIGINS = [
-    "https://charming-swartz-6sjspwzht.liara.run",
+    "https://test-azadi.liara.run",
 ]
 
 

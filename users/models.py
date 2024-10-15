@@ -1,4 +1,4 @@
-from uuid import uuid4
+# from uuid import uuid4
 
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
@@ -130,11 +130,29 @@ class UserInfo(CreateMixin, UpdateMixin):
         return super().save(*args, **kwargs)
 
 
+class GradeGpa(CreateMixin, UpdateMixin):
+    GRADE_CHOICES = (
+        ('دهم', 'دهم'),
+        ('یازدهم', 'یازدهم'),
+        ('دوازدهم', 'دوازدهم')
+    )
+
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='grade_gpas')
+    grade = models.CharField(max_length=10, choices=GRADE_CHOICES, blank=True, null=True)
+    gpa = models.FloatField(_("معدل"), validators=[MinValueValidator(0), MaxValueValidator(20)], blank=True, null=True)
+
+    class Meta:
+        db_table = 'grade_gpa'
+        verbose_name = _("grade gpa")
+        verbose_name_plural = _("grade gpa")
+        unique_together = ('user', 'grade')
+
+
 class Otp(CreateMixin):
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='user_otp')
     code = models.PositiveIntegerField(_('OTP code'), unique=True, default=generate_random_code)
     expired_at = models.DateTimeField(blank=True, null=True)
-    request_user = models.UUIDField(default=uuid4, editable=False, unique=True)
+    # request_user = models.UUIDField(default=uuid4, editable=False, unique=True)
 
     objects = OtpManager()
 

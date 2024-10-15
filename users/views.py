@@ -2,16 +2,17 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin
+from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, CreateModelMixin, \
+    ListModelMixin
 from rest_framework.viewsets import GenericViewSet
 from drf_spectacular.utils import extend_schema
-
-from users.serializers import UserRegisterSerializer, UserVerifyRegisterSerializer, UserResendVerifyRegisterSerializer, \
-    SendCodeMobilePhoneSerializer, VerifyCodeMobilePhoneSerializer, ResetPasswordSerializer, ForgetPasswordSerializer, \
-    ForgetPasswordConfirmSerializer, ProfileSerializer, SendOtpCodeSerializer
-from users.models import UserInfo
-from users.permissions import IsOwnerProfile
 from django.utils.timezone import now
+
+from users.serializers import UserRegisterSerializer, UserVerifyRegisterSerializer, ResetPasswordSerializer, \
+    ForgetPasswordSerializer, ForgetPasswordConfirmSerializer, ProfileSerializer, SendOtpCodeSerializer, \
+    GradeSerializer
+from users.models import UserInfo, GradeGpa
+from users.permissions import IsOwnerProfile
 
 
 class UserRegistrationAPIView(APIView):
@@ -38,53 +39,14 @@ class UserVerifyRegisterCodeAPIView(APIView):
     def post(self, request, *args, **kwargs):
         ser_data = UserVerifyRegisterSerializer(data=request.data)
         ser_data.is_valid(raise_exception=True)
-        ser_data.save()
-        return Response({"message": 'successfully varify account'}, status=status.HTTP_200_OK)
 
+        tokens = ser_data.save()
 
-class OtpResendAPIView(APIView):
-    @extend_schema(
-        request=UserResendVerifyRegisterSerializer,
-        responses={201: UserResendVerifyRegisterSerializer},
-        description="resend code to mobile phone for verify user register."
-                    "if mobile phone is exited or mobile phone is dose not exited we show massage code is send to "
-                    "mobile phone"
-    )
-    def post(self, request):
-        serializer = UserResendVerifyRegisterSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({'message': "code is resend"}, status=status.HTTP_201_CREATED)
-
-
-class SendCodeMobileApiView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    @extend_schema(
-        request=SendCodeMobilePhoneSerializer,
-        responses={200: SendCodeMobilePhoneSerializer},
-        description='Send confirmation code to change mobile number'
-    )
-    def post(self, request):
-        ser_data = SendCodeMobilePhoneSerializer(data=request.data, context={'request': request.user})
-        ser_data.is_valid(raise_exception=True)
-        ser_data.save()
-        return Response({"message": "successfully send code"})
-
-
-class VerifyCodeMobileApiview(APIView):
-    permission_classes = [IsAuthenticated]
-
-    @extend_schema(
-        request=VerifyCodeMobilePhoneSerializer,
-        responses={200, VerifyCodeMobilePhoneSerializer},
-        description="Verification of the code to change the mobile number"
-    )
-    def post(self, request):
-        ser_data = VerifyCodeMobilePhoneSerializer(data=request.data, context={'request': request.user})
-        ser_data.is_valid(raise_exception=True)
-        ser_data.save()
-        return Response({"message": "successfully change mobile please verify this mobile"}, status=status.HTTP_200_OK)
+        return Response({
+            "message": 'کاربر گرامی حساب شما با موفقیت احراز هویت شدید',
+            "access_token": tokens['access'],
+            "refresh_token": tokens['refresh']
+        }, status=status.HTTP_200_OK)
 
 
 class ResetPasswordAPIView(APIView):
@@ -99,7 +61,7 @@ class ResetPasswordAPIView(APIView):
         ser_data = ResetPasswordSerializer(data=request.data, context={'request': request.user})
         ser_data.is_valid(raise_exception=True)
         ser_data.save()
-        return Response({"message": "successfully reset password"}, status=status.HTTP_200_OK)
+        return Response({"message": "کاربر گرامی پسورد شما با موفقیت تغییر یافت"}, status=status.HTTP_200_OK)
 
 
 class ForgetPasswordApiView(APIView):
@@ -112,7 +74,7 @@ class ForgetPasswordApiView(APIView):
         ser_data = ForgetPasswordSerializer(data=request.data)
         ser_data.is_valid(raise_exception=True)
         ser_data.save()
-        return Response({"message": "we send code and verify for forget password"}, status=status.HTTP_200_OK)
+        return Response({"message": "کاربر گرامی ما یک کدی برای شما ارسال کریده ایم"}, status=status.HTTP_200_OK)
 
 
 class ForgetPasswordConfirmAPIView(APIView):
@@ -124,7 +86,7 @@ class ForgetPasswordConfirmAPIView(APIView):
         ser_data = ForgetPasswordConfirmSerializer(data=request.data)
         ser_data.is_valid(raise_exception=True)
         ser_data.save()
-        return Response({"message": "successfully change password"}, status=status.HTTP_200_OK)
+        return Response({"message": "کاربر گرامی پسورد شما با موفقیت تغییر یافت"}, status=status.HTTP_200_OK)
 
 
 class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
@@ -144,6 +106,15 @@ class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, Ge
         return super().destroy(request, *args, **kwargs)
 
 
+class GradeGpaViewSet(RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, GenericViewSet):
+    queryset = GradeGpa.objects.filter(user__is_active=True, user__is_verified=True)
+    serializer_class = GradeSerializer
+    permission_classes = [IsOwnerProfile]
+
+    def perform_create(self, serializer):
+        return serializer.save(user=self.request.user)
+
+
 class SendOtpCodeApiView(APIView):
     @extend_schema(
         request=SendOtpCodeSerializer,
@@ -154,4 +125,4 @@ class SendOtpCodeApiView(APIView):
         ser_data = SendOtpCodeSerializer(data=request.data)
         ser_data.is_valid(raise_exception=True)
         ser_data.save()
-        return Response({"message": "successfully send otp code"}, status=status.HTTP_201_CREATED)
+        return Response({"message": "کاربر گرامی کد برای شما ارسال خواهد شد"}, status=status.HTTP_201_CREATED)

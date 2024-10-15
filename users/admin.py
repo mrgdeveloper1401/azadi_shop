@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.admin import SimpleListFilter
 # from django_jalali.admin.filters import JDateFieldListFilter
 
-from users.models import UserAccount, UserInfo, Otp
+from users.models import UserAccount, UserInfo, Otp, GradeGpa
 
 
 # Register your models here.
@@ -61,7 +61,7 @@ class UserAdmin(BaseUserAdmin):
                     "is_verified", "is_deleted", "deleted_at")
     list_filter = ("is_staff", "is_superuser", "is_active", 'is_verified', "groups", "date_joined")
     search_fields = ("mobile_phone", "first_name", "last_name", "email")
-    ordering = ("mobile_phone",)
+    ordering = ("-date_joined",)
     filter_horizontal = (
         "groups",
         "user_permissions",
@@ -91,9 +91,17 @@ class UserInfoAdmin(admin.ModelAdmin):
 
 @admin.register(Otp)
 class OtpAdmin(admin.ModelAdmin):
-    list_display = ['user', 'id', 'code', 'request_user', 'created_at', 'expired_at']
+    list_display = ['user', 'id', 'code', 'created_at', 'expired_at']
     list_select_related = ['user']
     search_fields = ['user__mobile_phone']
     list_filter = ["created_at", "expired_at"]
     raw_id_fields = ['user']
 
+
+@admin.register(GradeGpa)
+class GradeGpaAdmin(admin.ModelAdmin):
+    list_display = ['user', 'id', "grade", "gpa"]
+    list_select_related = ['user']
+    search_fields = ['user__mobile_phone']
+    list_filter = ['grade']
+    raw_id_fields = ['user']
