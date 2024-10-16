@@ -6,13 +6,13 @@ from blogs.paginations import BlogPagination
 
 
 class CategoryNodeViewSet(ReadOnlyModelViewSet):
-    queryset = CategoryNode.objects.prefetch_related('parent').select_related('parent')
+    queryset = CategoryNode.objects.all()
     serializer_class = CategoryNodeSerializer
     lookup_field = 'category_slug'
 
 
 class PostViewSet(ReadOnlyModelViewSet):
-    queryset = (Post.objects.filter(is_publish=True).prefetch_related('category', 'fk_blog_post__image').
+    queryset = (Post.objects.filter(is_publish=True).prefetch_related('category').
                 select_related('author'))
     serializer_class = PostSerializer
     pagination_class = BlogPagination
@@ -21,6 +21,6 @@ class PostViewSet(ReadOnlyModelViewSet):
     def get_queryset(self):
         if self.kwargs:
             return (Post.objects.filter(category__category_slug=self.kwargs['category_category_slug']).
-                    prefetch_related('category', "fk_blog_post__image").select_related('author').
+                    prefetch_related('category').select_related('author').
                     filter(is_publish=True))
         return super().get_queryset()

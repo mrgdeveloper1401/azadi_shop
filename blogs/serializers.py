@@ -1,20 +1,13 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, CharField
 
-from blogs.models import CategoryNode, Post, BlogPostImage
+from blogs.models import CategoryNode, Post
 
 
 class CategoryNodeSerializer(ModelSerializer):
-    children = SerializerMethodField()
 
     class Meta:
         model = CategoryNode
-        exclude = ['created_at', "updated_at"]
-        # fields = '__all__'
-
-    def get_children(self, obj):
-        if obj.parent:
-            return [i.category_name for i in obj.children.all()]
-        return []
+        fields = ['id', "category_name", "category_slug", "path", "depth", 'numchild', "children"]
 
 
 class SimpleCategorySerializer(CategoryNodeSerializer):
@@ -23,25 +16,10 @@ class SimpleCategorySerializer(CategoryNodeSerializer):
         fields = ['category_name']
 
 
-class BlogPostImageSerializer(ModelSerializer):
-    class Meta:
-        model = BlogPostImage
-        fields = '__all__'
-
-
 class PostSerializer(ModelSerializer):
-    # category = SimpleCategorySerializer()
-    category = SerializerMethodField()
-    images = SerializerMethodField()
     author = CharField(source='author.get_full_name')
+    category = SimpleCategorySerializer(many=True)
 
     class Meta:
         model = Post
-        fields = '__all__'
-
-    def get_category(self, obj):
-        return [i.category_name for i in obj.category.all()]
-
-    def get_images(self, obj):
-        return [i.image.image_url for i in obj.fk_blog_post.all()]
-
+        exclude = ['deleted_at', "is_deleted"]
