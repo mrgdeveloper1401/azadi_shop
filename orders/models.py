@@ -8,17 +8,17 @@ from courses.models import Course
 from core.models import CreateMixin, UpdateMixin
 from datetime import datetime
 
-from users.models import UserAccount
+from users.models import User
 
 
 class Cart(CreateMixin, UpdateMixin):
     id = models.CharField(primary_key=True, editable=False, auto_created=True, verbose_name="ID", max_length=255)
-    user = models.ForeignKey('users.UserAccount', on_delete=models.CASCADE, verbose_name="cart user",
-                             related_name="user_cart")
+    # user = models.ForeignKey('users.UserAccount', on_delete=models.CASCADE, verbose_name="cart user",
+    #                          related_name="user_cart")
     # cart_complete = models.BooleanField(default=False)
 
     def __str__(self):
-        return f'{self.user}'
+        return f'{self.id}'
 
     @property
     def generate_ulid(self):
@@ -32,13 +32,6 @@ class Cart(CreateMixin, UpdateMixin):
     @property
     def items_number(self):
         return self.cart_item.count()
-
-    def clean(self):
-        if Cart.objects.filter(user__mobile_phone=self).exists():
-            raise ValidationError({"user": _("cart already exist")})
-        if not self.user:
-            raise ValidationError({'user': _("you must choose a user")})
-        return super().clean()
 
     def save(self, *args, **kwargs):
         self.id = self.generate_ulid

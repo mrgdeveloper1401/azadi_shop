@@ -1,13 +1,12 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from core.datetime_config import after_two_minute
 
-from users.models import UserAccount, UserInfo, Otp
-from users.random_code import generate_random_code
+from users.models import User, UserInfo, Otp
 
 
-@receiver(post_save, sender=UserAccount)
+@receiver(post_save, sender=User)
 def create_user_related_info(sender, instance, created, **kwargs):
-    if created:
-        UserInfo.objects.create(user=instance)
-        Otp.objects.create(user=instance, code=generate_random_code())
+    if not instance.is_superuser:
+        Otp.objects.get_or_create(mobile_phone=instance.mobile_phone)
+    if instance.is_verified:
+        UserInfo.objects.get_or_create(user=instance)

@@ -13,11 +13,9 @@ class OrderItemInline(admin.TabularInline):
 # Register your models here.
 @admin.register(Cart)
 class CartAdmin(admin.ModelAdmin):
-    list_display = ['id', 'user', "items_number", "total_price", 'created_at', "updated_at"]
+    list_display = ['id', "items_number", "total_price", 'created_at', "updated_at"]
     list_per_page = 20
-    list_select_related = ['user']
-    raw_id_fields = ['user']
-    search_fields = ['id', "user__mobile_phone"]
+    search_fields = ['id']
     list_filter = ['created_at', "updated_at"]
 
     def get_queryset(self, request):
@@ -30,7 +28,7 @@ class CartAdmin(admin.ModelAdmin):
 class CartItemAdmin(admin.ModelAdmin):
     list_display = ['id', 'cart', 'course', 'quantity', "item_price", "calc_final_price", "discount_value", 'created_at']
     list_filter = ['created_at']
-    search_fields = ['course__name', "cart__user__mobile_phone"]
+    search_fields = ['course__name',]
     list_per_page = 20
     raw_id_fields = ["cart", "course"]
     list_display_links = ['id', "cart"]
@@ -38,7 +36,7 @@ class CartItemAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         q = super().get_queryset(request)
-        q = q.prefetch_related('course__course_discount', "cart__user")
+        q = q.prefetch_related('course__course_discount',)
         return q
 
 

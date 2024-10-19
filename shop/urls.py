@@ -32,7 +32,7 @@ urlpatterns = [
 
 ]
 
-debug_mode = config("DEBUG", default=True, cast=str)
+debug_mode = config("DEBUG", default=False, cast=str)
 if debug_mode:
     from debug_toolbar.toolbar import debug_toolbar_urls
     urlpatterns += debug_toolbar_urls()

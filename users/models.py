@@ -1,96 +1,92 @@
-# from uuid import uuid4
-
+from string import digits
+from random import choices
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
 
 from users.managers import UserManager, OtpManager
 from users.validators import MobileValidator
-from users.random_code import generate_random_code
-from core.models import SoftDeleteMixin, CreateMixin, UpdateMixin
+from core.models import CreateMixin, UpdateMixin
 from core.datetime_config import after_two_minute
 from django.utils.timezone import now
 
 
 # Create your models here.
-class UserAccount(AbstractUser, SoftDeleteMixin):
-    is_verified = models.BooleanField(default=False)
-    mobile_phone = models.CharField(_("mobile phone"), max_length=11, unique=True,
+class User(AbstractBaseUser, PermissionsMixin, CreateMixin, UpdateMixin):
+    mobile_phone = models.CharField(_("شماره همراه"), max_length=11, unique=True,
                                     validators=[MobileValidator()])
-    username = None
+    is_verified = models.BooleanField(_('احراز هویت'), default=False)
     is_active = models.BooleanField(
-        _("active"),
+        _("فعال"),
         default=False,
         help_text=_(
             "Designates whether this user should be treated as active. "
             "Unselect this instead of deleting accounts."
         ),
     )
+    is_staff = models.BooleanField(
+        _("دسترسی کارمندی"),
+        default=False,
+        help_text=_("Designates whether the user can log into this admin site."),
+    )
     USERNAME_FIELD = 'mobile_phone'
-    REQUIRED_FIELDS = ['first_name', 'last_name', 'email']
 
     objects = UserManager()
-
-    @property
-    def get_full_name(self):
-        """
-        Return the first_name plus the last_name, with a space in between.
-        """
-        full_name = "%s %s" % (self.first_name, self.last_name)
-        return full_name.strip()
 
     def __str__(self):
         return self.mobile_phone
 
-    def delete(self, *args, **kwargs):
-        self.is_active = False
-        self.is_verified = False
-        self.is_superuser = False
-        self.is_staff = False
-        self.is_deleted = True
-        self.deleted_at = now()
-        return super().save(*args, **kwargs)
-
-    def save(self, *args, **kwargs):
-        if self.is_deleted:
-            self.deleted_at = now()
-        if not self.is_deleted:
-            self.deleted_at = None
-        return super().save(*args, **kwargs)
-
-    def clean(self):
-        if self.is_deleted and (self.is_active or self.is_verified):
-            raise ValidationError({'is_active': _("You cannot choose both")})
-        return super().clean()
-
     class Meta:
         db_table = 'user'
-        ordering = ("-date_joined",)
+        verbose_name = _("کاربر")
+        verbose_name_plural = _("کاربر ها")
+
+
+class Grade(models.Model):
+    grade_name = models.CharField(_("نام پایه"), max_length=20, unique=True)
+
+    def __str__(self):
+        return self.grade_name
+
+    class Meta:
+        db_table = 'grade'
+        verbose_name = _("پایه")
+        verbose_name_plural = _("پایه")
+
+
+class Major(models.Model):
+    major_name = models.CharField(_("رشته"), max_length=20, unique=True)
+
+    def __str__(self):
+        return self.major_name
+
+    class Meta:
+        db_table = 'major'
+        verbose_name = _("رشته")
+        verbose_name_plural = _("رشته ها")
 
 
 class UserInfo(CreateMixin, UpdateMixin):
-    GRADE_CHOICES = (
-        ('دهم', 'دهم'),
-        ('یازدهم', 'یازدهم'),
-        ('دوازدهم', 'دوازدهم')
-
-    )
-    MAJOR_CHOICES = (
-        ('تجربی', 'تجربی'),
-        ('ریاضی', 'ریاضی'),
-        ('انسانی', 'انسانی')
-
-    )
-    user = models.OneToOneField(UserAccount, on_delete=models.CASCADE, related_name='user_info')
-    grade = models.CharField(max_length=10, choices=GRADE_CHOICES, default='دهم')
-    major = models.CharField(max_length=10, choices=MAJOR_CHOICES, default='تجربی')
+    user = models.OneToOneField(User, on_delete=models.PROTECT, related_name='user_info',
+                                verbose_name=_("کاربر"))
+    grade = models.ForeignKey(Grade, on_delete=models.PROTECT, related_name='grade',
+                              verbose_name=_("پایه"), blank=True, null=True)
+    major = models.ForeignKey(Major, on_delete=models.PROTECT, related_name='major',
+                              verbose_name=_("رشته"), blank=True, null=True)
     gpa = models.FloatField(_("معدل"), validators=[MinValueValidator(0), MaxValueValidator(20)],
                             blank=True, null=True)
+    email = models.EmailField(_("ایمیل"), blank=True, null=True)
+    first_name = models.CharField(_("نام"), max_length=30, blank=True, null=True)
+    last_name = models.CharField(_("نام خوانوادگی"), max_length=30, blank=True, null=True)
 
     class Meta:
+        verbose_name = _("پروفایل کاربر")
+        verbose_name_plural = _("پروفایل کاربرها")
         db_table = 'user_info'
+        constraints = [
+            models.UniqueConstraint(fields=['email'], name='unique_email')
+        ]
 
     def __str__(self):
         return self.user.mobile_phone
@@ -100,64 +96,37 @@ class UserInfo(CreateMixin, UpdateMixin):
         return self.user.is_active
 
     @property
-    def get_is_deleted(self):
-        return self.user.is_deleted
-
-    @property
-    def get_deleted_at(self):
-        return self.user.deleted_at
-
-    @property
     def get_is_verified(self):
         return self.user.is_verified
 
     @property
-    def get_name(self):
-        return self.user.first_name
-
-    @property
-    def get_last_name(self):
-        return self.user.last_name
-
-    def delete(self, *args, **kwargs):
-        self.user.is_active = False
-        self.user.is_staff = False
-        self.user.is_superuser = False
-        self.user.deleted_at = now()
-        self.user.is_deleted = True
-        self.user.is_verified = False
-        self.user.save()
-        return super().save(*args, **kwargs)
+    def get_full_name(self):
+        return f'{self.first_name} {self.last_name}'
 
 
 class GradeGpa(CreateMixin, UpdateMixin):
-    GRADE_CHOICES = (
-        ('دهم', 'دهم'),
-        ('یازدهم', 'یازدهم'),
-        ('دوازدهم', 'دوازدهم')
-    )
-
-    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='grade_gpas')
-    grade = models.CharField(max_length=10, choices=GRADE_CHOICES, blank=True, null=True)
-    gpa = models.FloatField(_("معدل"), validators=[MinValueValidator(0), MaxValueValidator(20)], blank=True, null=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_grade_gpas',
+                             verbose_name=_("کاربر"))
+    grade = models.ForeignKey(Grade, on_delete=models.PROTECT, related_name='grade_gpa',
+                              verbose_name=_("پایه"))
+    gpa = models.FloatField(_("معدل"), validators=[MinValueValidator(0), MaxValueValidator(20)])
 
     class Meta:
         db_table = 'grade_gpa'
-        verbose_name = _("grade gpa")
-        verbose_name_plural = _("grade gpa")
+        verbose_name = _("نمره کاربر")
+        verbose_name_plural = _("نمرات کاربر")
         unique_together = ('user', 'grade')
 
 
 class Otp(CreateMixin):
-    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE, related_name='user_otp')
-    code = models.PositiveIntegerField(_('OTP code'), unique=True, default=generate_random_code)
-    expired_at = models.DateTimeField(blank=True, null=True)
-    # request_user = models.UUIDField(default=uuid4, editable=False, unique=True)
+    mobile_phone = models.CharField(_("شماره همراه"), max_length=11, validators=[MobileValidator()])
+    code = models.PositiveIntegerField(_('کد'), blank=True, null=True)
+    expired_at = models.DateTimeField(_('زمان انتقضای کد'), blank=True, null=True)
 
     objects = OtpManager()
 
     def __str__(self):
-        return self.user.mobile_phone
+        return self.mobile_phone
 
     def is_expired(self):
         return now() > self.expired_at
@@ -168,22 +137,17 @@ class Otp(CreateMixin):
             return True
         return False
 
-    # def clean(self):
-    #     otp_code = Otp.objects.filter(user=self.user)
-    #     user_account = UserAccount.objects.get(mobile_phone=self)
-    #     if user_account.is_active and user_account.is_verified:
-    #         raise ValidationError({"user": "user is active and verified"})
-    #     elif user_account.is_deleted:
-    #         raise ValidationError({"user": "user is deleted"})
-    #     elif otp_code.exists():
-    #         raise ValidationError({"user": "otp code already exits"})
-    #     super().clean()
+    @property
+    def generate_random_code(self):
+        code = ''.join(choices(digits, k=6))
+        return code
 
     def save(self, *args, **kwargs):
         self.expired_at = after_two_minute()
+        self.code = self.generate_random_code
         return super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'otp'
-        verbose_name = _('otp')
-        verbose_name_plural = _('OTPs')
+        verbose_name = _('کد')
+        verbose_name_plural = _('کدها')

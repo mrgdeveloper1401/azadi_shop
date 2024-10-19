@@ -3,12 +3,12 @@ from django.utils.text import slugify
 from treebeard.mp_tree import MP_Node
 from django.utils.translation import gettext_lazy as _
 
-from core.models import CreateMixin, UpdateMixin, SoftDeleteMixin
+from core.models import CreateMixin, UpdateMixin
 
 
 class CategoryNode(MP_Node):
-    category_name = models.CharField(max_length=50, unique=True)
-    category_slug = models.SlugField(max_length=50, allow_unicode=True, unique=True)
+    category_name = models.CharField(_('نام دسته بندی'), max_length=50, unique=True)
+    category_slug = models.SlugField(_('اسلاگ دسته بندی'), max_length=50, allow_unicode=True, unique=True)
     node_order_by = ['category_name']
 
     def __str__(self):
@@ -24,12 +24,12 @@ class CategoryNode(MP_Node):
 
     class Meta:
         db_table = 'blog_category'
-        verbose_name = _("category")
-        verbose_name_plural = _("categories")
+        verbose_name = _("دسته بندی")
+        verbose_name_plural = _("دسته بندی ها")
 
 
-class Post(CreateMixin, UpdateMixin, SoftDeleteMixin):
-    author = models.ForeignKey('users.UserAccount', on_delete=models.PROTECT, related_name='user_posts',
+class Post(CreateMixin, UpdateMixin):
+    author = models.ForeignKey('users.User', on_delete=models.PROTECT, related_name='user_posts',
                                limit_choices_to={'is_active': True, "is_staff": True, "is_verified": True},
                                verbose_name=_("نویسنده"))
     category = models.ManyToManyField(CategoryNode, related_name='posts', verbose_name=_("دسته بندی"))
@@ -40,7 +40,7 @@ class Post(CreateMixin, UpdateMixin, SoftDeleteMixin):
     view_number = models.PositiveIntegerField(_('تعداد بازدید'), default=0)
 
     def __str__(self):
-        return f'{self.author.get_full_name} {self.post_title}'
+        return self.post_title
 
     class Meta:
         verbose_name = 'Post'

@@ -1,13 +1,10 @@
-from decimal import Decimal
-
-from django.db.models import Q
-from rest_framework.serializers import ModelSerializer, IntegerField, ValidationError, Serializer, CharField \
-    , SerializerMethodField
+from rest_framework.serializers import ModelSerializer, IntegerField, ValidationError, Serializer, CharField, \
+    SerializerMethodField
 from ulid import ULID
 from django.db.transaction import atomic
 from datetime import datetime
 
-from users.models import UserAccount
+from users.models import User
 from courses.models import Course
 from orders.models import Cart, CartItem, OrderItem, Order
 from professors.models import Professor
@@ -15,7 +12,7 @@ from professors.models import Professor
 
 class SimpleUserSerializer(ModelSerializer):
     class Meta:
-        model = UserAccount
+        model = User
         fields = ['username']
 
 
@@ -62,8 +59,7 @@ class AddCartItemSerializer(ModelSerializer):
 
     def save(self, *args, **kwargs):
         course_id = self.validated_data['course_id']
-        user = self.context['user']
-        cart = Cart.objects.get(user=user)
+        cart = Cart.objects.get(pk=self.context['cart_id'])
         try:
             cart_item = CartItem.objects.get(course_id=course_id, cart_id=cart.id)
             self.instance = cart_item
@@ -71,24 +67,11 @@ class AddCartItemSerializer(ModelSerializer):
             self.instance = CartItem.objects.create(cart_id=cart.id, course_id=course_id)
         return self.instance
 
-    def validate(self, attrs):
-        orders = Order.objects.filter(user=self.context['user']).filter(Q(payment_status='complete') |
-                                                                        Q(payment_status='pending'))
-        check_order = orders.values_list('order_item__course__pk', flat=True)
-        course_id = attrs.get('course_id')
-        if course_id in check_order:
-            raise ValidationError("you already have this course")
-        return attrs
-
     def validate_course_id(self, data):
         try:
-            course = Course.objects.get(pk=data)
+            Course.objects.get(pk=data)
         except Course.DoesNotExist:
-            raise ValidationError('course not found')
-        if not course.is_sale:
-            raise ValidationError("course is unavailable")
-        if course.price == Decimal('0.00') or course.calc_final_price == Decimal('0.00'):
-            raise ValidationError("course is free")
+            raise ValidationError('دوره مورد نظر یافت نشد')
         return data
 
 
@@ -98,11 +81,6 @@ class CartSerializer(ModelSerializer):
     class Meta:
         model = Cart
         fields = ['id', 'cart_item', 'total_price']
-
-    def create(self, validated_data):
-        if Cart.objects.filter(user=validated_data['user']).exists():
-            raise ValidationError('cart already exists')
-        return super().create(validated_data)
 
 
 class OrderItemSerializer(ModelSerializer):
@@ -127,9 +105,9 @@ class CreateOrderSerializer(Serializer):
 
     def validate_cart_id(self, data):
         if not Cart.objects.filter(id=data).exists():
-            raise ValidationError('cart not found')
+            raise ValidationError('سید خرید یافت نشد')
         elif Cart.objects.filter(id=data).count() == 0:
-            raise ValidationError('cart is empty')
+            raise ValidationError('سبد خرید خالی هست')
         return data
 
     def generate_ulid(self):
@@ -138,8 +116,8 @@ class CreateOrderSerializer(Serializer):
     def validate(self, attr):
         order = Order.objects.filter(user_id=self.context['user_id']).last()
         if order and order.payment_status == "pending":
-            raise ValidationError({"message": "You already have a pending order, "
-                                              "please complete it before creating a new one."})
+            raise ValidationError({"message": "شما از قبل یک سفارش رو دارید, "
+                                              "ابتدا وضعیت ان را مشخص کنید"})
         return attr
 
     def save(self, **kwargs):

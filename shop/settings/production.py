@@ -9,10 +9,6 @@ SECRET_KEY = config('DEPLOY_SECRET_KEY', cast=str)
 
 ALLOWED_HOSTS = ["*"]
 
-INSTALLED_APPS += [
-    "corsheaders",
-]
-
 DATABASES = {
     # 'default': dj_database_url.config(default=config('DATABASE_URL', cast=str))
     'default': {
@@ -26,11 +22,21 @@ DATABASES = {
 }
 
 # cors allowed origin config
-CORS_ALLOWED_ORIGINS = [
-    "https://test-azadi.liara.run",
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_HEADERS = '*'
+# CORS_ALLOWED_ORIGINS = [
+#     'http://localhost:3000',
+#     "https://test-azadi.liara.run"
+# ]
+CORS_ALLOW_METHODS = [
+  "DELETE",
+  "GET",
+  "OPTIONS",
+  "PATCH",
+  "POST",
+  "PUT",
 ]
-
-
 # ssl config
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True

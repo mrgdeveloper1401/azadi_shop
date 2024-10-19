@@ -64,18 +64,18 @@ class RateFilter(admin.SimpleListFilter):
 class CategoryAdmin(TreeAdmin):
     form = movenodeform_factory(CourseCategory)
     raw_id_fields = ['icon']
-    list_display = ['name', "is_public"]
+    list_display = ['name', "slug"]
     list_per_page = 30
     search_fields = ['name']
     prepopulated_fields = {"slug": ("name",)}
-    list_filter = ['is_public']
+    # list_filter = ['is_public']
     list_select_related = ['icon']
 
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "professor", "price", "calc_final_price", "is_active", "is_free", "is_sale",
-                    "sale_number", "created_at", "total_like", "comment_number")
+                    "sale_number", "created_at", 'updated_at', "total_like", "comment_number")
     list_filter = ("is_active", "is_free", "is_sale", SalesFilter, "created_at", "updated_at")
     list_editable = ("is_active", "total_like", "is_free", "is_sale", "price")
     date_hierarchy = "created_at"
@@ -83,9 +83,9 @@ class CourseAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     list_per_page = 20
     list_display_links = ("id", "name")
-    raw_id_fields = ("professor", "category", "image")
+    raw_id_fields = ("professor", "image")
     list_select_related = ("professor", "image")
-    readonly_fields = ['created_at']
+    readonly_fields = ['created_at', "updated_at"]
     filter_horizontal = ('category',)
 
     def get_queryset(self, request):

@@ -18,36 +18,14 @@ from users.permissions import IsVerifiedUser
 
 class CartViewSet(CreateModelMixin, ListModelMixin, RetrieveModelMixin, GenericViewSet):
     queryset = Cart.objects.prefetch_related('cart_item', 'cart_item__course', "cart_item__course__professor",
-                                             "cart_item__course__image", "cart_item__course__course_discount"). \
-        select_related("user")
+                                             "cart_item__course__image", "cart_item__course__course_discount")
     serializer_class = CartSerializer
-    permission_classes = [IsOwner, IsVerifiedUser]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
-    
-    # def get_permissions(self):
-    #     if self.request.method == 'POST':
-    #         if not self.request.user.is_verified:
-    #             raise PermissionDenied("you must verify account")
-    #     return super().get_permissions()
-    
-    def get_queryset(self):
-        user = self.request.user
-        queryset = super().get_queryset()
-        if self.action == 'list':
-            queryset = queryset.filter(user=user)
-        return queryset
 
 
 class CartItemViewSet(RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, ListModelMixin, GenericViewSet):
     queryset = (CartItem.objects.select_related('course', "course__professor", "course__image").
                 prefetch_related("course__course_discount"))
     serializer_class = CartItemSerializer
-    permission_classes = [IsOwnerCartItem, IsVerifiedUser]
-
-    def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -55,8 +33,7 @@ class CartItemViewSet(RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, L
         return super().get_serializer_class()
 
     def get_serializer_context(self):
-        return {'cart_id': self.kwargs['cart_pk'],
-                'user': self.request.user}
+        return {'cart_id': self.kwargs['cart_pk']}
 
     def get_queryset(self):
         cart_id = self.kwargs['cart_pk']

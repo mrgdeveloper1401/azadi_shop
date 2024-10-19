@@ -35,6 +35,7 @@ THIRD_PARTY_PACKAGE = [
     "django_celery_results",
     "django_celery_beat",
     "storages",
+    "corsheaders",
 ]
 
 INSTALLED_APPS = [
@@ -52,6 +53,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # cors middleware
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     # whitenoise
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -128,7 +131,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
 # user
-AUTH_USER_MODEL = 'users.UserAccount'
+AUTH_USER_MODEL = 'users.User'
 
 # spectacular settings
 SPECTACULAR_SETTINGS = {

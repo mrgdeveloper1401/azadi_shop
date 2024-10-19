@@ -4,7 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from django.contrib.admin import SimpleListFilter
 # from django_jalali.admin.filters import JDateFieldListFilter
 
-from users.models import UserAccount, UserInfo, Otp, GradeGpa
+from users.models import User, UserInfo, Otp, GradeGpa, Grade, Major
 
 
 # Register your models here.
@@ -27,11 +27,10 @@ class IsActiveUserInfo(SimpleListFilter):
         return queryset
 
 
-@admin.register(UserAccount)
+@admin.register(User)
 class UserAdmin(BaseUserAdmin):
     fieldsets = (
         (None, {"fields": ("mobile_phone", "password")}),
-        (_("Personal info"), {"fields": ("first_name", "last_name", "email")}),
         (
             _("Permissions"),
             {
@@ -40,13 +39,12 @@ class UserAdmin(BaseUserAdmin):
                     "is_staff",
                     "is_superuser",
                     "is_verified",
-                    "is_deleted",
                     "groups",
                     "user_permissions",
                 ),
             },
         ),
-        (_("Important dates"), {"fields": ("last_login", "date_joined", "deleted_at")}),
+        (_("Important dates"), {"fields": ("last_login", "created_at", "updated_at")}),
     )
     add_fieldsets = (
         (
@@ -57,17 +55,16 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
-    list_display = ("id", "mobile_phone", "email", "first_name", "last_name", "is_staff", 'is_superuser', 'is_active',
-                    "is_verified", "is_deleted", "deleted_at")
-    list_filter = ("is_staff", "is_superuser", "is_active", 'is_verified', "groups", "date_joined")
-    search_fields = ("mobile_phone", "first_name", "last_name", "email")
-    ordering = ("-date_joined",)
+    list_display = ("id", "mobile_phone", "is_staff", 'is_superuser', 'is_active', "is_verified")
+    list_filter = ("is_staff", "is_superuser", "is_active", 'is_verified', "groups", "created_at")
+    search_fields = ("mobile_phone",)
+    ordering = ("-created_at",)
     filter_horizontal = (
         "groups",
         "user_permissions",
     )
-    readonly_fields = ['deleted_at', "last_login", "date_joined"]
-    list_display_links = ['id', "mobile_phone", "email"]
+    readonly_fields = ['created_at', "last_login", "updated_at"]
+    list_display_links = ['id', "mobile_phone"]
 
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
@@ -80,22 +77,21 @@ class UserAdmin(BaseUserAdmin):
 
 @admin.register(UserInfo)
 class UserInfoAdmin(admin.ModelAdmin):
-    list_display = ["id", 'user', 'grade', 'major', 'get_active', "get_is_deleted", "get_is_verified", "get_deleted_at"]
-    list_select_related = ['user']
-    search_fields = ["grade", "major", "user__mobile_phone"]
+    list_display = ["id", 'user', 'grade', 'major', 'email', 'first_name', 'last_name', 'get_active', "get_is_verified"]
+    list_select_related = ['user', "grade", "major"]
+    search_fields = ["grade__grade_name", "major_major_name", "user__mobile_phone"]
     list_per_page = 100
     list_filter = [IsActiveUserInfo]
     list_display_links = ['id', "user"]
-    raw_id_fields = ['user']
+    raw_id_fields = ['user', "grade", "major"]
+    ordering = ['-created_at']
 
 
 @admin.register(Otp)
 class OtpAdmin(admin.ModelAdmin):
-    list_display = ['user', 'id', 'code', 'created_at', 'expired_at']
-    list_select_related = ['user']
-    search_fields = ['user__mobile_phone']
-    list_filter = ["created_at", "expired_at"]
-    raw_id_fields = ['user']
+    list_display = ['mobile_phone', 'id', 'code', 'created_at', 'expired_at']
+    search_fields = ['mobile_phone']
+    list_filter = ["created_at"]
 
 
 @admin.register(GradeGpa)
@@ -105,3 +101,13 @@ class GradeGpaAdmin(admin.ModelAdmin):
     search_fields = ['user__mobile_phone']
     list_filter = ['grade']
     raw_id_fields = ['user']
+
+
+@admin.register(Grade)
+class GradeAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(Major)
+class MajorAdmin(admin.ModelAdmin):
+    pass

@@ -29,7 +29,7 @@ RUN adduser -D -H azadi
 ENV GDAL_LIBRARY_PATH=/usr/lib/libgdal.so
 ENV GEOS_LIBRARY_PATH=/usr/lib/libgeos_c.so
 RUN pip install --upgrade pip
-RUN pip install -r /home/app/requirements/production.txt
+RUN pip install -r /home/app/requirements.txt
 RUN python /home/app/manage.py collectstatic --settings=shop.settings.production
 RUN chown -R azadi:azadi /home/app/static
 RUN chmod +x /home/app/start.sh

@@ -2,8 +2,7 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, CreateModelMixin, \
-    ListModelMixin
+from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, CreateModelMixin
 from rest_framework.viewsets import GenericViewSet
 from drf_spectacular.utils import extend_schema
 from django.utils.timezone import now
@@ -16,13 +15,8 @@ from users.permissions import IsOwnerProfile
 
 
 class UserRegistrationAPIView(APIView):
-    @extend_schema(
-        request=UserRegisterSerializer,
-        responses={201: UserRegisterSerializer},
-        description="enter mobile phone and password and confirm password for register user,"
-                    "one letter password must be upper case"
-                    "password must be same"
-    )
+    serializer_class = UserRegisterSerializer
+
     def post(self, request):
         serializer = UserRegisterSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -31,11 +25,8 @@ class UserRegistrationAPIView(APIView):
 
 
 class UserVerifyRegisterCodeAPIView(APIView):
-    @extend_schema(
-        request=UserVerifyRegisterSerializer,
-        responses={201: UserVerifyRegisterSerializer},
-        description='enter code and verify user register, but code time more then 2 minute code is expired'
-    )
+    serializer_class = UserVerifyRegisterSerializer
+
     def post(self, request, *args, **kwargs):
         ser_data = UserVerifyRegisterSerializer(data=request.data)
         ser_data.is_valid(raise_exception=True)
@@ -51,12 +42,8 @@ class UserVerifyRegisterCodeAPIView(APIView):
 
 class ResetPasswordAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    serializer_class = ResetPasswordSerializer
 
-    @extend_schema(
-        request=ResetPasswordSerializer,
-        responses={200: ResetPasswordSerializer},
-        description="this url for reset password when user is authenticate"
-    )
     def post(self, request):
         ser_data = ResetPasswordSerializer(data=request.data, context={'request': request.user})
         ser_data.is_valid(raise_exception=True)
@@ -90,8 +77,7 @@ class ForgetPasswordConfirmAPIView(APIView):
 
 
 class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
-    queryset = UserInfo.objects.select_related('user').filter(user__is_active=True,
-                                                              user__is_deleted=False)
+    queryset = UserInfo.objects.select_related('user').filter(user__is_active=True, user__is_verified=True)
     serializer_class = ProfileSerializer
     permission_classes = [IsOwnerProfile]
 
@@ -116,11 +102,8 @@ class GradeGpaViewSet(RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, Ge
 
 
 class SendOtpCodeApiView(APIView):
-    @extend_schema(
-        request=SendOtpCodeSerializer,
-        responses={201: SendOtpCodeSerializer},
-        description='send otp code to mobile phone'
-    )
+    serializer_class = SendOtpCodeSerializer
+
     def post(self, request, *args, **kwargs):
         ser_data = SendOtpCodeSerializer(data=request.data)
         ser_data.is_valid(raise_exception=True)

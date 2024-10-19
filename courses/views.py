@@ -6,25 +6,17 @@ from django.db.models import Case, When, F, DecimalField, Value
 
 from courses.permissions import IsOwner
 from courses.paginations import CoursePagination
-from courses.serializers import (CommentSerializers, CourseSerializers, CreatCommentSerializer, CategoryTreeSerializers,
-                                 CategoryNodeSerializer, UpdateCommentSerializer)
+from courses.serializers import CommentSerializers, CourseSerializers, CreatCommentSerializer, UpdateCommentSerializer, \
+    CategorySerializers
 from courses.models import CourseCategory, Course, Comment
 from courses.filters import CourseFilter
 from users.permissions import IsVerifiedUser
 
 
 class CategoryViewSet(ReadOnlyModelViewSet):
-    queryset = CourseCategory.objects.is_publish().select_related("icon")
+    queryset = CourseCategory.objects.select_related("icon")
+    serializer_class = CategorySerializers
     lookup_field = 'slug'
-
-    def get_serializer_class(self):
-        match self.action:
-            case 'list':
-                return CategoryTreeSerializers
-            case 'retrieve':
-                return CategoryNodeSerializer
-            case _:
-                raise NotAcceptable()
 
 
 class CourseViewSet(ReadOnlyModelViewSet):

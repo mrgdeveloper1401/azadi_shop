@@ -22,4 +22,4 @@ class PostSerializer(ModelSerializer):
 
     class Meta:
         model = Post
-        exclude = ['deleted_at', "is_deleted"]
+        fields = '__all__'
