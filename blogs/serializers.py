@@ -17,7 +17,7 @@ class SimpleCategorySerializer(CategoryNodeSerializer):
 
 
 class PostSerializer(ModelSerializer):
-    author = CharField(source='author.get_full_name')
+    author = CharField(source='author.user_info.get_full_name')
     category = SimpleCategorySerializer(many=True)
 
     class Meta:

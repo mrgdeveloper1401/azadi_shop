@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 # from django_jalali.db.models import jDateField
+from django.contrib.postgres.fields import ArrayField
 
 from core.models import CreateMixin, UpdateMixin
 from users.validators import MobileValidator
@@ -11,8 +12,8 @@ from professors.validators import NationCodeValidator
 class Professor(CreateMixin, UpdateMixin):
     first_name = models.CharField(_("نام"), max_length=255)
     last_name = models.CharField(_("نام خانوادگی"), max_length=255)
-    professor_contact = models.ForeignKey("ProfessorContact", on_delete=models.PROTECT, related_name="contact",
-                                          verbose_name=_("راه ارتباطی استاد"))
+    # professor_contact = models.ForeignKey("ProfessorContact", on_delete=models.PROTECT, related_name="contact",
+    #                                       verbose_name=_("راه ارتباطی استاد"))
     nation_code = models.CharField(_("کد ملی"), max_length=11, unique=True,
                                    validators=[NationCodeValidator()])
     birth_date = models.DateField(_("تاریخ تولد"), blank=True, null=True)
@@ -35,8 +36,8 @@ class Professor(CreateMixin, UpdateMixin):
     education_status = models.CharField(_("وضعیت تحصیل"), choices=EducationStatus.choices, max_length=26)
     is_active = models.BooleanField(default=False)
     email = models.EmailField(_("ایمیل"), blank=True, null=True)
-    mobile_phone = models.CharField(_("شماره تلفن"), max_length=11, blank=True, null=True,
-                                    validators=[MobileValidator()])
+    mobile_phone = ArrayField(models.CharField(_('شماره تلفن های استاد'), max_length=11),
+                              blank=True, null=True, size=5)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"

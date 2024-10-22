@@ -48,13 +48,13 @@ class Course(CreateMixin, UpdateMixin):
     video = models.FileField(_('فیلم معرفی دوره'), upload_to='videos/%Y/%m/%d', blank=True, null=True)
     image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name="course_image",
                               verbose_name=_("عکس دوره"))
-    sale_number = models.PositiveSmallIntegerField(_('تعداد فروش دوره'), default=0)
+    sale_number = models.PositiveSmallIntegerField(_('تعداد فروش دوره'), default=0, editable=False)
     is_sale = models.BooleanField(_('قابل فروش'), default=True,
                                   help_text=_("if is sale is true, this course can be sale ,otherwise this course "
                                               "can't"))
     is_free = models.BooleanField(_('رایگان'), default=False)
     is_active = models.BooleanField(_('فعال'), default=True)
-    total_like = models.PositiveIntegerField(_("تعداد کاربران پسندیده شده"), default=0)
+    total_like = models.PositiveIntegerField(_("تعداد کاربران پسندیده شده"), default=0, editable=False)
 
     objects = CourseManager()
 

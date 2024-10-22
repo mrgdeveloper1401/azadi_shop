@@ -77,7 +77,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "professor", "price", "calc_final_price", "is_active", "is_free", "is_sale",
                     "sale_number", "created_at", 'updated_at', "total_like", "comment_number")
     list_filter = ("is_active", "is_free", "is_sale", SalesFilter, "created_at", "updated_at")
-    list_editable = ("is_active", "total_like", "is_free", "is_sale", "price")
+    list_editable = ("is_active", "is_free", "is_sale", "price")
     date_hierarchy = "created_at"
     search_fields = ("name", "professor__first_name", "professor__last_name")
     prepopulated_fields = {"slug": ("name",)}
@@ -85,7 +85,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_display_links = ("id", "name")
     raw_id_fields = ("professor", "image")
     list_select_related = ("professor", "image")
-    readonly_fields = ['created_at', "updated_at"]
+    readonly_fields = ['created_at', "updated_at", "total_like", "sale_number"]
     filter_horizontal = ('category',)
 
     def get_queryset(self, request):

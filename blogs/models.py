@@ -37,12 +37,12 @@ class Post(CreateMixin, UpdateMixin):
     slug = models.SlugField(_('اسلاگ'), max_length=255, unique=True, allow_unicode=True)
     post_body = models.TextField(_('متن پست'))
     is_publish = models.BooleanField(_("قابل انتشار"), default=False)
-    view_number = models.PositiveIntegerField(_('تعداد بازدید'), default=0)
+    view_number = models.PositiveIntegerField(_('تعداد بازدید'), default=0, editable=False)
 
     def __str__(self):
         return self.post_title
 
     class Meta:
-        verbose_name = 'Post'
-        verbose_name_plural = 'Posts'
+        verbose_name = 'پست وبلاگ'
+        verbose_name_plural = 'پست های وبلاگ'
         db_table = 'blog_post'
