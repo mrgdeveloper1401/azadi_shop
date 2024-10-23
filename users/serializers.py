@@ -23,6 +23,8 @@ class UserRegisterSerializer(serializers.Serializer):
     def create(self, validated_data):
         del validated_data['confirm_password']
         user, created = User.objects.get_or_create(**validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
         return user
 
     def validate(self, data):
