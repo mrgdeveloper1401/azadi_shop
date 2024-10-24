@@ -44,7 +44,7 @@ class User(AbstractBaseUser, PermissionsMixin, CreateMixin, UpdateMixin):
 
 
 class Grade(models.Model):
-    grade_name = models.CharField(_("نام پایه"), max_length=20, unique=True)
+    grade_name = models.CharField(_("نام پایه"), max_length=20)
 
     def __str__(self):
         return self.grade_name
@@ -115,7 +115,7 @@ class GradeGpa(CreateMixin, UpdateMixin):
         db_table = 'grade_gpa'
         verbose_name = _("نمره کاربر")
         verbose_name_plural = _("نمرات کاربر")
-        unique_together = ('user', 'grade')
+        ordering = ('-created_at',)
 
 
 class Otp(CreateMixin):

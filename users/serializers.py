@@ -5,7 +5,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
-from users.models import User, Otp, UserInfo, GradeGpa
+from users.models import User, Otp, UserInfo, GradeGpa, Grade
 from users.validators import MobileValidator
 
 
@@ -206,10 +206,39 @@ class ProfileSerializer(serializers.ModelSerializer):
         return instance
 
 
+class SimpleUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['mobile_phone']
+
+
+class SimpleGradeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Grade
+        fields = ['grade_name']
+
+
 class GradeSerializer(serializers.ModelSerializer):
+    user = SimpleUserSerializer(read_only=True)
+    # grade = SimpleGradeSerializer()
+    grade_name = serializers.SerializerMethodField()
+
     class Meta:
         model = GradeGpa
-        fields = ['id', 'grade', "gpa"]
+        fields = ['id', 'user', 'grade', 'grade_name', "gpa"]
+        extra_kwargs = {
+            "user": {'read_only': True},
+        }
+
+    def get_grade_name(self, obj):
+        return obj.grade.grade_name
+
+    def create(self, validated_data):
+        grade = validated_data['grade']
+        user = self.context['user']
+        if GradeGpa.objects.filter(user=user, grade=grade).exists():
+            raise ValidationError({"detail": _("شما از قبل چنین پایه رو اضافه کردید")})
+        return GradeGpa.objects.create(**validated_data)
 
 
 class SendOtpCodeSerializer(serializers.Serializer):

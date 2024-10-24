@@ -2,7 +2,8 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, CreateModelMixin
+from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, CreateModelMixin, \
+    ListModelMixin
 from rest_framework.viewsets import GenericViewSet
 from drf_spectacular.utils import extend_schema
 from django.utils.timezone import now
@@ -92,13 +93,19 @@ class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, Ge
         return super().destroy(request, *args, **kwargs)
 
 
-class GradeGpaViewSet(RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, GenericViewSet):
-    queryset = GradeGpa.objects.filter(user__is_active=True, user__is_verified=True)
+class GradeGpaViewSet(ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, GenericViewSet):
     serializer_class = GradeSerializer
     permission_classes = [IsOwnerProfile]
 
     def perform_create(self, serializer):
         return serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        return (GradeGpa.objects.filter(user=self.request.user, user__is_active=True, user__is_verified=True).
+                select_related('user', 'grade'))
+
+    def get_serializer_context(self):
+        return {'user': self.request.user}
 
 
 class SendOtpCodeApiView(APIView):
