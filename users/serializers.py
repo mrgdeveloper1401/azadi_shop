@@ -22,10 +22,15 @@ class UserRegisterSerializer(serializers.Serializer):
 
     def create(self, validated_data):
         del validated_data['confirm_password']
-        user, created = User.objects.get_or_create(**validated_data)
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
+        user_account = User.objects.filter(mobile_phone=validated_data['mobile_phone']).last()
+        if user_account:
+            Otp.objects.get_or_create(mobile_phone=validated_data['mobile_phone'])
+            return user_account
+        else:
+            user, created = User.objects.get_or_create(**validated_data)
+            user.set_password(validated_data['password'])
+            user.save()
+            return user
 
     def validate(self, data):
         if data['password'] != data['confirm_password']:
@@ -42,6 +47,7 @@ class UserVerifyRegisterSerializer(serializers.Serializer):
     verify user register with mobile phone
     """
     code = serializers.IntegerField()
+    mobile_phone = serializers.CharField(required=False, validators=[MobileValidator()])
 
     # request_user = serializers.UUIDField(write_only=True)
 

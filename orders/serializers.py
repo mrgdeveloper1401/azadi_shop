@@ -69,9 +69,12 @@ class AddCartItemSerializer(ModelSerializer):
 
     def validate_course_id(self, data):
         try:
-            Course.objects.get(pk=data)
+            course = Course.objects.get(pk=data)
         except Course.DoesNotExist:
             raise ValidationError('دوره مورد نظر یافت نشد')
+        else:
+            if not course.is_active:
+                raise ValidationError('دوره مد نظر غیر فعال میباشد')
         return data
 
 
@@ -104,10 +107,14 @@ class CreateOrderSerializer(Serializer):
     cart_id = CharField()
 
     def validate_cart_id(self, data):
+        cart = Cart.objects.filter(pk=data).last()
+        cart_item = CartItem.objects.filter(cart=cart)
         if not Cart.objects.filter(id=data).exists():
             raise ValidationError('سید خرید یافت نشد')
         elif Cart.objects.filter(id=data).count() == 0:
             raise ValidationError('سبد خرید خالی هست')
+        if not cart_item.course.is_active:
+            raise ValidationError('محصول غیر فعال میباشد')
         return data
 
     def generate_ulid(self):
@@ -118,6 +125,7 @@ class CreateOrderSerializer(Serializer):
         if order and order.payment_status == "pending":
             raise ValidationError({"message": "شما از قبل یک سفارش رو دارید, "
                                               "ابتدا وضعیت ان را مشخص کنید"})
+
         return attr
 
     def save(self, **kwargs):

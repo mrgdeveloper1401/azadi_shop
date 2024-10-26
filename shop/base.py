@@ -32,10 +32,12 @@ THIRD_PARTY_PACKAGE = [
     "rest_framework_simplejwt.token_blacklist",
     "treebeard",
     "django_filters",
-    "django_celery_results",
-    "django_celery_beat",
+    # "django_celery_results",
+    # "django_celery_beat",
     "storages",
     "corsheaders",
+    'ckeditor',
+    "ckeditor_uploader",
 ]
 
 INSTALLED_APPS = [
@@ -196,7 +198,10 @@ AWS_S3_ENDPOINT_URL = config("ARVAN_ENDPOINT", cast=str)
 AWS_S3_REGION_NAME = 'us-east-1'
 AWS_S3_FILE_OVERWRITE = False
 AWS_SERVICE_NAME = 's3'
+# AWS_QUERYSTRING_AUTH = False
 # AWS_S3_VERIFY = False
+# for upload object storage
+AWS_S3_SECURE_URLS = True
 
 
 # with logging django
@@ -256,3 +261,24 @@ LOGGING = {
         }
     }
 }
+
+# ckeditor
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'removePlugins': "exportpdf",
+    },
+}
+
+CKEDITOR_ALLOW_ALL_FILE_TYPES = True
+CKEDITOR_MAX_FILE_SIZE = 5
+CKEDITOR_FILE_UPLOAD_PERMISSION = "staff"
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_RESTRICT_BY_USER = True
+CKEDITOR_IMAGE_BACKEND = "pillow"
+CKEDITOR_STORAGE_BACKEND = STORAGES['default']['BACKEND']
+# CKEDITOR_BASEPATH = os.path.join(BASE_DIR, 'static', 'ckeditor')
+CKEDITOR_BROWSE_SHOW_DIRS = True
+# CKEDITOR_RESTRICT_BY_DATE = True
+CKEDITOR_THUMBNAIL_SIZE = (100, 100)
+CKEDITOR_IMAGE_QUALITY = 100

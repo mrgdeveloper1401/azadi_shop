@@ -1,10 +1,9 @@
-from django.db.models import F
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 from django.utils.timezone import now
 
 from courses.models import Like, DiscountCourse
-from orders.models import Order, OrderItem
+from professors.models import Professor
 
 
 @receiver(post_save, sender=Like)
@@ -25,8 +24,7 @@ def delete_discount_course(sender, instance, **kwargs):
         instance.delete()
 
 
-# @receiver(post_save, sender=Order)
-# def add_sale_number(sender, instance, created, **kwargs):
-#     if created:
-#         if instance.payment_status == 'complete':
-#             order_item = instance.order_items.all()
+@receiver(post_save, sender=Professor)
+def deactivate_course(sender, instance, created, **kwargs):
+    if not instance.is_active:
+        instance.professor_course.update(is_active=False, is_sale=False, is_free=False)

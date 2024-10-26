@@ -1,11 +1,12 @@
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-# from django_jalali.db.models import jDateField
 from django.contrib.postgres.fields import ArrayField
 
 from core.models import CreateMixin, UpdateMixin
-from users.validators import MobileValidator
 from professors.validators import NationCodeValidator
+from users.validators import MobileValidator
+
+
 # Create your models here.
 
 
@@ -50,18 +51,7 @@ class Professor(CreateMixin, UpdateMixin):
         db_table = 'professors'
         verbose_name = _("professor")
         verbose_name_plural = _("professors")
-
-
-class ProfessorContact(CreateMixin, UpdateMixin):
-    contact_name = models.CharField(_("اسم راه ارتباطی"), max_length=100,
-                                    help_text=_("The name of the connection"))
-    contact_url = models.URLField(_("آدرس راه ارتباطی"))
-    is_active = models.BooleanField(default=True)
-
-    def __str__(self):
-        return self.contact_name
-
-    class Meta:
-        db_table = 'professor_contact'
-        verbose_name = _("professor contact")
-        verbose_name_plural = _("professor contacts")
+        constraints = [
+            models.UniqueConstraint(fields=['email'], name='unique_professor_email'),
+            models.UniqueConstraint(fields=['mobile_phone'], name='unique_professor_mobile_phone')
+        ]

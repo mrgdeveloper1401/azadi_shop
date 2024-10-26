@@ -3,14 +3,14 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer, CharField
 from django.utils.translation import gettext_lazy as _
 
-from users.models import UserAccount, UserInfo, Otp
+from users.models import User, UserInfo, Otp
 
 
 class AdminUserCreateSerializer(ModelSerializer):
     confirm_password = CharField(write_only=True, min_length=8, style={"input_type": "password"})
 
     class Meta:
-        model = UserAccount
+        model = User
         fields = ("mobile_phone", "password", "confirm_password")
 
         extra_kwargs = {
@@ -28,12 +28,12 @@ class AdminUserCreateSerializer(ModelSerializer):
 
     def create(self, validated_data):
         del validated_data['confirm_password']
-        return UserAccount.objects.create_user(**validated_data)
+        return User.objects.create_user(**validated_data)
 
 
 class AdminUserSerializer(ModelSerializer):
     class Meta:
-        model = UserAccount
+        model = User
         fields = '__all__'
 
 
@@ -67,7 +67,7 @@ class AdminOtpCreateSerializer(ModelSerializer):
         return attrs
 
     def save(self, **kwargs):
-        user_account = UserAccount.objects.get(pk=self.data['user'])
+        user_account = User.objects.get(pk=self.data['user'])
         try:
             otp_code = Otp.objects.get(user=user_account)
             if otp_code.is_expired():

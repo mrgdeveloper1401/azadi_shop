@@ -16,6 +16,7 @@ class CourseCategory(MP_Node):
                              blank=True, null=True, verbose_name=_("عکس دسته بندی"))
     # is_public = models.BooleanField(default=True)
     slug = models.SlugField(_('اسلاگ'), max_length=200, allow_unicode=True, unique=True)
+
     # objects = CategoryManager()
 
     @property
@@ -52,16 +53,35 @@ class Course(CreateMixin, UpdateMixin):
     is_sale = models.BooleanField(_('قابل فروش'), default=True,
                                   help_text=_("if is sale is true, this course can be sale ,otherwise this course "
                                               "can't"))
-    is_free = models.BooleanField(_('رایگان'), default=False)
-    is_active = models.BooleanField(_('فعال'), default=True)
+    is_free = models.BooleanField(_('دوره رایگان باشد'), default=False)
+    is_active = models.BooleanField(_('دوره در سایت منتشر شود'), default=True)
     total_like = models.PositiveIntegerField(_("تعداد کاربران پسندیده شده"), default=0, editable=False)
+    number_of_video = models.PositiveSmallIntegerField(_("تعداد ویدیو ها"), default=0, editable=False)
+
+    class CourseLevelChoices(models.TextChoices):
+        basic = 'basic', _("مقدماتی")
+        middle = 'middle', _("متوسط")
+        advance = 'advance', _("پیشرفته")
+
+    course_level = models.CharField(_("سطح دوره"), choices=CourseLevelChoices.choices,
+                                    default=CourseLevelChoices.basic, max_length=7)
+
+    class CourseStatusChoices(models.TextChoices):
+        done = 'done', _("تمام یافته")
+        in_progress = 'in_progress', _("در حال برگزاری")
+
+    course_status = models.CharField(_("وضعیت دوره"), max_length=11, choices=CourseStatusChoices.choices,
+                                     default=CourseStatusChoices.in_progress,
+                                     help_text=_("دروه در حال برگزاری هست یا به اتمام رسیده هست"))
+    course_duration = models.FloatField(_("مدت زمان دوره"), default=0.00, editable=False,
+                                        help_text=_("تا حالا چند ساعت دوره برگزار شده هست"))
 
     objects = CourseManager()
 
     class Meta:
         db_table = 'course'
-        verbose_name = _('course')
-        verbose_name_plural = _("courses")
+        verbose_name = _('دوره')
+        verbose_name_plural = _("دوره ها")
         ordering = ['-created_at']
 
     def save(self, *args, **kwargs):

@@ -13,11 +13,11 @@ DATABASES = {
     # 'default': dj_database_url.config(default=config('DATABASE_URL', cast=str))
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'PORT': "5432",
-        "HOST": "trusting-ardinghelli-b2z7dtoje-db",
-        "USER": "root",
-        "PASSWORD": "uv5MlphP6a5hERnehMn6sa89",
-        'NAME': "postgres"
+        'PORT': config("POSTDB_PORT", cast=int),
+        "HOST": config('POSTDB_HOST', cast=str),
+        "USER": config("POSTDB_USER", cast=str),
+        "PASSWORD": config("POSTDB_PASSWORD", cast=str),
+        'NAME': config("POSTDB_NAME", cast=str),
     }
 }
 
@@ -87,6 +87,3 @@ MIDDLEWARE += [
     # cors-header
     "corsheaders.middleware.CorsMiddleware",
 ]
-
-# for upload object storage
-AWS_S3_SECURE_URLS = True

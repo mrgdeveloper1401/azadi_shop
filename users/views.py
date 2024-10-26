@@ -26,10 +26,14 @@ class UserRegistrationAPIView(APIView):
 
 
 class UserVerifyRegisterCodeAPIView(APIView):
+    """
+    code is required \n
+    mobile phone not required
+    """
     serializer_class = UserVerifyRegisterSerializer
 
     def post(self, request, *args, **kwargs):
-        ser_data = UserVerifyRegisterSerializer(data=request.data)
+        ser_data = self.serializer_class(data=request.data)
         ser_data.is_valid(raise_exception=True)
 
         tokens = ser_data.save()

@@ -55,7 +55,7 @@ class CartItem(CreateMixin):
 
     @property
     def item_price(self):
-        price = self.course.price * self.quantity
+        price = self.course.calc_final_price * self.quantity
         return price
 
     @property
@@ -92,7 +92,7 @@ class Order(CreateMixin):
 
     @property
     def order_total_price(self):
-        price = [i.course.calc_final_price for i in self.order_item.all()]
+        price = [i.course_price for i in self.order_item.all()]
         return sum(price)
 
     @property
