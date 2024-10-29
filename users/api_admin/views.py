@@ -26,13 +26,6 @@ class AdminUserCreateViewSet(ModelViewSet):
         else:
             return super().get_serializer_class()
 
-    def destroy(self, request, *args, **kwargs):
-        q = self.get_object()
-        if q.is_deleted:
-            return Response({"message": "you have already deleted account"})
-        q.delete()
-        return super().destroy(request, *args, **kwargs)
-
     def get_permissions(self):
         if self.request.method in 'POST':
             return [AllowAny()]

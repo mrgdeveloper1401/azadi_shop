@@ -21,7 +21,7 @@ class Professor(CreateMixin, UpdateMixin):
     certificate = models.ForeignKey("images.Image", on_delete=models.PROTECT, related_name='certificate_image',
                                     blank=True, null=True, verbose_name=_("عکس اخرین مدرک تحصیلی"))
     professor_image = models.ForeignKey("images.Image", on_delete=models.PROTECT, related_name="professor_image",
-                                        verbose_name=_("عکس استاد"))
+                                        verbose_name=_("عکس استاد"), blank=True, null=True)
     field_of_study = models.CharField(_("رشته تحصیلی"), max_length=255)
     name_of_education = models.CharField(_("نام دانشگاه"), max_length=255)
 

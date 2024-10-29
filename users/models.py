@@ -13,7 +13,7 @@ from django.utils.timezone import now
 
 
 # Create your models here.
-class User(AbstractBaseUser, PermissionsMixin, CreateMixin, UpdateMixin):
+class User(AbstractBaseUser, CreateMixin, UpdateMixin):
     mobile_phone = models.CharField(_("شماره همراه"), max_length=11, unique=True,
                                     validators=[MobileValidator()])
     is_verified = models.BooleanField(_('احراز هویت'), default=False)
@@ -31,8 +31,22 @@ class User(AbstractBaseUser, PermissionsMixin, CreateMixin, UpdateMixin):
         help_text=_("Designates whether the user can log into this admin site."),
     )
     USERNAME_FIELD = 'mobile_phone'
+    is_superuser = models.BooleanField(
+        _("superuser status"),
+        default=False,
+        help_text=_(
+            "Designates that this user has all permissions without "
+            "explicitly assigning them."
+        ),
+    )
 
     objects = UserManager()
+
+    def has_perm(self, perm, obj=None):
+        return True
+
+    def has_module_perms(self, app_label):
+        return True
 
     def __str__(self):
         return self.mobile_phone

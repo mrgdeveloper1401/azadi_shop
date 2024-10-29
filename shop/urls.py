@@ -38,7 +38,8 @@ if debug_mode:
     urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
 
 api_admin = [
-    path('user_admin/', include('users.api_admin.urls', namespace='user_admin'))
+    path('user_admin/', include('users.api_admin.urls', namespace='user_admin')),
+    path('professor_admin/', include('professors.api_admin.urls', namespace='professor_admin'))
 ]
 
 urlpatterns += api_admin

@@ -39,8 +39,6 @@ class UserAdmin(BaseUserAdmin):
                     "is_staff",
                     "is_superuser",
                     "is_verified",
-                    "groups",
-                    "user_permissions",
                 ),
             },
         ),
@@ -56,23 +54,12 @@ class UserAdmin(BaseUserAdmin):
         ),
     )
     list_display = ("id", "mobile_phone", "is_staff", 'is_superuser', 'is_active', "is_verified")
-    list_filter = ("is_staff", "is_superuser", "is_active", 'is_verified', "groups", "created_at")
+    list_filter = ("is_staff", "is_superuser", "is_active", 'is_verified', "created_at")
     search_fields = ("mobile_phone",)
     ordering = ("-created_at",)
-    filter_horizontal = (
-        "groups",
-        "user_permissions",
-    )
     readonly_fields = ['created_at', "last_login", "updated_at"]
     list_display_links = ['id', "mobile_phone"]
-
-    def get_form(self, request, obj=None, **kwargs):
-        form = super().get_form(request, obj, **kwargs)
-        is_super = request.user.is_superuser
-        if not is_super:
-            form.base_fields['is_superuser'].disabled = True
-            form.base_fields['is_deleted'].disabled = True
-        return form
+    filter_horizontal = []
 
 
 @admin.register(UserInfo)
