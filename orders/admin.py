@@ -50,6 +50,7 @@ class OrderAdmin(admin.ModelAdmin):
     date_hierarchy = 'created_at'
     readonly_fields = ['order_number']
     raw_id_fields = ['user']
+    list_editable = ['payment_status']
 
     def get_queryset(self, request):
         q = super().get_queryset(request)

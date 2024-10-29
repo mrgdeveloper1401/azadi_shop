@@ -16,7 +16,6 @@ from users.permissions import IsVerifiedUser
 class CategoryViewSet(ReadOnlyModelViewSet):
     queryset = CourseCategory.objects.select_related("icon")
     serializer_class = CategorySerializers
-    lookup_field = 'slug'
 
 
 class CourseViewSet(ReadOnlyModelViewSet):
@@ -26,7 +25,7 @@ class CourseViewSet(ReadOnlyModelViewSet):
     search_fields = ['name']
     ordering_fields = ['created_at', "updated_at", "sale_number"]
     pagination_class = CoursePagination
-    lookup_field = 'slug'
+    # lookup_field = 'slug'
 
     def get_queryset(self):
         queryset = Course.objects.is_active().select_related('professor__professor_image', 'image') \
@@ -43,8 +42,8 @@ class CourseViewSet(ReadOnlyModelViewSet):
             final_price=F('price') - F('discount_value')
         )
 
-        if 'category_slug' in self.kwargs:
-            queryset = queryset.filter(category__slug=self.kwargs['category_slug'])
+        if 'category_pk' in self.kwargs:
+            queryset = queryset.filter(category__pk=self.kwargs['category_pk'])
 
         return queryset
 
@@ -57,7 +56,7 @@ class CommentViewSet(ModelViewSet):
         serializer.save(user=self.request.user)
 
     def get_serializer_context(self):
-        return {"course_slug": self.kwargs['course_slug'], "request": self.request}
+        return {"course_pk": self.kwargs['course_pk'], "request": self.request}
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -69,4 +68,4 @@ class CommentViewSet(ModelViewSet):
         return super().get_serializer_class()
 
     def get_queryset(self):
-        return Comment.objects.filter(course__slug=self.kwargs['course_slug']).select_related("user", "course")
+        return Comment.objects.filter(course__pk=self.kwargs['course_pk']).select_related("user", "course")

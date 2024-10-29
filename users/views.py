@@ -96,6 +96,9 @@ class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, Ge
         user.save()
         return super().destroy(request, *args, **kwargs)
 
+    def perform_create(self, serializer):
+        return serializer.save(user=self.request.user)
+
 
 class GradeGpaViewSet(ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, GenericViewSet):
     serializer_class = GradeSerializer

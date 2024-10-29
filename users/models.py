@@ -41,6 +41,7 @@ class User(AbstractBaseUser, PermissionsMixin, CreateMixin, UpdateMixin):
         db_table = 'user'
         verbose_name = _("کاربر")
         verbose_name_plural = _("کاربر ها")
+        ordering = ('-created_at',)
 
 
 class Grade(models.Model):
@@ -87,6 +88,7 @@ class UserInfo(CreateMixin, UpdateMixin):
         constraints = [
             models.UniqueConstraint(fields=['email'], name='unique_email')
         ]
+        ordering = ('-created_at',)
 
     def __str__(self):
         return self.user.mobile_phone
@@ -151,3 +153,4 @@ class Otp(CreateMixin):
         db_table = 'otp'
         verbose_name = _('کد')
         verbose_name_plural = _('کدها')
+        ordering = ('-created_at',)

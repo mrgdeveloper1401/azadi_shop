@@ -36,3 +36,9 @@ if debug_mode:
     from debug_toolbar.toolbar import debug_toolbar_urls
     urlpatterns += debug_toolbar_urls()
     urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
+
+api_admin = [
+    path('user_admin/', include('users.api_admin.urls', namespace='user_admin'))
+]
+
+urlpatterns += api_admin

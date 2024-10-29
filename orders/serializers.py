@@ -3,6 +3,7 @@ from rest_framework.serializers import ModelSerializer, IntegerField, Validation
 from ulid import ULID
 from django.db.transaction import atomic
 from datetime import datetime
+from django.utils.translation import gettext_lazy as _
 
 from users.models import User
 from courses.models import Course
@@ -75,6 +76,8 @@ class AddCartItemSerializer(ModelSerializer):
         else:
             if not course.is_active:
                 raise ValidationError('دوره مد نظر غیر فعال میباشد')
+            if not course.is_sale:
+                raise ValidationError({"message": _("دروه قابل فروش نیست")})
         return data
 
 
@@ -108,24 +111,27 @@ class CreateOrderSerializer(Serializer):
 
     def validate_cart_id(self, data):
         cart = Cart.objects.filter(pk=data).last()
-        cart_item = CartItem.objects.filter(cart=cart)
+        # cart_item = CartItem.objects.filter(cart=cart)
         if not Cart.objects.filter(id=data).exists():
             raise ValidationError('سید خرید یافت نشد')
         elif Cart.objects.filter(id=data).count() == 0:
             raise ValidationError('سبد خرید خالی هست')
-        if not cart_item.course.is_active:
-            raise ValidationError('محصول غیر فعال میباشد')
         return data
 
     def generate_ulid(self):
         return str(ULID.from_datetime(datetime.now()))
 
     def validate(self, attr):
+        cart = Cart.objects.get(pk=attr['cart_id'])
         order = Order.objects.filter(user_id=self.context['user_id']).last()
         if order and order.payment_status == "pending":
             raise ValidationError({"message": "شما از قبل یک سفارش رو دارید, "
                                               "ابتدا وضعیت ان را مشخص کنید"})
-
+        for i in cart.cart_item.all():
+            if not i.course.is_active:
+                raise ValidationError({"course": _(f"{i.course} غیر فعال میباشد ")})
+            if not i.course.is_sale:
+                raise ValidationError({"message": _(f"{i.course} قابل فروش نمیباشد ")})
         return attr
 
     def save(self, **kwargs):

@@ -193,23 +193,23 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    user = UserSerializer()
+    user = UserSerializer(required=False)
 
     class Meta:
         model = UserInfo
-        fields = ('grade', "major", "user", "gpa")
+        fields = ("user", "first_name", "last_name", "email")
 
-    def update(self, instance, validated_data):
-        user_data = validated_data.pop('user', None)
-        if user_data:
-            user_instance = instance.user
-            for key, value in user_data.items():
-                setattr(user_instance, key, value)
-            user_instance.save()
-        for key, value in validated_data.items():
-            setattr(instance, key, value)
-        instance.save()
-        return instance
+    # def update(self, instance, validated_data):
+    #     user_data = validated_data.pop('user', None)
+    #     if user_data:
+    #         user_instance = instance.user
+    #         for key, value in user_data.items():
+    #             setattr(user_instance, key, value)
+    #         user_instance.save()
+    #     for key, value in validated_data.items():
+    #         setattr(instance, key, value)
+    #     instance.save()
+    #     return instance
 
 
 class SimpleUserSerializer(serializers.ModelSerializer):

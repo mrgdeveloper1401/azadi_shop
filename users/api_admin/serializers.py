@@ -3,7 +3,7 @@ from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer, CharField
 from django.utils.translation import gettext_lazy as _
 
-from users.models import User, UserInfo, Otp
+from users.models import User, UserInfo, Otp, GradeGpa, Major, Grade
 
 
 class AdminUserCreateSerializer(ModelSerializer):
@@ -35,6 +35,9 @@ class AdminUserSerializer(ModelSerializer):
     class Meta:
         model = User
         fields = '__all__'
+        extra_kwargs = {
+            "password": {'read_only': True}
+        }
 
 
 class AdminUserInfoSerializer(ModelSerializer):
@@ -46,39 +49,25 @@ class AdminUserInfoSerializer(ModelSerializer):
 
 
 class AdminOtpSerializer(ModelSerializer):
-    mobile_phone = CharField(source="user.mobile_phone", read_only=True)
-
     class Meta:
         model = Otp
         fields = '__all__'
+        ordering = ('-created_at',)
 
 
-class AdminOtpCreateSerializer(ModelSerializer):
+class GradeGpaSerializer(ModelSerializer):
     class Meta:
-        model = Otp
-        fields = ['user']
-
-    def validate(self, attrs):
-        user = attrs['user']
-        if user.is_active and user.is_verified:
-            raise ValidationError({"message": _("account is verify")})
-        if user.is_deleted:
-            raise ValidationError({"message": _("account is deleted")})
-        return attrs
-
-    def save(self, **kwargs):
-        user_account = User.objects.get(pk=self.data['user'])
-        try:
-            otp_code = Otp.objects.get(user=user_account)
-            if otp_code.is_expired():
-                otp_code.delete_if_expired()
-            self.instance = otp_code
-        except Otp.DoesNotExist:
-            self.instance = Otp.objects.create_otp(user=user_account)
-        return self.instance
+        model = GradeGpa
+        fields = '__all__'
 
 
-class AdminOtpPartialSerializer(ModelSerializer):
+class MajorSerializer(ModelSerializer):
     class Meta:
-        model = Otp
+        model = Major
+        fields = '__all__'
+
+
+class GradeSerializer(ModelSerializer):
+    class Meta:
+        model = Grade
         fields = '__all__'
