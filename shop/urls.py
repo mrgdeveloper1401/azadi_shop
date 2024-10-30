@@ -39,7 +39,13 @@ if debug_mode:
 
 api_admin = [
     path('user_admin/', include('users.api_admin.urls', namespace='user_admin')),
-    path('professor_admin/', include('professors.api_admin.urls', namespace='professor_admin'))
+    path('professor_admin/', include('professors.api_admin.urls', namespace='professor_admin')),
+    path('payment_admin/', include('payments.api_admin.urls', namespace='payment_admin')),
+    path('order_admin/', include('orders.api_admin.urls', namespace='order_admin')),
+    path('main_setting_admin/', include('main_settings.api_admin.urls', namespace='main_setting_admin')),
+    path('image_admin/', include('images.api_admin.urls', namespace='image_admin')),
+    path('course_admin/', include('courses.api_admin.urls', namespace='course_admin')),
+    path('blog_admin/', include('blogs.api_admin.urls', namespace='blog_admin'))
 ]
 
 urlpatterns += api_admin

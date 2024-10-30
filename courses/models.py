@@ -15,7 +15,7 @@ class CourseCategory(MP_Node):
     icon = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name='image_category',
                              blank=True, null=True, verbose_name=_("عکس دسته بندی"))
     # is_public = models.BooleanField(default=True)
-    slug = models.SlugField(_('اسلاگ'), max_length=200, allow_unicode=True, unique=True)
+    slug = models.SlugField(_('اسلاگ'), max_length=200, allow_unicode=True, unique=True, blank=True)
 
     # objects = CategoryManager()
 

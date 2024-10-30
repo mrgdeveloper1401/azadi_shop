@@ -3,6 +3,7 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 from core.models import CreateMixin, UpdateMixin
+from main_settings.validators import HomeMobileValidator
 from users.validators import MobileValidator
 
 
@@ -27,18 +28,18 @@ class HomeSite(CreateMixin, UpdateMixin):
                                   verbose_name=_("عکس لوگو سایت"))
     slider_image = models.ManyToManyField("images.Image", related_name='home_site_slider',
                                           verbose_name=_("عکس اسلایدر سایت"))
-    header_phone_number = models.CharField(_("شماره تماس"), max_length=15, unique=True)
+    header_phone_number = models.CharField(_("شماره تماس"), max_length=15, unique=True,
+                                           validators=[HomeMobileValidator()], help_text=_("شماره تماس میتواند 11 رقمی تا 15 رقمی باشد"))
     about_us_body = models.TextField(_("متن درباره ما"))
-    about_us_image = models.ForeignKey("images.Image", on_delete=models.PROTECT,
-                                       related_name='home_site_about_us_image')
-    slider_professor_image = models.ForeignKey('images.Image', related_name='home_site_slider_professor_image',
-                                               verbose_name=_("عکس اساتید"), on_delete=models.PROTECT)
+    about_us_image = models.ManyToManyField("images.Image", related_name='home_site_about_us_image')
+    slider_professor_image = models.ManyToManyField('images.Image', related_name='home_site_slider_professor_image',
+                                                    verbose_name=_("عکس اساتید"))
     email = models.EmailField(_("ایمیل"), unique=True)
     description_footer = models.TextField(_("توضیح فوتر"))
     awards_image = models.ManyToManyField('images.Image', related_name='home_site_awards_image',
                                           verbose_name=_('عکس جوایز و افتخارات'))
-    team_image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name='home_site_team_image',
-                                   verbose_name=_("عکس تیم"))
+    team_image = models.ManyToManyField('images.Image', related_name='home_site_team_image',
+                                        verbose_name=_("عکس تیم"))
     is_active = models.BooleanField(_("فعال باشد"), default=True)
 
     def __str__(self):

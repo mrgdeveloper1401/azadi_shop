@@ -1,5 +1,5 @@
 from django.contrib import admin
-from main_settings.models import HeaderSite, Newsletter, ContactUs, Services, TopRankStudent, HomeSite
+from main_settings.models import HeaderSite, Newsletter, ContactUs, Services, TopRankStudent, HomeSite, TopRankProfessor
 
 
 # Register your models here.
@@ -53,3 +53,11 @@ class TopRankAdmin(admin.ModelAdmin):
 class HomeSiteAdmin(admin.ModelAdmin):
     raw_id_fields = ['site_logo', 'slider_image', "about_us_image", "slider_professor_image", "awards_image",
                      "team_image"]
+
+
+@admin.register(TopRankProfessor)
+class TopRankProfessorAdmin(admin.ModelAdmin):
+    list_display = ['full_name', "field_title"]
+    search_fields = ['full_name', "field_title"]
+    raw_id_fields = ['professor_image']
+    list_select_related = ['professor_image']

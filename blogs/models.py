@@ -8,8 +8,9 @@ from core.models import CreateMixin, UpdateMixin
 
 
 class CategoryNode(MP_Node):
-    category_name = models.CharField(_('نام دسته بندی'), max_length=50, unique=True)
-    category_slug = models.SlugField(_('اسلاگ دسته بندی'), max_length=50, allow_unicode=True, unique=True)
+    category_name = models.CharField(_('نام دسته بندی'), max_length=50)
+    category_slug = models.SlugField(_('اسلاگ دسته بندی'), max_length=255, allow_unicode=True, unique=True,
+                                     blank=True)
     node_order_by = ['category_name']
 
     def __str__(self):
@@ -20,7 +21,7 @@ class CategoryNode(MP_Node):
         return self.get_children().values('category_name')
 
     def save(self, *args, **kwargs):
-        self.slug = slugify(self.category_name, allow_unicode=True)
+        self.category_slug = slugify(self.category_name, allow_unicode=True)
         return super().save(*args, **kwargs)
 
     class Meta:
@@ -38,7 +39,7 @@ class Post(CreateMixin, UpdateMixin):
     tiny_title = models.CharField(_("عنوان کوتاه پست"), max_length=50, blank=True, null=True,
                                   help_text=_("عنوان خلاصه شده پست هست و حداکثر 50 تا کاراتر میتوان نوشت"))
     introduction = models.CharField(_("مقدمه"), max_length=255, blank=True, null=True)
-    slug = models.SlugField(_('اسلاگ'), max_length=255, unique=True, allow_unicode=True)
+    slug = models.SlugField(_('اسلاگ'), max_length=255, allow_unicode=True, blank=True)
     post_body = RichTextUploadingField()
     is_publish = models.BooleanField(_("قابل انتشار"), default=False)
     view_number = models.PositiveIntegerField(_('تعداد بازدید'), default=0, editable=False)

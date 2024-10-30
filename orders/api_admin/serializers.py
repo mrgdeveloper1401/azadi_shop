@@ -1,22 +1,21 @@
 from rest_framework.exceptions import ValidationError
 from rest_framework.serializers import ModelSerializer, CharField
 
-from orders.models import Cart, CartItem, Order, OrderItem
-from users.models import UserAccount
+from orders.models import Order, OrderItem
+from users.models import User
 
 
-class AdminCartSerializer(ModelSerializer):
-    mobile_phone = CharField(source="user.mobile_phone", read_only=True)
+class AdminOrderSerializer(ModelSerializer):
+    user = CharField()
 
     class Meta:
-        model = Cart
+        model = Order
         fields = '__all__'
 
-        extra_kwargs = {
-            "created_at": {"format": "%Y-%m-%d %H:%M:%S"},
-        }
 
-    def validate(self, attrs):
-        if Cart.objects.filter(user=attrs["user"]).exists():
-            raise ValidationError({"message": "cart already exists"})
-        return attrs
+class AdminOrderItemSerializer(ModelSerializer):
+    course = CharField()
+
+    class Meta:
+        model = OrderItem
+        fields = '__all__'
