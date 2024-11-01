@@ -28,5 +28,5 @@ class Payment(CreateMixin, UpdateMixin):
 
     class Meta:
         db_table = 'payments'
-        verbose_name = _("payments")
-        verbose_name_plural = _("payments")
+        verbose_name = _("پرداخت")
+        verbose_name_plural = _("پرداخت ها")

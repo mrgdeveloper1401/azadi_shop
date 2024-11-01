@@ -1,13 +1,17 @@
 from django.contrib import admin
+from django.contrib.auth.models import Group
+from unfold.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 from django.contrib.admin import SimpleListFilter
-# from django_jalali.admin.filters import JDateFieldListFilter
+from import_export.admin import ImportExportModelAdmin
 
 from users.models import User, UserInfo, Otp, GradeGpa, Grade, Major
 
-
 # Register your models here.
+admin.site.unregister(Group)
+
+
 # user info simple list filter
 class IsActiveUserInfo(SimpleListFilter):
     title = _("Is Active User")
@@ -28,7 +32,7 @@ class IsActiveUserInfo(SimpleListFilter):
 
 
 @admin.register(User)
-class UserAdmin(BaseUserAdmin):
+class UserAdmin(BaseUserAdmin, ModelAdmin, ImportExportModelAdmin):
     fieldsets = (
         (None, {"fields": ("mobile_phone", "password")}),
         (
@@ -53,8 +57,9 @@ class UserAdmin(BaseUserAdmin):
             },
         ),
     )
-    list_display = ("id", "mobile_phone", "is_staff", 'is_superuser', 'is_active', "is_verified")
-    list_filter = ("is_staff", "is_superuser", "is_active", 'is_verified', "created_at")
+    list_display = ("id", "mobile_phone", "is_staff", 'is_superuser', 'is_active', "is_verified", "created_at",
+                    "updated_at")
+    list_filter = ("is_staff", "is_superuser", "is_active", 'is_verified', "created_at", "updated_at")
     search_fields = ("mobile_phone",)
     ordering = ("-created_at",)
     readonly_fields = ['created_at', "last_login", "updated_at"]
@@ -63,38 +68,39 @@ class UserAdmin(BaseUserAdmin):
 
 
 @admin.register(UserInfo)
-class UserInfoAdmin(admin.ModelAdmin):
-    list_display = ["id", 'user', 'grade', 'major', 'email', 'first_name', 'last_name', 'get_active', "get_is_verified"]
+class UserInfoAdmin(ModelAdmin, ImportExportModelAdmin):
+    list_display = ["id", 'user', 'grade', 'major', 'email', 'first_name', 'last_name', 'get_active', "get_is_verified",
+                    "created_at", "updated_at"]
     list_select_related = ['user', "grade", "major"]
     search_fields = ["grade__grade_name", "major_major_name", "user__mobile_phone"]
     list_per_page = 100
-    list_filter = [IsActiveUserInfo]
+    list_filter = [IsActiveUserInfo, "created_at", "updated_at"]
     list_display_links = ['id', "user"]
     raw_id_fields = ['user', "grade", "major"]
     ordering = ['-created_at']
 
 
 @admin.register(Otp)
-class OtpAdmin(admin.ModelAdmin):
+class OtpAdmin(ModelAdmin):
     list_display = ['mobile_phone', 'id', 'code', 'created_at', 'expired_at']
     search_fields = ['mobile_phone']
     list_filter = ["created_at"]
 
 
 @admin.register(GradeGpa)
-class GradeGpaAdmin(admin.ModelAdmin):
-    list_display = ['user', 'id', "grade", "gpa"]
+class GradeGpaAdmin(ModelAdmin, ImportExportModelAdmin):
+    list_display = ['user', 'id', "grade", "gpa", "created_at", "updated_at"]
     list_select_related = ['user']
     search_fields = ['user__mobile_phone']
-    list_filter = ['grade']
+    list_filter = ['grade', "created_at", "updated_at"]
     raw_id_fields = ['user']
 
 
 @admin.register(Grade)
-class GradeAdmin(admin.ModelAdmin):
+class GradeAdmin(ModelAdmin, ImportExportModelAdmin):
     pass
 
 
 @admin.register(Major)
-class MajorAdmin(admin.ModelAdmin):
+class MajorAdmin(ModelAdmin, ImportExportModelAdmin):
     pass

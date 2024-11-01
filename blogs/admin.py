@@ -1,13 +1,15 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
+from unfold.admin import ModelAdmin
 
 from blogs.models import CategoryNode, Post
 
 
 # Register your models here.
 @admin.register(CategoryNode)
-class CategoryNodeAdmin(TreeAdmin):
+class CategoryNodeAdmin(ModelAdmin, TreeAdmin, ImportExportModelAdmin):
     form = movenodeform_factory(CategoryNode)
     prepopulated_fields = {'category_slug': ("category_name",)}
     search_fields = ['category_name']
@@ -17,7 +19,7 @@ class CategoryNodeAdmin(TreeAdmin):
 
 
 @admin.register(Post)
-class PostAdmin(admin.ModelAdmin):
+class PostAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ['id', 'author', "post_title", "is_publish", "created_at", "updated_at"]
     list_filter = ['created_at', "updated_at"]
     search_fields = ['title', "author__mobile_phone"]

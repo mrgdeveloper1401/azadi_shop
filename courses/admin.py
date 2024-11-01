@@ -1,9 +1,13 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
+from unfold.admin import ModelAdmin
+# from admin_tools_stats.modules import DashboardChart, get_active_graph
+
+
 from courses.models import CourseCategory, Course, Comment, DiscountCourse, Like
 from django.utils.translation import gettext_lazy as _
 from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
-# from django_jalali.admin.filters import JDateFieldListFilter
 
 
 class SalesFilter(admin.SimpleListFilter):
@@ -61,7 +65,7 @@ class RateFilter(admin.SimpleListFilter):
 
 
 @admin.register(CourseCategory)
-class CategoryAdmin(TreeAdmin):
+class CategoryAdmin(ModelAdmin, TreeAdmin, ImportExportModelAdmin):
     form = movenodeform_factory(CourseCategory)
     raw_id_fields = ['icon']
     list_display = ['name', "slug"]
@@ -73,7 +77,7 @@ class CategoryAdmin(TreeAdmin):
 
 
 @admin.register(Course)
-class CourseAdmin(admin.ModelAdmin):
+class CourseAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ("id", "name", "professor", "price", "calc_final_price", "is_active", "is_free", "is_sale",
                     "sale_number", "created_at", 'updated_at', "total_like", "comment_number")
     list_filter = ("is_active", "is_free", "is_sale", SalesFilter, "created_at", "updated_at")
@@ -95,7 +99,7 @@ class CourseAdmin(admin.ModelAdmin):
 
 
 @admin.register(Comment)
-class CommentAdmin(admin.ModelAdmin):
+class CommentAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ("id", "user", "course", "rating", "public", "created_at")
     list_editable = ("public",)
     search_fields = ("user__mobile_phone", "course__name")
@@ -109,8 +113,8 @@ class CommentAdmin(admin.ModelAdmin):
 
 
 @admin.register(DiscountCourse)
-class DiscountCourseAdmin(admin.ModelAdmin):
-    list_display = ("course", "discount_type", "value", "is_active", "expired_date", "created_at")
+class DiscountCourseAdmin(ModelAdmin, ImportExportModelAdmin):
+    list_display = ("course", "discount_type", "value", "is_active", "expired_date", "created_at", "updated_at")
     list_editable = ("is_active",)
     search_fields = ("course__name", "value")
     list_filter = ("is_active", "created_at", "expired_date")
@@ -120,7 +124,7 @@ class DiscountCourseAdmin(admin.ModelAdmin):
 
 
 @admin.register(Like)
-class LikeAdmin(admin.ModelAdmin):
+class LikeAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ['user', "course", "created_at", "dislike"]
     list_filter = ['created_at', "dislike"]
     date_hierarchy = "created_at"

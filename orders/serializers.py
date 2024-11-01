@@ -14,7 +14,7 @@ from professors.models import Professor
 class SimpleUserSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ['username']
+        fields = ['mobile_phone']
 
 
 class SimpleProfessorSerializer(ModelSerializer):
@@ -110,8 +110,6 @@ class CreateOrderSerializer(Serializer):
     cart_id = CharField()
 
     def validate_cart_id(self, data):
-        cart = Cart.objects.filter(pk=data).last()
-        # cart_item = CartItem.objects.filter(cart=cart)
         if not Cart.objects.filter(id=data).exists():
             raise ValidationError('سید خرید یافت نشد')
         elif Cart.objects.filter(id=data).count() == 0:
@@ -124,6 +122,7 @@ class CreateOrderSerializer(Serializer):
     def validate(self, attr):
         cart = Cart.objects.get(pk=attr['cart_id'])
         order = Order.objects.filter(user_id=self.context['user_id']).last()
+        all_order = Order.objects.filter(user_id=self.context['user_id'])
         if order and order.payment_status == "pending":
             raise ValidationError({"message": "شما از قبل یک سفارش رو دارید, "
                                               "ابتدا وضعیت ان را مشخص کنید"})

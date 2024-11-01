@@ -2,6 +2,7 @@ from pathlib import Path
 from datetime import timedelta
 from decouple import config
 import os
+from .unfold_settings import *
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,10 +39,20 @@ THIRD_PARTY_PACKAGE = [
     "corsheaders",
     'ckeditor',
     "ckeditor_uploader",
+    "import_export",
+    "djangobower",
+    "webpack_loader"
 ]
 
 INSTALLED_APPS = [
+    "django_light",
+    "admin_tools_stats",
+    "django_nvd3",
     "unfold",
+    "unfold.contrib.filters",
+    "unfold.contrib.inlines",
+    "unfold.contrib.forms",
+    "unfold.contrib.import_export",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -127,8 +138,7 @@ USE_L10N = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR / 'static')
-
+STATIC_ROOT = os.path.join(BASE_DIR / 'staticfiles')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
@@ -138,7 +148,7 @@ AUTH_USER_MODEL = 'users.User'
 
 # spectacular settings
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Azad project',
+    'TITLE': 'گروه اموزش انرژی',
     'DESCRIPTION': 'Your  description',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
@@ -155,6 +165,7 @@ STORAGES = {
     },
     'staticfiles': {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        # "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
     },
 }
 
@@ -169,7 +180,7 @@ REST_FRAMEWORK = {
         'rest_framework.throttling.UserRateThrottle'
     ],
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '20/minute',
+        'anon': '15/minute',
         'user': '1000/day'
     }
 }
@@ -203,7 +214,6 @@ AWS_SERVICE_NAME = 's3'
 # AWS_S3_VERIFY = False
 # for upload object storage
 AWS_S3_SECURE_URLS = True
-
 
 # with logging django
 log_dir = os.path.join(BASE_DIR / 'general_log_django')
@@ -283,3 +293,17 @@ CKEDITOR_BROWSE_SHOW_DIRS = True
 # CKEDITOR_RESTRICT_BY_DATE = True
 CKEDITOR_THUMBNAIL_SIZE = (100, 100)
 CKEDITOR_IMAGE_QUALITY = 100
+
+# django admin chart config
+ADMIN_CHARTS_NVD3_JS_PATH = 'bow/nvd3/build/nv.d3.js'
+ADMIN_CHARTS_NVD3_CSS_PATH = 'bow/nvd3/build/nv.d3.css'
+ADMIN_CHARTS_D3_JS_PATH = 'bow/d3/d3.js'
+BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, 'components')
+BOWER_INSTALLED_APPS = [
+    'd3#3.3.13',
+    'nvd3#1.7.1',
+]
+
+STATICFILES_FINDERS = [
+    'djangobower.finders.BowerFinder',
+]

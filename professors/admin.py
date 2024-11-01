@@ -1,14 +1,15 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
+from unfold.admin import ModelAdmin
 
 from professors.models import Professor
-# Register your models here.
 
 
 @admin.register(Professor)
-class ProfessorAdmin(admin.ModelAdmin):
+class ProfessorAdmin(ModelAdmin, ImportExportModelAdmin):
     raw_id_fields = ['certificate', "professor_image"]
     list_display = ['first_name', "last_name", "nation_code", "birth_date", "education_status", "is_active",
-                    "created_at"]
+                    "created_at", "updated_at"]
     list_editable = ("is_active", )
     list_per_page = 20
     search_fields = ['first_name', 'last_name', 'nation_code']

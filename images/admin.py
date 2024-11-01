@@ -1,11 +1,13 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
+from unfold.admin import ModelAdmin
 
 from images.models import Image
 # Register your models here.
 
 
 @admin.register(Image)
-class ImageAdmin(admin.ModelAdmin):
+class ImageAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ["id", 'title', "file_size"]
     list_display_links = ['id', "title"]
     search_fields = ['title']

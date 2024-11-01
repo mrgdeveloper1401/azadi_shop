@@ -4,12 +4,9 @@ from django.contrib.postgres.fields import ArrayField
 
 from core.models import CreateMixin, UpdateMixin
 from professors.validators import NationCodeValidator
-from users.validators import MobileValidator
 
 
 # Create your models here.
-
-
 class Professor(CreateMixin, UpdateMixin):
     first_name = models.CharField(_("نام"), max_length=255)
     last_name = models.CharField(_("نام خانوادگی"), max_length=255)
@@ -38,7 +35,8 @@ class Professor(CreateMixin, UpdateMixin):
     is_active = models.BooleanField(default=False)
     email = models.EmailField(_("ایمیل"), blank=True, null=True)
     mobile_phone = ArrayField(models.CharField(_('شماره تلفن های استاد'), max_length=11),
-                              blank=True, null=True, size=5)
+                              blank=True, null=True, size=5,
+                              help_text=_("اگر استاد چندین شماره موبایل رو دارد با کاما از هم جدا کنید"))
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
@@ -49,8 +47,8 @@ class Professor(CreateMixin, UpdateMixin):
 
     class Meta:
         db_table = 'professors'
-        verbose_name = _("professor")
-        verbose_name_plural = _("professors")
+        verbose_name = _("استاد")
+        verbose_name_plural = _("استاید ها")
         constraints = [
             models.UniqueConstraint(fields=['email'], name='unique_professor_email'),
             models.UniqueConstraint(fields=['mobile_phone'], name='unique_professor_mobile_phone')

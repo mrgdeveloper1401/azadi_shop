@@ -1,10 +1,13 @@
 from django.contrib import admin
+from import_export.admin import ImportExportModelAdmin
+from unfold.admin import ModelAdmin
+
 from main_settings.models import HeaderSite, Newsletter, ContactUs, Services, TopRankStudent, HomeSite, TopRankProfessor
 
 
 # Register your models here.
 @admin.register(HeaderSite)
-class HeaderSiteAdmin(admin.ModelAdmin):
+class HeaderSiteAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ['title', "is_active"]
     list_editable = ['is_active']
     list_filter = ['is_active']
@@ -13,7 +16,7 @@ class HeaderSiteAdmin(admin.ModelAdmin):
 
 
 @admin.register(Newsletter)
-class NewsletterAdmin(admin.ModelAdmin):
+class NewsletterAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ['email']
     list_per_page = 30
     search_fields = ['email']
@@ -22,7 +25,7 @@ class NewsletterAdmin(admin.ModelAdmin):
 
 
 @admin.register(ContactUs)
-class ContactUsAdmin(admin.ModelAdmin):
+class ContactUsAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ['full_name', "mobile_phone"]
     search_fields = ['full_name', "mobile_phone"]
     list_filter = ['created_at']
@@ -31,7 +34,7 @@ class ContactUsAdmin(admin.ModelAdmin):
 
 
 @admin.register(Services)
-class ServicesAdmin(admin.ModelAdmin):
+class ServicesAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ['title', "services_image", "is_active"]
     list_editable = ['is_active']
     search_fields = ['title']
@@ -42,7 +45,7 @@ class ServicesAdmin(admin.ModelAdmin):
 
 
 @admin.register(TopRankStudent)
-class TopRankAdmin(admin.ModelAdmin):
+class TopRankAdmin(ModelAdmin, ImportExportModelAdmin):
     list_filter = ['is_active', "created_at", "updated_at"]
     search_fields = ['first_name', "last_name", "fields"]
     list_display = ['first_name', "last_name", "is_active", "fields"]
@@ -50,13 +53,13 @@ class TopRankAdmin(admin.ModelAdmin):
 
 
 @admin.register(HomeSite)
-class HomeSiteAdmin(admin.ModelAdmin):
+class HomeSiteAdmin(ModelAdmin, ImportExportModelAdmin):
     raw_id_fields = ['site_logo', 'slider_image', "about_us_image", "slider_professor_image", "awards_image",
                      "team_image"]
 
 
 @admin.register(TopRankProfessor)
-class TopRankProfessorAdmin(admin.ModelAdmin):
+class TopRankProfessorAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ['full_name', "field_title"]
     search_fields = ['full_name', "field_title"]
     raw_id_fields = ['professor_image']

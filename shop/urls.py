@@ -29,11 +29,14 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     # django ckeditor
     path('ckeditor/', include('ckeditor_uploader.urls')),
+    path('admin_tools_stats/', include('admin_tools_stats.urls')),
+
 ]
 
 debug_mode = config("DEBUG", default=False, cast=str)
 if debug_mode:
     from debug_toolbar.toolbar import debug_toolbar_urls
+
     urlpatterns += debug_toolbar_urls()
     urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
 
@@ -48,4 +51,8 @@ api_admin = [
     path('blog_admin/', include('blogs.api_admin.urls', namespace='blog_admin'))
 ]
 
+# api admin
 urlpatterns += api_admin
+
+# admin settings
+admin.site.index_title = 'پنل مدیریت'

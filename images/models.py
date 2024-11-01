@@ -60,5 +60,5 @@ class Image(CreateMixin, UpdateMixin):
 
     class Meta:
         db_table = "image"
-        verbose_name = _("Image")
-        verbose_name_plural = _("Images")
+        verbose_name = _("عکس")
+        verbose_name_plural = _("عکس ها")

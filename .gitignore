@@ -143,3 +143,5 @@ general_log_django
 logs
 test-azadi-shop.zip
 static
+
+templates

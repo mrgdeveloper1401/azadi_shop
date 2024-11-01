@@ -46,7 +46,7 @@ class Course(CreateMixin, UpdateMixin):
     description = models.TextField(_('درباره دوره'), blank=True, null=True)
     price = models.DecimalField(_('قیمت دوره'), decimal_places=2, max_digits=12,
                                 validators=[MinValueValidator(Decimal(0))])
-    video = models.FileField(_('فیلم معرفی دوره'), upload_to='videos/%Y/%m/%d', blank=True, null=True)
+    # video = models.FileField(_('فیلم معرفی دوره'), upload_to='videos/%Y/%m/%d', blank=True, null=True)
     image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name="course_image",
                               verbose_name=_("عکس دوره"))
     sale_number = models.PositiveSmallIntegerField(_('تعداد فروش دوره'), default=0, editable=False)
