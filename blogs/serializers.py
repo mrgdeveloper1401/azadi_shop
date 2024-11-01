@@ -19,7 +19,11 @@ class SimpleCategorySerializer(CategoryNodeSerializer):
 class PostSerializer(ModelSerializer):
     author = CharField(source='author.user_info.get_full_name')
     category = SimpleCategorySerializer(many=True)
+    post_image_url = SerializerMethodField()
 
     class Meta:
         model = Post
         fields = '__all__'
+
+    def get_post_image_url(self, obj):
+        return obj.post_image.image_url if obj.post_image else None

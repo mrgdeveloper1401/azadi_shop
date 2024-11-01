@@ -23,7 +23,7 @@ class PostAdmin(admin.ModelAdmin):
     search_fields = ['title', "author__mobile_phone"]
     date_hierarchy = 'created_at'
     list_select_related = ['author']
-    raw_id_fields = ["author"]
+    raw_id_fields = ["author", "post_image"]
     filter_horizontal = ['category']
     prepopulated_fields = {"slug": ("post_title",)}
     list_display_links = ['id', "author"]

@@ -3,11 +3,12 @@ from rest_framework.urls import path
 from rest_framework_nested.routers import DefaultRouter, NestedDefaultRouter
 # from rest_framework.routers import DefaultRouter
 
-from blogs.views import PostViewSet, CategoryNodeViewSet
+from blogs.views import PostViewSet, CategoryNodeViewSet, ListPostViewSet
 
 router = DefaultRouter()
 router.register('category', CategoryNodeViewSet, basename='category')
 router.register('posts', PostViewSet, basename='posts')
+router.register('last_ten_post', ListPostViewSet, basename='last_ten_post')
 
 category = NestedDefaultRouter(router, 'category', lookup='category')
 category.register('posts', PostViewSet, basename='post')

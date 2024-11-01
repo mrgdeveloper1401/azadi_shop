@@ -85,7 +85,7 @@ class CourseAdmin(admin.ModelAdmin):
     list_display_links = ("id", "name")
     raw_id_fields = ("professor", "image")
     list_select_related = ("professor", "image")
-    readonly_fields = ['created_at', "updated_at", "total_like", "sale_number"]
+    readonly_fields = ['created_at', "updated_at", "total_like", "sale_number", "course_license"]
     filter_horizontal = ('category',)
 
     def get_queryset(self, request):

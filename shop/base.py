@@ -41,6 +41,7 @@ THIRD_PARTY_PACKAGE = [
 ]
 
 INSTALLED_APPS = [
+    "unfold",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

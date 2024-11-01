@@ -57,6 +57,7 @@ class Course(CreateMixin, UpdateMixin):
     is_active = models.BooleanField(_('دوره در سایت منتشر شود'), default=True)
     total_like = models.PositiveIntegerField(_("تعداد کاربران پسندیده شده"), default=0, editable=False)
     number_of_video = models.PositiveSmallIntegerField(_("تعداد ویدیو ها"), default=0, editable=False)
+    course_license = models.CharField(_("لاینسس دوره"), max_length=255, blank=True, null=True)
 
     class CourseLevelChoices(models.TextChoices):
         basic = 'basic', _("مقدماتی")

@@ -1,4 +1,4 @@
-FROM python:3.12-alpine
+FROM python:3.12-alpine3.20
 
 WORKDIR /home/app
 
@@ -18,7 +18,6 @@ RUN apk update && \
     apk add proj && \
     apk add proj-dev && \
     apk add postgis && \
-    apk add supervisor && \
     apk add celery && \
     apk add nginx
 

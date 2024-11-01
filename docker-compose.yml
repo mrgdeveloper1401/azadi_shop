@@ -10,7 +10,7 @@ services:
       - main
     volumes:
       - .:/home/app
-      - supervisor:/etc/supervisor
+#      - supervisor:/etc/supervisor
 #    command: sh -c "python manage.py makemigrations && \
 #      python manage.py migrate && \
 #      python manage.py collectstatic --noinput"
@@ -31,4 +31,4 @@ networks:
 
 volumes:
   django-static:
-  supervisor:
+#  supervisor:

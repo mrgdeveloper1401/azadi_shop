@@ -43,11 +43,18 @@ class Post(CreateMixin, UpdateMixin):
     post_body = RichTextUploadingField()
     is_publish = models.BooleanField(_("قابل انتشار"), default=False)
     view_number = models.PositiveIntegerField(_('تعداد بازدید'), default=0, editable=False)
+    post_image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name='blog_post_image',
+                                   blank=True, null=True)
 
     def __str__(self):
         return self.post_title
+    
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.post_title, allow_unicode=True)
+        return super().save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'پست وبلاگ'
         verbose_name_plural = 'پست های وبلاگ'
         db_table = 'blog_post'
+        ordering = ('-created_at',)
