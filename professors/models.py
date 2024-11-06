@@ -1,26 +1,25 @@
 from django.db import models
+from django.db.models import Q
 from django.utils.translation import gettext_lazy as _
 from django.contrib.postgres.fields import ArrayField
 
 from core.models import CreateMixin, UpdateMixin
-from professors.validators import NationCodeValidator
+from professors.validators import NationCodeValidator, validate_birth_date
 
 
 # Create your models here.
 class Professor(CreateMixin, UpdateMixin):
-    first_name = models.CharField(_("نام"), max_length=255)
-    last_name = models.CharField(_("نام خانوادگی"), max_length=255)
-    # professor_contact = models.ForeignKey("ProfessorContact", on_delete=models.PROTECT, related_name="contact",
-    #                                       verbose_name=_("راه ارتباطی استاد"))
+    first_name = models.CharField(_("نام"), max_length=50)
+    last_name = models.CharField(_("نام خانوادگی"), max_length=50)
     nation_code = models.CharField(_("کد ملی"), max_length=11, unique=True,
                                    validators=[NationCodeValidator()])
-    birth_date = models.DateField(_("تاریخ تولد"), blank=True, null=True)
-    certificate = models.ForeignKey("images.Image", on_delete=models.PROTECT, related_name='certificate_image',
-                                    blank=True, null=True, verbose_name=_("عکس اخرین مدرک تحصیلی"))
-    professor_image = models.ForeignKey("images.Image", on_delete=models.PROTECT, related_name="professor_image",
-                                        verbose_name=_("عکس استاد"), blank=True, null=True)
-    field_of_study = models.CharField(_("رشته تحصیلی"), max_length=255)
-    name_of_education = models.CharField(_("نام دانشگاه"), max_length=255)
+    birth_date = models.DateField(_("تاریخ تولد"), validators=[validate_birth_date],
+                                  help_text=_("%YYYY-%mm-%dd به این شکل میتوانید وارد کنید"))
+    certificate = models.ImageField(_("عکس مدرک تحصیلی استاد"), upload_to="professor/certificate/%Y/%m/%d", blank=True,
+                                    null=True)
+    professor_image = models.ImageField(_("عکس استاد"), upload_to='professor/image/%Y/%m/%d')
+    field_of_study = models.CharField(_("رشته تحصیلی"), max_length=100)
+    name_of_education = models.CharField(_("نام دانشگاه"), max_length=50)
 
     class EducationStatus(models.TextChoices):
         diploma = 'دیپلم', _("دیپلم")
@@ -32,7 +31,7 @@ class Professor(CreateMixin, UpdateMixin):
         doctoral_student = 'دانشجوی دکترا', _("دانشجوی دکترا")
         phd_graduate = 'فارغ التحصیل دکترا', _("فارغ التحصیل دکترا")
     education_status = models.CharField(_("وضعیت تحصیل"), choices=EducationStatus.choices, max_length=26)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(_('فعال'), default=True)
     email = models.EmailField(_("ایمیل"), blank=True, null=True)
     mobile_phone = ArrayField(models.CharField(_('شماره تلفن های استاد'), max_length=11),
                               blank=True, null=True, size=5,
@@ -50,6 +49,7 @@ class Professor(CreateMixin, UpdateMixin):
         verbose_name = _("استاد")
         verbose_name_plural = _("استاید ها")
         constraints = [
-            models.UniqueConstraint(fields=['email'], name='unique_professor_email'),
-            models.UniqueConstraint(fields=['mobile_phone'], name='unique_professor_mobile_phone')
+            models.UniqueConstraint(fields=['email'], name='unique_professor_email', condition=Q(email__isnull=True)),
+            models.UniqueConstraint(fields=['mobile_phone'], name='unique_professor_mobile_phone',
+                                    condition=Q(mobile_phone__isnull=True))
         ]

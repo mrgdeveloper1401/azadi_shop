@@ -15,7 +15,7 @@ class AdminCategoryViewSet(ModelViewSet):
 
 
 class AdminCourseViewSet(ModelViewSet):
-    queryset = Course.objects.select_related('professor', "image").prefetch_related('category')
+    queryset = Course.objects.select_related('professor').prefetch_related('category')
     serializer_class = AdminCourseSerializer
     permission_classes = [IsAdminUser]
     pagination_class = UserAdminPagination

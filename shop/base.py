@@ -40,14 +40,10 @@ THIRD_PARTY_PACKAGE = [
     'ckeditor',
     "ckeditor_uploader",
     "import_export",
-    "djangobower",
     "webpack_loader"
 ]
 
 INSTALLED_APPS = [
-    "django_light",
-    "admin_tools_stats",
-    "django_nvd3",
     "unfold",
     "unfold.contrib.filters",
     "unfold.contrib.inlines",
@@ -181,7 +177,7 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_THROTTLE_RATES': {
         'anon': '15/minute',
-        'user': '1000/day'
+        'user': '40/minute'
     }
 }
 
@@ -295,15 +291,15 @@ CKEDITOR_THUMBNAIL_SIZE = (100, 100)
 CKEDITOR_IMAGE_QUALITY = 100
 
 # django admin chart config
-ADMIN_CHARTS_NVD3_JS_PATH = 'bow/nvd3/build/nv.d3.js'
-ADMIN_CHARTS_NVD3_CSS_PATH = 'bow/nvd3/build/nv.d3.css'
-ADMIN_CHARTS_D3_JS_PATH = 'bow/d3/d3.js'
-BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, 'components')
-BOWER_INSTALLED_APPS = [
-    'd3#3.3.13',
-    'nvd3#1.7.1',
-]
-
-STATICFILES_FINDERS = [
-    'djangobower.finders.BowerFinder',
-]
+# ADMIN_CHARTS_NVD3_JS_PATH = 'bow/nvd3/build/nv.d3.js'
+# ADMIN_CHARTS_NVD3_CSS_PATH = 'bow/nvd3/build/nv.d3.css'
+# ADMIN_CHARTS_D3_JS_PATH = 'bow/d3/d3.js'
+# BOWER_COMPONENTS_ROOT = os.path.join(BASE_DIR, 'components')
+# BOWER_INSTALLED_APPS = [
+#     'd3#3.3.13',
+#     'nvd3#1.7.1',
+# ]
+#
+# STATICFILES_FINDERS = [
+#     'djangobower.finders.BowerFinder',
+# ]

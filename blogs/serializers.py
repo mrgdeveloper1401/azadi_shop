@@ -26,4 +26,4 @@ class PostSerializer(ModelSerializer):
         fields = '__all__'
 
     def get_post_image_url(self, obj):
-        return obj.post_image.image_url if obj.post_image else None
+        return obj.post_image.url if obj.post_image else None

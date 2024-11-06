@@ -14,7 +14,7 @@ from users.permissions import IsVerifiedUser
 
 
 class CategoryViewSet(ReadOnlyModelViewSet):
-    queryset = CourseCategory.objects.select_related("icon")
+    queryset = CourseCategory.objects.all()
     serializer_class = CategorySerializers
 
 
@@ -28,7 +28,7 @@ class CourseViewSet(ReadOnlyModelViewSet):
     # lookup_field = 'slug'
 
     def get_queryset(self):
-        queryset = Course.objects.is_active().select_related('professor__professor_image', 'image') \
+        queryset = Course.objects.is_active().select_related('professor__professor_image') \
             .prefetch_related('course_discount', "category") \
             .annotate(
             discount_value=Case(

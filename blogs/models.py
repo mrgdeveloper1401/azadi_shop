@@ -43,8 +43,7 @@ class Post(CreateMixin, UpdateMixin):
     post_body = RichTextUploadingField()
     is_publish = models.BooleanField(_("قابل انتشار"), default=False)
     view_number = models.PositiveIntegerField(_('تعداد بازدید'), default=0, editable=False)
-    post_image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name='blog_post_image',
-                                   blank=True, null=True)
+    post_image = models.ImageField(_("عکس پست"))
 
     def __str__(self):
         return self.post_title

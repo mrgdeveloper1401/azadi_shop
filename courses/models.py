@@ -12,8 +12,7 @@ from courses.managers import DiscountManager
 
 class CourseCategory(MP_Node):
     name = models.CharField(_('نام دسته بندی'), max_length=200, unique=True)
-    icon = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name='image_category',
-                             blank=True, null=True, verbose_name=_("عکس دسته بندی"))
+    icon = models.ImageField(_("عکس دسته بندی دوره"), blank=True, null=True, upload_to='course/category_image/%Y/%m/%d')
     # is_public = models.BooleanField(default=True)
     slug = models.SlugField(_('اسلاگ'), max_length=200, allow_unicode=True, unique=True, blank=True)
 
@@ -47,8 +46,7 @@ class Course(CreateMixin, UpdateMixin):
     price = models.DecimalField(_('قیمت دوره'), decimal_places=2, max_digits=12,
                                 validators=[MinValueValidator(Decimal(0))])
     # video = models.FileField(_('فیلم معرفی دوره'), upload_to='videos/%Y/%m/%d', blank=True, null=True)
-    image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name="course_image",
-                              verbose_name=_("عکس دوره"))
+    image = models.ImageField(_("عکس دوره"), upload_to="course/course_image/%Y/%m/%d")
     sale_number = models.PositiveSmallIntegerField(_('تعداد فروش دوره'), default=0, editable=False)
     is_sale = models.BooleanField(_('قابل فروش'), default=True,
                                   help_text=_("if is sale is true, this course can be sale ,otherwise this course "
@@ -95,7 +93,7 @@ class Course(CreateMixin, UpdateMixin):
 
     @property
     def show_image_url(self):
-        return self.image.image.url
+        return self.image.url
 
     @property
     def calc_final_price(self):

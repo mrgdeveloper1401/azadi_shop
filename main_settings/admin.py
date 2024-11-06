@@ -2,7 +2,7 @@ from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from unfold.admin import ModelAdmin
 
-from main_settings.models import HeaderSite, Newsletter, ContactUs, Services, TopRankStudent, HomeSite, TopRankProfessor
+from main_settings.models import HeaderSite, Newsletter, ContactUs, TopRankStudent, HomeSite, TopRankProfessor
 
 
 # Register your models here.
@@ -33,15 +33,15 @@ class ContactUsAdmin(ModelAdmin, ImportExportModelAdmin):
     list_per_page = 30
 
 
-@admin.register(Services)
-class ServicesAdmin(ModelAdmin, ImportExportModelAdmin):
-    list_display = ['title', "services_image", "is_active"]
-    list_editable = ['is_active']
-    search_fields = ['title']
-    list_per_page = 30
-    list_display_links = ['services_image']
-    list_filter = ['is_active', "created_at", "updated_at"]
-    raw_id_fields = ['services_image']
+# @admin.register(Services)
+# class ServicesAdmin(ModelAdmin, ImportExportModelAdmin):
+#     list_display = ['title', "services_image", "is_active"]
+#     list_editable = ['is_active']
+#     search_fields = ['title']
+#     list_per_page = 30
+#     list_display_links = ['services_image']
+#     list_filter = ['is_active', "created_at", "updated_at"]
+#     raw_id_fields = ['services_image']
 
 
 @admin.register(TopRankStudent)
@@ -54,7 +54,7 @@ class TopRankAdmin(ModelAdmin, ImportExportModelAdmin):
 
 @admin.register(HomeSite)
 class HomeSiteAdmin(ModelAdmin, ImportExportModelAdmin):
-    raw_id_fields = ['site_logo', 'slider_image', "about_us_image", "slider_professor_image", "awards_image",
+    raw_id_fields = ['slider_image', "about_us_image", "slider_professor_image", "awards_image",
                      "team_image"]
 
 
@@ -62,5 +62,3 @@ class HomeSiteAdmin(ModelAdmin, ImportExportModelAdmin):
 class TopRankProfessorAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ['full_name', "field_title"]
     search_fields = ['full_name', "field_title"]
-    raw_id_fields = ['professor_image']
-    list_select_related = ['professor_image']

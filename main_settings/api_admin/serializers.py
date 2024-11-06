@@ -30,7 +30,7 @@ class HomeSiteSerializer(ModelSerializer):
         return img
 
     def get_site_logos(self, obj):
-        return obj.site_logo.image_url if obj.site_logo else None
+        return obj.site_logo.image.url if obj.site_logo else None
 
     def get_slider_professor_images(self, obj):
         img = [i.image_url if i.image_url else None for i in obj.slider_professor_image.all()]
@@ -65,7 +65,7 @@ class AdminTopRankProfessorSerializer(ModelSerializer):
         fields = '__all__'
 
     def get_professor_images(self, obj):
-        return obj.professor_image.image_url if obj.professor_image else None
+        return obj.professor_image.url if obj.professor_image else None
 
 
 class AdminNewsLatterSerializer(ModelSerializer):

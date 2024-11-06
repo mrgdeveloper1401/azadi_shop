@@ -122,7 +122,7 @@ class UserInfo(CreateMixin, UpdateMixin):
 
 class GradeGpa(CreateMixin, UpdateMixin):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_grade_gpas',
-                             verbose_name=_("کاربر"))
+                             verbose_name=_("کاربر"), limit_choices_to={"is_active": True, "is_verified": True})
     grade = models.ForeignKey(Grade, on_delete=models.PROTECT, related_name='grade_gpa',
                               verbose_name=_("پایه"))
     gpa = models.FloatField(_("معدل"), validators=[MinValueValidator(0), MaxValueValidator(20)])
@@ -132,6 +132,7 @@ class GradeGpa(CreateMixin, UpdateMixin):
         verbose_name = _("نمره کاربر")
         verbose_name_plural = _("نمرات کاربر")
         ordering = ('-created_at',)
+        unique_together = ("user", "grade")
 
 
 class Otp(CreateMixin):
@@ -165,6 +166,6 @@ class Otp(CreateMixin):
 
     class Meta:
         db_table = 'otp'
-        verbose_name = _('کد')
-        verbose_name_plural = _('کدها')
+        verbose_name = _('کد otp')
+        verbose_name_plural = _('کدهای otp')
         ordering = ('-created_at',)

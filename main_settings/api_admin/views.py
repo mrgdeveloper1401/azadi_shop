@@ -1,4 +1,4 @@
-from rest_framework.viewsets import ModelViewSet, GenericViewSet
+from rest_framework.viewsets import ModelViewSet
 
 from orders.api_admin.permissions import IsAdmin
 from users.api_admin.pagination import UserAdminPagination
@@ -38,7 +38,7 @@ class AdminTopRankStudentViewSet(ModelViewSet):
 
 
 class AdminTopRankProfessorViewSet(ModelViewSet):
-    queryset = TopRankProfessor.objects.prefetch_related('professor_image')
+    queryset = TopRankProfessor.objects.all()
     serializer_class = AdminTopRankProfessorSerializer
     permission_classes = [IsAdmin]
     pagination_class = UserAdminPagination

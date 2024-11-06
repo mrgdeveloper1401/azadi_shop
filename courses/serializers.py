@@ -59,9 +59,7 @@ class CourseSerializers(serializers.ModelSerializer):
         exclude = ['image']
 
     def get_image_url(self, obj):
-        if obj.image:
-            return obj.image.image_url
-        return None
+        return obj.image.url if obj.image else None
 
 
 class CategorySerializers(serializers.ModelSerializer):

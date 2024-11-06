@@ -24,8 +24,7 @@ class HeaderSite(CreateMixin, UpdateMixin):
 
 
 class HomeSite(CreateMixin, UpdateMixin):
-    site_logo = models.ForeignKey("images.Image", on_delete=models.PROTECT, related_name='home_site_logo',
-                                  verbose_name=_("عکس لوگو سایت"))
+    site_logo = models.ImageField(_('عکس لوگو سایت'), upload_to='main_settings/home-site/%Y/%m/%d')
     slider_image = models.ManyToManyField("images.Image", related_name='home_site_slider',
                                           verbose_name=_("عکس اسلایدر سایت"))
     header_phone_number = models.CharField(_("شماره تماس"), max_length=15, unique=True,
@@ -51,21 +50,21 @@ class HomeSite(CreateMixin, UpdateMixin):
         verbose_name_plural = _("بخش های از سایت")
 
 
-class Services(CreateMixin, UpdateMixin):
-    title = models.CharField(_("عنوان خدمات ما"), max_length=100, unique=True)
-    services_image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name='services_image',
-                                       verbose_name=_("عکس یا لوگوی خدمات ما"))
-    description = models.TextField(_("توضیحات خدمات ما "), blank=True, null=True)
-    link = models.URLField(_("ادرس"))
-    is_active = models.BooleanField(_("قعال باشد"), default=True)
-
-    def __str__(self):
-        return self.title
-
-    class Meta:
-        db_table = 'services'
-        verbose_name = _("خدمات")
-        verbose_name_plural = _("خدمات")
+# class Services(CreateMixin, UpdateMixin):
+#     title = models.CharField(_("عنوان خدمات ما"), max_length=100, unique=True)
+#     services_image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name='services_image',
+#                                        verbose_name=_("عکس یا لوگوی خدمات ما"))
+#     description = models.TextField(_("توضیحات خدمات ما "), blank=True, null=True)
+#     link = models.URLField(_("ادرس"))
+#     is_active = models.BooleanField(_("قعال باشد"), default=True)
+#
+#     def __str__(self):
+#         return self.title
+#
+#     class Meta:
+#         db_table = 'services'
+#         verbose_name = _("خدمات")
+#         verbose_name_plural = _("خدمات")
 
 
 class ContactUs(CreateMixin, UpdateMixin):
@@ -85,8 +84,7 @@ class ContactUs(CreateMixin, UpdateMixin):
 class TopRankProfessor(CreateMixin, UpdateMixin):
     full_name = models.CharField(_("نام و نام خوانوادگی"), max_length=50)
     field_title = models.CharField(_("عنوان درس"), max_length=50)
-    professor_image = models.ForeignKey('images.Image', on_delete=models.PROTECT,
-                                        related_name='top_rank_professor_image', verbose_name=_("عکس استاد"))
+    professor_image = models.ImageField(_("عکس اساتید"), upload_to='main_settings/top_professor/%Y/%m/%d')
 
     def __str__(self):
         return f"{self.full_name} {self.field_title}"
@@ -109,7 +107,7 @@ class TopRankStudent(CreateMixin, UpdateMixin):
         math = 'math', _("ریاضی")
         human = 'human', _("انسانی")
 
-    title = models.CharField(_("title"), max_length=12, choices=TitleChoices.choices)
+    title = models.CharField(_("رشته تحصیلی"), max_length=12, choices=TitleChoices.choices)
 
     def __str__(self):
         return f"{self.title} {self.first_name} {self.last_name}"

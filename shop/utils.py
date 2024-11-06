@@ -1,7 +1,7 @@
 from decouple import config
 from requests import post
 
-base_url = 'https:#panel.spotplayer.ir/license/edit/'
+base_url = 'https://panel.spotplayer.ir/license/edit/'
 api_key = config('SPOT_API_KEY', cast=str)
 url = base_url + api_key
 

@@ -47,7 +47,7 @@ CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://127.0.0.1:6379/2",
-        "TIMEOUT": 300,
+        "TIMEOUT": 900,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
             "SOCKET_CONNECT_TIMEOUT": 5,
@@ -94,6 +94,3 @@ DJANGO_LOGGING = {
         }
     }
 }
-
-# for upload with object storage
-AWS_S3_SECURE_URLS = False

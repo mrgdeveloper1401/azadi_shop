@@ -1,7 +1,6 @@
 from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from unfold.admin import ModelAdmin
-# from admin_tools_stats.modules import DashboardChart, get_active_graph
 
 
 from courses.models import CourseCategory, Course, Comment, DiscountCourse, Like
@@ -67,13 +66,11 @@ class RateFilter(admin.SimpleListFilter):
 @admin.register(CourseCategory)
 class CategoryAdmin(ModelAdmin, TreeAdmin, ImportExportModelAdmin):
     form = movenodeform_factory(CourseCategory)
-    raw_id_fields = ['icon']
     list_display = ['name', "slug"]
     list_per_page = 30
     search_fields = ['name']
     prepopulated_fields = {"slug": ("name",)}
     # list_filter = ['is_public']
-    list_select_related = ['icon']
 
 
 @admin.register(Course)
@@ -87,8 +84,8 @@ class CourseAdmin(ModelAdmin, ImportExportModelAdmin):
     prepopulated_fields = {"slug": ("name",)}
     list_per_page = 20
     list_display_links = ("id", "name")
-    raw_id_fields = ("professor", "image")
-    list_select_related = ("professor", "image")
+    raw_id_fields = ("professor",)
+    list_select_related = ("professor",)
     readonly_fields = ['created_at', "updated_at", "total_like", "sale_number", "course_license"]
     filter_horizontal = ('category',)
 

@@ -1,10 +1,12 @@
 from django.contrib import admin
+from django.contrib.auth.forms import AdminUserCreationForm
 from django.contrib.auth.models import Group
 from unfold.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 from django.contrib.admin import SimpleListFilter
 from import_export.admin import ImportExportModelAdmin
+from unfold.forms import AdminPasswordChangeForm, UserChangeForm
 
 from users.models import User, UserInfo, Otp, GradeGpa, Grade, Major
 
@@ -33,6 +35,9 @@ class IsActiveUserInfo(SimpleListFilter):
 
 @admin.register(User)
 class UserAdmin(BaseUserAdmin, ModelAdmin, ImportExportModelAdmin):
+    form = UserChangeForm
+    add_form = AdminUserCreationForm
+    change_password_form = AdminPasswordChangeForm
     fieldsets = (
         (None, {"fields": ("mobile_phone", "password")}),
         (
@@ -63,8 +68,9 @@ class UserAdmin(BaseUserAdmin, ModelAdmin, ImportExportModelAdmin):
     search_fields = ("mobile_phone",)
     ordering = ("-created_at",)
     readonly_fields = ['created_at', "last_login", "updated_at"]
-    list_display_links = ['id', "mobile_phone"]
+    list_display_links = ['id', "mobile_phone", "created_at", "updated_at"]
     filter_horizontal = []
+    list_editable = ['is_staff', "is_superuser", "is_active", "is_verified"]
 
 
 @admin.register(UserInfo)
@@ -75,7 +81,7 @@ class UserInfoAdmin(ModelAdmin, ImportExportModelAdmin):
     search_fields = ["grade__grade_name", "major_major_name", "user__mobile_phone"]
     list_per_page = 100
     list_filter = [IsActiveUserInfo, "created_at", "updated_at"]
-    list_display_links = ['id', "user"]
+    list_display_links = ['id', "user", "grade", "major", "email", "first_name", "last_name"]
     raw_id_fields = ['user', "grade", "major"]
     ordering = ['-created_at']
 
@@ -90,10 +96,11 @@ class OtpAdmin(ModelAdmin):
 @admin.register(GradeGpa)
 class GradeGpaAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ['user', 'id', "grade", "gpa", "created_at", "updated_at"]
-    list_select_related = ['user']
+    list_select_related = ['user', "grade"]
     search_fields = ['user__mobile_phone']
     list_filter = ['grade', "created_at", "updated_at"]
     raw_id_fields = ['user']
+    list_display_links = ['user', "id", "grade", "gpa"]
 
 
 @admin.register(Grade)

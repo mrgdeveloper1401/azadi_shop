@@ -4,6 +4,7 @@ from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from shop.base import MEDIA_URL, MEDIA_ROOT
 from django.conf.urls.static import static
+from .base import DEBUG
 
 # url order panel api_admin
 # admin_url = [
@@ -29,14 +30,12 @@ urlpatterns = [
     path('api-auth/', include('rest_framework.urls')),
     # django ckeditor
     path('ckeditor/', include('ckeditor_uploader.urls')),
-    path('admin_tools_stats/', include('admin_tools_stats.urls')),
 
 ]
 
 debug_mode = config("DEBUG", default=False, cast=str)
 if debug_mode:
     from debug_toolbar.toolbar import debug_toolbar_urls
-
     urlpatterns += debug_toolbar_urls()
     urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
 
@@ -56,3 +55,7 @@ urlpatterns += api_admin
 
 # admin settings
 admin.site.index_title = 'پنل مدیریت'
+
+if DEBUG:
+    from debug_toolbar.toolbar import debug_toolbar_urls
+    urlpatterns += debug_toolbar_urls()

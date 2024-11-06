@@ -7,7 +7,7 @@ from ..models import Professor
 
 
 class AdminProfessorViewSet(ModelViewSet):
-    queryset = Professor.objects.select_related('certificate', "professor_image")
+    queryset = Professor.objects.all()
     serializer_class = AdminProfessorSerializer
     permission_classes = [IsAdmin]
     pagination_class = UserAdminPagination
