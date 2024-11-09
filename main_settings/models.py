@@ -1,4 +1,4 @@
-from django.contrib.gis.db.models import PointField
+from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -8,8 +8,6 @@ from users.validators import MobileValidator
 
 
 # Create your models here.
-
-
 class HeaderSite(CreateMixin, UpdateMixin):
     title = models.CharField(_("title"), max_length=50)
     is_active = models.BooleanField(_("is active"), default=True)
@@ -27,10 +25,10 @@ class HomeSite(CreateMixin, UpdateMixin):
     site_logo = models.ImageField(_('عکس لوگو سایت'), upload_to='main_settings/home-site/%Y/%m/%d')
     slider_image = models.ManyToManyField("images.Image", related_name='home_site_slider',
                                           verbose_name=_("عکس اسلایدر سایت"))
-    header_phone_number = models.CharField(_("شماره تماس"), max_length=15, unique=True,
-                                           validators=[HomeMobileValidator()], help_text=_("شماره تماس میتواند 11 رقمی تا 15 رقمی باشد"))
+    header_phone_number = models.CharField(_("شماره تماس هدر"), max_length=15, unique=True,
+                                           validators=[HomeMobileValidator()],
+                                           help_text=_("شماره تماس میتواند 11 رقمی تا 15 رقمی باشد"))
     about_us_body = models.TextField(_("متن درباره ما"))
-    about_us_image = models.ManyToManyField("images.Image", related_name='home_site_about_us_image')
     slider_professor_image = models.ManyToManyField('images.Image', related_name='home_site_slider_professor_image',
                                                     verbose_name=_("عکس اساتید"))
     email = models.EmailField(_("ایمیل"), unique=True)
@@ -44,27 +42,16 @@ class HomeSite(CreateMixin, UpdateMixin):
     def __str__(self):
         return f"{self.header_phone_number} {self.email} {self.is_active}"
 
+    def clean(self):
+        if self.is_active:
+            if HomeSite.objects.filter(is_active=True).exists():
+                raise ValidationError({"is_active": _("شما فقط میتواند یک تنطم سایت فعال رو داشته باشد")})
+        return super().clean()
+
     class Meta:
         db_table = 'home_site'
         verbose_name = _("بخش هایی از سایت")
         verbose_name_plural = _("بخش های از سایت")
-
-
-# class Services(CreateMixin, UpdateMixin):
-#     title = models.CharField(_("عنوان خدمات ما"), max_length=100, unique=True)
-#     services_image = models.ForeignKey('images.Image', on_delete=models.PROTECT, related_name='services_image',
-#                                        verbose_name=_("عکس یا لوگوی خدمات ما"))
-#     description = models.TextField(_("توضیحات خدمات ما "), blank=True, null=True)
-#     link = models.URLField(_("ادرس"))
-#     is_active = models.BooleanField(_("قعال باشد"), default=True)
-#
-#     def __str__(self):
-#         return self.title
-#
-#     class Meta:
-#         db_table = 'services'
-#         verbose_name = _("خدمات")
-#         verbose_name_plural = _("خدمات")
 
 
 class ContactUs(CreateMixin, UpdateMixin):
@@ -77,8 +64,8 @@ class ContactUs(CreateMixin, UpdateMixin):
 
     class Meta:
         db_table = 'contact_us'
-        verbose_name = _("ارتباط با ما")
-        verbose_name_plural = _("ارتباط با ما")
+        verbose_name = _("تماس با ما")
+        verbose_name_plural = _("تماس با ما")
 
 
 class TopRankProfessor(CreateMixin, UpdateMixin):
@@ -132,11 +119,12 @@ class Newsletter(CreateMixin, UpdateMixin):
 
 class BusinessAddress(CreateMixin, UpdateMixin):
     address = models.TextField(_("ادرس"))
-    location = PointField(verbose_name=_("لوکیشن"), geography=True)
+    location_lat = models.DecimalField(max_digits=20, decimal_places=10)
+    location_long = models.DecimalField(max_digits=20, decimal_places=10)
     is_active = models.BooleanField(_("فعال بودن"), default=True)
 
     def __str__(self):
-        return f'{self.address[:20]} {self.is_active}'
+        return f'{self.location_lat} {self.location_long}'
 
     class Meta:
         db_table = 'business_address'

@@ -23,7 +23,7 @@ class CartViewSet(CreateModelMixin, ListModelMixin, RetrieveModelMixin, GenericV
 
 
 class CartItemViewSet(RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, ListModelMixin, GenericViewSet):
-    queryset = (CartItem.objects.select_related('course', "course__professor", "course__image").
+    queryset = (CartItem.objects.select_related("cart", "course", "course__professor").
                 prefetch_related("course__course_discount"))
     serializer_class = CartItemSerializer
 
@@ -44,9 +44,8 @@ class CartItemViewSet(RetrieveModelMixin, CreateModelMixin, DestroyModelMixin, L
 
 
 class OrderViewSet(ModelViewSet):
-    queryset = (Order.objects.prefetch_related("order_item", "order_item__course", "order_item__course__image",
-                                               "order_item__course__professor", "order_item__course__course_discount").
-                select_related('user')).filter(payment_status="pending")
+    queryset = (Order.objects.prefetch_related("order_item__course__professor", "order_item__course__course_discount") \
+                .select_related('user')).filter(payment_status="pending")
 
     def create(self, request, *args, **kwargs):
         ser_data = CreateOrderSerializer(data=request.data, context={'user_id': self.request.user.id})
@@ -83,9 +82,6 @@ class CompleteOrderViewSet(ReadOnlyModelViewSet):
             Order.objects.filter(user=self.request.user)
             .filter(Q(payment_status='complete') | Q(payment_status='failed'))
             .prefetch_related(
-                "order_item",
-                "order_item__course",
-                "order_item__course__image",
                 "order_item__course__professor",
                 "order_item__course__course_discount"
             )

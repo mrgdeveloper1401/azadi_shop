@@ -46,7 +46,6 @@ class NewsletterSerializer(ModelSerializer):
 
 class HomeSiteSerializer(ModelSerializer):
     site_logo = SerializerMethodField()
-    about_us_image = SerializerMethodField()
     slider_professor_image = SerializerMethodField()
     team_image = SerializerMethodField()
     slider_image = SerializerMethodField()
@@ -59,14 +58,13 @@ class HomeSiteSerializer(ModelSerializer):
     def get_site_logo(self, obj):
         return obj.site_logo.url if obj.site_logo else None
 
-    def get_about_us_image(self, obj):
-        return obj.about_us_image.image_url
-
     def get_slider_professor_image(self, obj):
-        return obj.slider_professor_image.image_url
+        img = [i.image_url for i in obj.slider_professor_image.all()]
+        return img
 
     def get_team_image(self, obj):
-        return obj.team_image.image_url
+        img = [i.image_url for i in obj.team_image.all()]
+        return img
 
     def get_slider_image(self, obj):
         return [i.image_url for i in obj.slider_image.all()]

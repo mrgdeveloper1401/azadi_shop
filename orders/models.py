@@ -1,4 +1,3 @@
-from django.core.exceptions import ValidationError
 from django.db import models
 from ulid import ULID
 from uuid import uuid4
@@ -7,8 +6,6 @@ from shop.base import AUTH_USER_MODEL
 from courses.models import Course
 from core.models import CreateMixin, UpdateMixin
 from datetime import datetime
-
-from users.models import User
 
 
 class Cart(CreateMixin, UpdateMixin):

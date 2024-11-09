@@ -11,7 +11,6 @@ class AdminHeaderSiteSerializer(ModelSerializer):
 
 class HomeSiteSerializer(ModelSerializer):
     slider_images = SerializerMethodField()
-    about_us_images = SerializerMethodField()
     site_logos = SerializerMethodField()
     slider_professor_images = SerializerMethodField()
     awards_images = SerializerMethodField()
@@ -23,10 +22,6 @@ class HomeSiteSerializer(ModelSerializer):
 
     def get_slider_images(self, obj):
         img = [i.image_url if i.image_url else None for i in obj.slider_image.all()]
-        return img
-
-    def get_about_us_images(self, obj):
-        img = [i.image_url if i.image_url else None for i in obj.about_us_image.all()]
         return img
 
     def get_site_logos(self, obj):

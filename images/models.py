@@ -1,7 +1,5 @@
 from django.db import models
 from hashlib import sha1
-from base64 import b64encode
-# from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
 from core.models import CreateMixin, UpdateMixin
@@ -17,7 +15,6 @@ class Image(CreateMixin, UpdateMixin):
     height = models.IntegerField(_('طول اندازه عکس'), null=True, blank=True)
     file_hash = models.CharField(_('هش فایل عکس'), max_length=40, null=True, blank=True)
     file_size = models.PositiveIntegerField(_('حجم عکس'), null=True, blank=True, help_text=_("file size as xx.b"))
-    image_base64 = models.TextField(_("تبدیل به فورمت base64"), blank=True, null=True)
 
     @property
     def generate_hash(self):
@@ -26,24 +23,14 @@ class Image(CreateMixin, UpdateMixin):
             hasher.update(c)
         return hasher.hexdigest()
 
-    @property
-    def encode_image(self):
-        encode_b64 = b64encode(self.image.read())
-        return encode_b64.decode("utf-8")
-
     def __str__(self):
-        return f"{self.file_hash} && {self.title}"
+        return self.title
 
     @property
     def image_url(self):
         return self.image.url
 
-    def show_image_base64(self):
-        d = 'data:image/png;base64,{}'.format(self.image_base64)
-        return d
-
     def save(self, *args, **kwargs):
-        self.image_base64 = self.encode_image
         self.file_hash = self.generate_hash
         self.file_size = self.image.size
         return super().save(*args, **kwargs)

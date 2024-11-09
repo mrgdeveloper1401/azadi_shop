@@ -1,4 +1,6 @@
 from decimal import Decimal
+
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.utils.text import slugify
@@ -51,11 +53,12 @@ class Course(CreateMixin, UpdateMixin):
     is_sale = models.BooleanField(_('قابل فروش'), default=True,
                                   help_text=_("if is sale is true, this course can be sale ,otherwise this course "
                                               "can't"))
-    is_free = models.BooleanField(_('دوره رایگان باشد'), default=False)
+    is_free = models.BooleanField(_('دوره رایگان باشد'), default=False, help_text=_("دروه رایگان در نظر گرفته خواهد شد"))
     is_active = models.BooleanField(_('دوره در سایت منتشر شود'), default=True)
     total_like = models.PositiveIntegerField(_("تعداد کاربران پسندیده شده"), default=0, editable=False)
     number_of_video = models.PositiveSmallIntegerField(_("تعداد ویدیو ها"), default=0, editable=False)
-    course_license = models.CharField(_("لاینسس دوره"), max_length=255, blank=True, null=True)
+    course_license = models.TextField(_("لاینسس دوره"), blank=True, null=True,
+                                      help_text=_("هر دوره درون اسپات پلییر یک لاینسس دارد یا همان شناسه دوره"))
 
     class CourseLevelChoices(models.TextChoices):
         basic = 'basic', _("مقدماتی")
@@ -72,8 +75,8 @@ class Course(CreateMixin, UpdateMixin):
     course_status = models.CharField(_("وضعیت دوره"), max_length=11, choices=CourseStatusChoices.choices,
                                      default=CourseStatusChoices.in_progress,
                                      help_text=_("دروه در حال برگزاری هست یا به اتمام رسیده هست"))
-    course_duration = models.FloatField(_("مدت زمان دوره"), default=0.00, editable=False,
-                                        help_text=_("تا حالا چند ساعت دوره برگزار شده هست"))
+    # course_duration = models.FloatField(_("مدت زمان دوره"), default=0.00, editable=False,
+    #                                     help_text=_("تا حالا چند ساعت دوره برگزار شده هست"))
 
     objects = CourseManager()
 
@@ -119,7 +122,7 @@ class Course(CreateMixin, UpdateMixin):
 
 class DiscountCourse(CreateMixin, UpdateMixin):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='course_discount',
-                               limit_choices_to={"is_active": True, "is_sale": True, 'is_free': False},
+                               limit_choices_to={"is_active": True},
                                verbose_name=_("دوره"))
 
     TYPE_CHOICES = (

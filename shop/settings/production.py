@@ -1,24 +1,20 @@
 from shop.base import *
 import dj_database_url
 
-
-GDAL_LIBRARY_PATH = os.getenv('GDAL_LIBRARY_PATH')
-GEOS_LIBRARY_PATH = os.getenv('GEOS_LIBRARY_PATH')
-
 SECRET_KEY = config('DEPLOY_SECRET_KEY', cast=str)
 
 ALLOWED_HOSTS = ["*"]
 
 DATABASES = {
-    # 'default': dj_database_url.config(default=config('DATABASE_URL', cast=str))
-    'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'PORT': config("POSTDB_PORT", cast=int),
-        "HOST": config('POSTDB_HOST', cast=str),
-        "USER": config("POSTDB_USER", cast=str),
-        "PASSWORD": config("POSTDB_PASSWORD", cast=str),
-        'NAME': config("POSTDB_NAME", cast=str),
-    }
+    'default': dj_database_url.config(default=config('DATABASE_URL', cast=str))
+    #     'default': {
+    #         'ENGINE': 'django.contrib.gis.db.backends.postgis',
+    #         'PORT': config("POSTDB_PORT", cast=int),
+    #         "HOST": config('POSTDB_HOST', cast=str),
+    #         "USER": config("POSTDB_USER", cast=str),
+    #         "PASSWORD": config("POSTDB_PASSWORD", cast=str),
+    #         'NAME': config("POSTDB_NAME", cast=str),
+    #     }
 }
 
 # cors allowed origin config
@@ -30,12 +26,12 @@ CORS_ALLOW_HEADERS = '*'
 #     "https://test-azadi.liara.run"
 # ]
 CORS_ALLOW_METHODS = [
-  "DELETE",
-  "GET",
-  "OPTIONS",
-  "PATCH",
-  "POST",
-  "PUT",
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
 ]
 # ssl config
 SESSION_COOKIE_SECURE = True
@@ -50,7 +46,6 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 SECURE_REFERRER_POLICY = "strict-origin"
 USE_X_FORWARDED_HOST = True
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-
 
 # # simple jwt config
 SIMPLE_JWT['SIGNING_KEY'] = config('DEPLOY_SECRET_KEY', cast=str)
@@ -74,7 +69,6 @@ CACHES = {
         }
     }
 }
-
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = True

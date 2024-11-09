@@ -54,8 +54,11 @@ class TopRankAdmin(ModelAdmin, ImportExportModelAdmin):
 
 @admin.register(HomeSite)
 class HomeSiteAdmin(ModelAdmin, ImportExportModelAdmin):
-    raw_id_fields = ['slider_image', "about_us_image", "slider_professor_image", "awards_image",
-                     "team_image"]
+    filter_horizontal = ['slider_image', "slider_professor_image", "awards_image", "team_image"]
+    list_display = ['header_phone_number', "email", "is_active", "created_at", "updated_at"]
+    list_editable = ['is_active']
+    list_filter = ['created_at', 'updated_at']
+    list_display_links = ['header_phone_number', "email"]
 
 
 @admin.register(TopRankProfessor)

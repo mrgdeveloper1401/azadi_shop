@@ -1,10 +1,10 @@
-from rest_framework import serializers
+from rest_framework.serializers import ModelSerializer, SerializerMethodField, CharField, DecimalField
 
 from courses.models import Course, CourseCategory, Comment
 from professors.models import Professor
 
 
-class CreatCommentSerializer(serializers.ModelSerializer):
+class CreatCommentSerializer(ModelSerializer):
     class Meta:
         model = Comment
         fields = ['body', "rating"]
@@ -14,45 +14,44 @@ class CreatCommentSerializer(serializers.ModelSerializer):
         return Comment.objects.create(course=course, **validated_data)
 
 
-class CommentSerializers(serializers.ModelSerializer):
-    user = serializers.CharField(source="user.mobile_phone")
-    course = serializers.CharField(source="course.name")
+class CommentSerializers(ModelSerializer):
+    user = CharField(source="user.mobile_phone")
+    course = CharField(source="course.name")
 
     class Meta:
         model = Comment
         fields = "__all__"
 
 
-class UpdateCommentSerializer(serializers.ModelSerializer):
+class UpdateCommentSerializer(ModelSerializer):
     class Meta:
         model = Comment
         fields = ['rating', "body"]
 
 
-class SimpleProfessorSerializer(serializers.ModelSerializer):
-    professor_image = serializers.SerializerMethodField()
+class SimpleProfessorSerializer(ModelSerializer):
+    professor_image = SerializerMethodField()
 
     class Meta:
         model = Professor
         fields = ["first_name", "last_name", "professor_image"]
 
     def get_professor_image(self, obj):
-        return obj.professor_image.image_url
+        return obj.professor_image.url if obj.professor_image else None
 
 
-class SimpleCategorySerializer(serializers.ModelSerializer):
-
+class SimpleCategorySerializer(ModelSerializer):
     class Meta:
         model = CourseCategory
         fields = ['name']
 
 
-class CourseSerializers(serializers.ModelSerializer):
+class CourseSerializers(ModelSerializer):
     professor = SimpleProfessorSerializer()
     category = SimpleCategorySerializer(many=True)
-    final_price = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
-    discount_value = serializers.DecimalField(max_digits=12, decimal_places=2, read_only=True)
-    image_url = serializers.SerializerMethodField()
+    final_price = DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    discount_value = DecimalField(max_digits=12, decimal_places=2, read_only=True)
+    image_url = SerializerMethodField()
 
     class Meta:
         model = Course
@@ -62,7 +61,7 @@ class CourseSerializers(serializers.ModelSerializer):
         return obj.image.url if obj.image else None
 
 
-class CategorySerializers(serializers.ModelSerializer):
+class CategorySerializers(ModelSerializer):
     class Meta:
         model = CourseCategory
         fields = ['id', 'name', 'slug', "depth", "path", "numchild", "icon", "children"]

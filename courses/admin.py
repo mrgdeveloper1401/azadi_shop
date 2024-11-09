@@ -5,9 +5,7 @@ from unfold.admin import ModelAdmin
 
 from courses.models import CourseCategory, Course, Comment, DiscountCourse, Like
 from django.utils.translation import gettext_lazy as _
-from treebeard.admin import TreeAdmin
 from treebeard.forms import movenodeform_factory
-
 
 class SalesFilter(admin.SimpleListFilter):
     title = 'sale_number'
@@ -64,13 +62,15 @@ class RateFilter(admin.SimpleListFilter):
 
 
 @admin.register(CourseCategory)
-class CategoryAdmin(ModelAdmin, TreeAdmin, ImportExportModelAdmin):
+class CategoryAdmin(ModelAdmin, ImportExportModelAdmin):
     form = movenodeform_factory(CourseCategory)
-    list_display = ['name', "slug"]
+    list_display = ['name', "children"]
     list_per_page = 30
     search_fields = ['name']
     prepopulated_fields = {"slug": ("name",)}
-    # list_filter = ['is_public']
+
+    def children(self, obj):
+        return ' ** '.join([child.name for child in obj.get_children()])
 
 
 @admin.register(Course)
@@ -78,15 +78,15 @@ class CourseAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ("id", "name", "professor", "price", "calc_final_price", "is_active", "is_free", "is_sale",
                     "sale_number", "created_at", 'updated_at', "total_like", "comment_number")
     list_filter = ("is_active", "is_free", "is_sale", SalesFilter, "created_at", "updated_at")
-    list_editable = ("is_active", "is_free", "is_sale", "price")
+    list_editable = ("is_active", "is_free", "is_sale")
     date_hierarchy = "created_at"
     search_fields = ("name", "professor__first_name", "professor__last_name")
     prepopulated_fields = {"slug": ("name",)}
     list_per_page = 20
-    list_display_links = ("id", "name")
+    list_display_links = ("id", "name", "professor")
     raw_id_fields = ("professor",)
     list_select_related = ("professor",)
-    readonly_fields = ['created_at', "updated_at", "total_like", "sale_number", "course_license"]
+    readonly_fields = ['created_at', "updated_at", "total_like", "sale_number"]
     filter_horizontal = ('category',)
 
     def get_queryset(self, request):

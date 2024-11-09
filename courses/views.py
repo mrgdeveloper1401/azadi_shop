@@ -1,8 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from rest_framework.exceptions import NotAcceptable
-from django.db.models import Case, When, F, DecimalField, Value
+from django.db.models import Case, When, F, DecimalField, Value, DateTimeField, Count
 
 from courses.permissions import IsOwner
 from courses.paginations import CoursePagination
@@ -25,10 +24,9 @@ class CourseViewSet(ReadOnlyModelViewSet):
     search_fields = ['name']
     ordering_fields = ['created_at', "updated_at", "sale_number"]
     pagination_class = CoursePagination
-    # lookup_field = 'slug'
 
     def get_queryset(self):
-        queryset = Course.objects.is_active().select_related('professor__professor_image') \
+        queryset = Course.objects.is_active().select_related('professor') \
             .prefetch_related('course_discount', "category") \
             .annotate(
             discount_value=Case(
@@ -39,7 +37,12 @@ class CourseViewSet(ReadOnlyModelViewSet):
                 default=Value(0),
                 output_field=DecimalField(),
             ),
-            final_price=F('price') - F('discount_value')
+            final_price=F("price") - F("discount_value"),
+            amount=F("course_discount__value"),
+            discount_time=Case(
+                When(course_discount__is_active=True, then=F("course_discount__expired_date")),
+                default=Value(None), output_field=DateTimeField()
+            )
         )
 
         if 'category_pk' in self.kwargs:

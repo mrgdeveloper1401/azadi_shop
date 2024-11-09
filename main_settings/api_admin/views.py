@@ -16,7 +16,7 @@ class AdminHeaderSiteViewSet(ModelViewSet):
 
 class HomeSiteViewSet(ModelViewSet):
     queryset = HomeSite.objects.prefetch_related(
-        "slider_image", "about_us_image", "slider_professor_image", "awards_image", "team_image"
+        "slider_image", "slider_professor_image", "awards_image", "team_image"
     ).select_related('site_logo')
     serializer_class = HomeSiteSerializer
     pagination_class = UserAdminPagination

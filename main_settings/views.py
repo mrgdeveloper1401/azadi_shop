@@ -33,8 +33,7 @@ class NewsLatterViewSet(CreateModelMixin, GenericViewSet):
 
 class HomeSiteViewSet(ReadOnlyModelViewSet):
     queryset = (HomeSite.objects.filter(is_active=True).
-                prefetch_related("about_us_image", "slider_professor_image", "team_image").
-                select_related("site_logo"))
+                prefetch_related("slider_professor_image", "team_image"))
     serializer_class = HomeSiteSerializer
 
 
