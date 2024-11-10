@@ -24,18 +24,22 @@ DATABASES = {
 }
 
 INSTALLED_APPS += [
-    "django_logging",
+    # "django_logging",
     'debug_toolbar',
     # "django_ckeditor_5",
 ]
 MIDDLEWARE += [
     # debug toolbar
     "debug_toolbar.middleware.DebugToolbarMiddleware",
-    'django_logging.middleware.RequestLogMiddleware',
+
+    # package dj-logging
+    # 'django_logging.middleware.RequestLogMiddleware',
+
     # chash with django redis
     # "django.middleware.cache.UpdateCacheMiddleware",
     # "django.middleware.common.CommonMiddleware",
     # "django.middleware.cache.FetchFromCacheMiddleware",
+
     # whitenoise
     "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
@@ -62,35 +66,35 @@ DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = True
 DJANGO_REDIS_LOGGER = 'azadi_redis_logger'
 
 # logging in django, whit third party package
-log_file = BASE_DIR / "logs"
-DJANGO_LOGGING = {
-    "AUTO_INITIALIZATION_ENABLE": True,
-    "INITIALIZATION_MESSAGE_ENABLE": True,
-    "LOG_FILE_LEVELS": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
-    "LOG_DIR": f"{log_file}",
-    "LOG_FILE_FORMATS": {
-        "DEBUG": 1,
-        "INFO": 1,
-        "WARNING": 1,
-        "ERROR": 1,
-        "CRITICAL": 1,
-    },
-    "LOG_CONSOLE_LEVEL": "DEBUG",
-    "LOG_CONSOLE_FORMAT": 1,
-    "LOG_CONSOLE_COLORIZE": True,
-    "LOG_DATE_FORMAT": "%Y-%m-%d %H:%M:%S",
-    "LOG_EMAIL_NOTIFIER": {
-        "ENABLE": False,
-        "NOTIFY_ERROR": False,
-        "NOTIFY_CRITICAL": False,
-        "LOG_FORMAT": 1,
-        "USE_TEMPLATE": True,
-    },
-    "LOGGERS": {
-        "azadi_redis_logger": {
-            "level": "ERROR",
-            "handlers": ["console", "file"],
-            "propagate": True,
-        }
-    }
-}
+# log_file = BASE_DIR / "logs"
+# DJANGO_LOGGING = {
+#     "AUTO_INITIALIZATION_ENABLE": True,
+#     "INITIALIZATION_MESSAGE_ENABLE": True,
+#     "LOG_FILE_LEVELS": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+#     "LOG_DIR": f"{log_file}",
+#     "LOG_FILE_FORMATS": {
+#         "DEBUG": 1,
+#         "INFO": 1,
+#         "WARNING": 1,
+#         "ERROR": 1,
+#         "CRITICAL": 1,
+#     },
+#     "LOG_CONSOLE_LEVEL": "DEBUG",
+#     "LOG_CONSOLE_FORMAT": 1,
+#     "LOG_CONSOLE_COLORIZE": True,
+#     "LOG_DATE_FORMAT": "%Y-%m-%d %H:%M:%S",
+#     "LOG_EMAIL_NOTIFIER": {
+#         "ENABLE": False,
+#         "NOTIFY_ERROR": False,
+#         "NOTIFY_CRITICAL": False,
+#         "LOG_FORMAT": 1,
+#         "USE_TEMPLATE": True,
+#     },
+#     "LOGGERS": {
+#         "azadi_redis_logger": {
+#             "level": "ERROR",
+#             "handlers": ["console", "file"],
+#             "propagate": True,
+#         }
+#     }
+# }

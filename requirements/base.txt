@@ -27,3 +27,4 @@ redis==5.1.1
 pyzstd==0.16.1
 django-ckeditor==6.7.1
 django-unfold==0.40.0
+django-import-export==4.2.0

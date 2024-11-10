@@ -1,4 +1,4 @@
-from ckeditor_uploader.fields import RichTextUploadingField
+# from ckeditor_uploader.fields import RichTextUploadingField
 from django.db import models
 from django.utils.text import slugify
 from treebeard.mp_tree import MP_Node
@@ -40,7 +40,8 @@ class Post(CreateMixin, UpdateMixin):
                                   help_text=_("عنوان خلاصه شده پست هست و حداکثر 50 تا کاراتر میتوان نوشت"))
     introduction = models.CharField(_("مقدمه"), max_length=255, blank=True, null=True)
     slug = models.SlugField(_('اسلاگ'), max_length=255, allow_unicode=True, blank=True)
-    post_body = RichTextUploadingField()
+    # post_body = RichTextUploadingField()
+    post = models.TextField(_("متن پست"))
     is_publish = models.BooleanField(_("قابل انتشار"), default=False)
     view_number = models.PositiveIntegerField(_('تعداد بازدید'), default=0, editable=False)
     post_image = models.ImageField(_("عکس پست"))

@@ -6,12 +6,6 @@ from shop.base import MEDIA_URL, MEDIA_ROOT
 from django.conf.urls.static import static
 from .base import DEBUG
 
-# url order panel api_admin
-# admin_url = [
-#     path('order/', include('orders.api_admin.urls', namespace='admin_order')),
-#     path('auth_admin/', include('users.api_admin.urls'))
-# ]
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("api_auth/", include("users.urls", namespace="users")),
@@ -29,15 +23,9 @@ urlpatterns = [
     # api auth
     path('api-auth/', include('rest_framework.urls')),
     # django ckeditor
-    path('ckeditor/', include('ckeditor_uploader.urls')),
+    # path('ckeditor/', include('ckeditor_uploader.urls')),
 
 ]
-
-debug_mode = config("DEBUG", default=False, cast=str)
-if debug_mode:
-    from debug_toolbar.toolbar import debug_toolbar_urls
-    urlpatterns += debug_toolbar_urls()
-    urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
 
 api_admin = [
     path('user_admin/', include('users.api_admin.urls', namespace='user_admin')),
@@ -56,6 +44,8 @@ urlpatterns += api_admin
 # admin settings
 admin.site.index_title = 'پنل مدیریت'
 
-if DEBUG:
-    from debug_toolbar.toolbar import debug_toolbar_urls
-    urlpatterns += debug_toolbar_urls()
+# debug_mode = config("DEBUG", default=False, cast=str)
+# if debug_mode:
+#     from debug_toolbar.toolbar import debug_toolbar_urls
+#     urlpatterns += debug_toolbar_urls()
+#     urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

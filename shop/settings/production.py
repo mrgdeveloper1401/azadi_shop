@@ -50,29 +50,29 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 # # simple jwt config
 SIMPLE_JWT['SIGNING_KEY'] = config('DEPLOY_SECRET_KEY', cast=str)
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": config('LIARA_REDIS_URL', cast=str),
-        'TIMEOUT': 300,
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-            "SOCKET_CONNECT_TIMEOUT": 10,
-            "SOCKET_TIMEOUT": 5,
-            "COMPRESSOR": "django_redis.compressors.zstd.ZStdCompressor",
-            "IGNORE_EXCEPTIONS": False,
-            "CONNECTION_POOL_KWARGS": {
-                'max_connections': 100,
-                "retry_on_timeout": True,
-            },
-            "SERIALIZER": "django_redis.serializers.msgpack.MSGPackSerializer",
-        }
-    }
-}
-
-SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
-DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = True
-SESSION_REDIS_TTL = 300
+# CACHES = {
+#     "default": {
+#         "BACKEND": "django_redis.cache.RedisCache",
+#         "LOCATION": config('LIARA_REDIS_URL', cast=str),
+#         'TIMEOUT': 300,
+#         "OPTIONS": {
+#             "CLIENT_CLASS": "django_redis.client.DefaultClient",
+#             "SOCKET_CONNECT_TIMEOUT": 10,
+#             "SOCKET_TIMEOUT": 5,
+#             "COMPRESSOR": "django_redis.compressors.zstd.ZStdCompressor",
+#             "IGNORE_EXCEPTIONS": False,
+#             "CONNECTION_POOL_KWARGS": {
+#                 'max_connections': 100,
+#                 "retry_on_timeout": True,
+#             },
+#             "SERIALIZER": "django_redis.serializers.msgpack.MSGPackSerializer",
+#         }
+#     }
+# }
+#
+# SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+# DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = True
+# SESSION_REDIS_TTL = 300
 
 MIDDLEWARE += [
     # "django.middleware.cache.UpdateCacheMiddleware",
