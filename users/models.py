@@ -5,6 +5,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser, AbstractBaseUser, PermissionsMixin
 from django.utils.translation import gettext_lazy as _
 
+from shop.utils import send_sms
 from users.managers import UserManager, OtpManager
 from users.validators import MobileValidator
 from core.models import CreateMixin, UpdateMixin
@@ -162,6 +163,7 @@ class Otp(CreateMixin):
     def save(self, *args, **kwargs):
         self.expired_at = after_two_minute()
         self.code = self.generate_random_code
+        send_sms(self.mobile_phone, self.code)
         return super().save(*args, **kwargs)
 
     class Meta:
