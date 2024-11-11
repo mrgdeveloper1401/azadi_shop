@@ -63,7 +63,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin, ImportExportModelAdmin):
         ),
     )
     list_display = ("id", "mobile_phone", "is_staff", 'is_superuser', 'is_active', "is_verified", "created_at",
-                    "updated_at")
+                    "updated_at", "is_deleted", "deleted_at")
     list_filter = ("is_staff", "is_superuser", "is_active", 'is_verified', "created_at", "updated_at")
     search_fields = ("mobile_phone",)
     ordering = ("-created_at",)
@@ -75,14 +75,14 @@ class UserAdmin(BaseUserAdmin, ModelAdmin, ImportExportModelAdmin):
 
 @admin.register(UserInfo)
 class UserInfoAdmin(ModelAdmin, ImportExportModelAdmin):
-    list_display = ["id", 'user', 'grade', 'major', 'email', 'first_name', 'last_name', 'get_active', "get_is_verified",
-                    "created_at", "updated_at"]
-    list_select_related = ['user', "grade", "major"]
-    search_fields = ["grade__grade_name", "major_major_name", "user__mobile_phone"]
+    list_display = ["id", 'user', 'email', 'first_name', 'last_name', 'get_active', "get_is_verified",
+                    "created_at", "updated_at", "is_deleted", "deleted_at"]
+    list_select_related = ['user']
+    search_fields = ["major_major_name", "user__mobile_phone"]
     list_per_page = 100
     list_filter = [IsActiveUserInfo, "created_at", "updated_at"]
-    list_display_links = ['id', "user", "grade", "major", "email", "first_name", "last_name"]
-    raw_id_fields = ['user', "grade", "major"]
+    list_display_links = ['id', "user", "email", "first_name", "last_name"]
+    raw_id_fields = ['user']
     ordering = ['-created_at']
 
 

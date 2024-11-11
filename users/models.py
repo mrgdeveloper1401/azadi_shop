@@ -8,13 +8,13 @@ from django.utils.translation import gettext_lazy as _
 from shop.utils import send_sms
 from users.managers import UserManager, OtpManager
 from users.validators import MobileValidator
-from core.models import CreateMixin, UpdateMixin
+from core.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 from core.datetime_config import after_two_minute
 from django.utils.timezone import now
 
 
 # Create your models here.
-class User(AbstractBaseUser, CreateMixin, UpdateMixin):
+class User(AbstractBaseUser, CreateMixin, UpdateMixin, SoftDeleteMixin):
     mobile_phone = models.CharField(_("شماره همراه"), max_length=11, unique=True,
                                     validators=[MobileValidator()])
     is_verified = models.BooleanField(_('احراز هویت'), default=False)
@@ -48,6 +48,11 @@ class User(AbstractBaseUser, CreateMixin, UpdateMixin):
 
     def has_module_perms(self, app_label):
         return True
+
+    def deactivate_user(self):
+        self.is_active = False
+        self.is_verified = False
+        self.save()
 
     def __str__(self):
         return self.mobile_phone
@@ -83,15 +88,15 @@ class Major(models.Model):
         verbose_name_plural = _("رشته ها")
 
 
-class UserInfo(CreateMixin, UpdateMixin):
+class UserInfo(CreateMixin, UpdateMixin, SoftDeleteMixin):
     user = models.OneToOneField(User, on_delete=models.PROTECT, related_name='user_info',
                                 verbose_name=_("کاربر"))
-    grade = models.ForeignKey(Grade, on_delete=models.PROTECT, related_name='grade',
-                              verbose_name=_("پایه"), blank=True, null=True)
-    major = models.ForeignKey(Major, on_delete=models.PROTECT, related_name='major',
-                              verbose_name=_("رشته"), blank=True, null=True)
-    gpa = models.FloatField(_("معدل"), validators=[MinValueValidator(0), MaxValueValidator(20)],
-                            blank=True, null=True)
+    # grade = models.ForeignKey(Grade, on_delete=models.PROTECT, related_name='grade',
+    #                           verbose_name=_("پایه"), blank=True, null=True)
+    # major = models.ForeignKey(Major, on_delete=models.PROTECT, related_name='major',
+    #                           verbose_name=_("رشته"), blank=True, null=True)
+    # gpa = models.FloatField(_("معدل"), validators=[MinValueValidator(0), MaxValueValidator(20)],
+    #                         blank=True, null=True)
     email = models.EmailField(_("ایمیل"), blank=True, null=True)
     first_name = models.CharField(_("نام"), max_length=30, blank=True, null=True)
     last_name = models.CharField(_("نام خوانوادگی"), max_length=30, blank=True, null=True)

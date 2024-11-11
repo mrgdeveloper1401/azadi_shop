@@ -7,6 +7,7 @@ from rest_framework.mixins import RetrieveModelMixin, UpdateModelMixin, DestroyM
 from rest_framework.viewsets import GenericViewSet
 from drf_spectacular.utils import extend_schema
 from django.utils.timezone import now
+from rest_framework.generics import RetrieveUpdateDestroyAPIView
 
 from users.serializers import UserRegisterSerializer, UserVerifyRegisterSerializer, ResetPasswordSerializer, \
     ForgetPasswordSerializer, ForgetPasswordConfirmSerializer, ProfileSerializer, SendOtpCodeSerializer, \
@@ -35,9 +36,7 @@ class UserVerifyRegisterCodeAPIView(APIView):
     def post(self, request, *args, **kwargs):
         ser_data = self.serializer_class(data=request.data)
         ser_data.is_valid(raise_exception=True)
-
         tokens = ser_data.save()
-
         return Response({
             "message": 'کاربر گرامی حساب شما با موفقیت احراز هویت شدید',
             "access_token": tokens['access'],
@@ -66,7 +65,7 @@ class ForgetPasswordApiView(APIView):
         ser_data = ForgetPasswordSerializer(data=request.data)
         ser_data.is_valid(raise_exception=True)
         ser_data.save()
-        return Response({"message": "کاربر گرامی ما یک کدی برای شما ارسال کریده ایم"}, status=status.HTTP_200_OK)
+        return Response({"message": "در صورت وجود حساب یک کد بازیابی ارسال خواهد شد"}, status=status.HTTP_200_OK)
 
 
 class ForgetPasswordConfirmAPIView(APIView):
@@ -81,23 +80,26 @@ class ForgetPasswordConfirmAPIView(APIView):
         return Response({"message": "کاربر گرامی پسورد شما با موفقیت تغییر یافت"}, status=status.HTTP_200_OK)
 
 
-class ProfileViewSet(RetrieveModelMixin, UpdateModelMixin, DestroyModelMixin, GenericViewSet):
-    queryset = UserInfo.objects.select_related('user').filter(user__is_active=True, user__is_verified=True)
+class ProfileViewSet(RetrieveUpdateDestroyAPIView):
     serializer_class = ProfileSerializer
     permission_classes = [IsOwnerProfile]
 
-    def destroy(self, request, *args, **kwargs):
-        user_info = self.get_object()
-        user = user_info.user
-        user.is_active = False
-        user.is_verified = False
-        user.is_deleted = True
-        user.deleted_at = now()
-        user.save()
-        return super().destroy(request, *args, **kwargs)
-
-    def perform_create(self, serializer):
+    def perform_update(self, serializer):
         return serializer.save(user=self.request.user)
+
+    def get_queryset(self):
+        return UserInfo.objects.select_related('user').filter(user__is_active=True, user__is_verified=True,
+                                                              user=self.request.user)
+
+    def get_object(self):
+        return UserInfo.objects.get(user=self.request.user)
+
+    def destroy(self, request, *args, **kwargs):
+        user = self.get_object()
+        user.delete()
+        user.user.delete()
+        user.user.deactivate_user()
+        return super().destroy(request, *args, **kwargs)
 
 
 class GradeGpaViewSet(ListModelMixin, RetrieveModelMixin, CreateModelMixin, UpdateModelMixin, GenericViewSet):
