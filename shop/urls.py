@@ -25,6 +25,9 @@ urlpatterns = [
     # django ckeditor
     # path('ckeditor/', include('ckeditor_uploader.urls')),
 
+    # jet admin url
+    # path('jet_api/', include('jet_django.urls')),
+
 ]
 
 api_admin = [
@@ -44,8 +47,9 @@ urlpatterns += api_admin
 # admin settings
 admin.site.index_title = 'پنل مدیریت'
 
-# debug_mode = config("DEBUG", default=False, cast=str)
-# if debug_mode:
-#     from debug_toolbar.toolbar import debug_toolbar_urls
-#     urlpatterns += debug_toolbar_urls()
-#     urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
+debug_mode = config("DEBUG", default=False, cast=str)
+if debug_mode:
+    from debug_toolbar.toolbar import debug_toolbar_urls
+
+    urlpatterns += debug_toolbar_urls()
+    urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

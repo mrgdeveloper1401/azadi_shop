@@ -32,14 +32,24 @@ class UserRegisterSerializer(serializers.Serializer):
             user.save()
             return user
 
-    def validate(self, data):
-        if data['password'] != data['confirm_password']:
+    def validate(self, attrs):
+        if attrs['password'] != attrs['confirm_password']:
             raise serializers.ValidationError(_("رمز عبور باید یکسان باشد"))
         try:
-            validate_password(data['password'])
+            validate_password(attrs['password'])
         except ValidationError as e:
             return ValidationError({'message': e})
-        return data
+        try:
+            otp = Otp.objects.get(mobile_phone=attrs['mobile_phone'])
+        except Otp.DoesNotExist:
+            pass
+        else:
+            if otp:
+                if otp.is_expired():
+                    otp.delete()
+                else:
+                    raise ValidationError({"message": _("شما از قبل یه درخواست رو دارید لطفا به مدت 2 دقیقه صبر کنید")})
+        return attrs
 
 
 class UserVerifyRegisterSerializer(serializers.Serializer):

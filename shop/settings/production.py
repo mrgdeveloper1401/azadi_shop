@@ -7,14 +7,6 @@ ALLOWED_HOSTS = ["*"]
 
 DATABASES = {
     'default': dj_database_url.config(default=config('DATABASE_URL', cast=str))
-    #     'default': {
-    #         'ENGINE': 'django.contrib.gis.db.backends.postgis',
-    #         'PORT': config("POSTDB_PORT", cast=int),
-    #         "HOST": config('POSTDB_HOST', cast=str),
-    #         "USER": config("POSTDB_USER", cast=str),
-    #         "PASSWORD": config("POSTDB_PASSWORD", cast=str),
-    #         'NAME': config("POSTDB_NAME", cast=str),
-    #     }
 }
 
 # cors allowed origin config

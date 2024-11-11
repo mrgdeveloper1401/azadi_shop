@@ -1,9 +1,4 @@
 # settings.py
-
-from django.templatetags.static import static
-from django.urls import reverse_lazy
-from django.utils.translation import gettext_lazy as _
-
 UNFOLD = {
     "SITE_TITLE": "گروه اموزشی انرژی",
     "SITE_HEADER": "گروه اموزشی انرژی",
