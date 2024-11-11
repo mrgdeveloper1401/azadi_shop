@@ -47,7 +47,7 @@ urlpatterns += api_admin
 admin.site.index_title = 'پنل مدیریت'
 
 debug_mode = config("DEBUG", default=False, cast=str)
-if debug_mode:
-    from debug_toolbar.toolbar import debug_toolbar_urls
-    urlpatterns += debug_toolbar_urls()
-    urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
+# if debug_mode:
+#     from debug_toolbar.toolbar import debug_toolbar_urls
+#     urlpatterns += debug_toolbar_urls()
+#     urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

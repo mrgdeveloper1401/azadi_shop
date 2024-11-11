@@ -58,6 +58,7 @@ class UserVerifyRegisterSerializer(serializers.Serializer):
     verify user register with mobile phone
     """
     code = serializers.CharField(max_length=8)
+
     # mobile_phone = serializers.CharField(required=False, validators=[MobileValidator()])
 
     def validate(self, attrs):
@@ -194,9 +195,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(read_only=True)
+
     class Meta:
         model = UserInfo
-        fields = ("first_name", "last_name", "email")
+        fields = ("user", "first_name", "last_name", "email")
 
 
 class SimpleUserSerializer(serializers.ModelSerializer):
