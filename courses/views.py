@@ -1,13 +1,14 @@
+from django.utils.timezone import now
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.viewsets import ModelViewSet, ReadOnlyModelViewSet
-from django.db.models import Case, When, F, DecimalField, Value, DateTimeField, Count
+from django.db.models import Case, When, F, DecimalField, Value, DateTimeField
 
 from courses.permissions import IsOwner
 from courses.paginations import CoursePagination
 from courses.serializers import CommentSerializers, CourseSerializers, CreatCommentSerializer, UpdateCommentSerializer, \
-    CategorySerializers
-from courses.models import CourseCategory, Course, Comment
+    CategorySerializers, DiscountCourseSerializer
+from courses.models import CourseCategory, Course, Comment, DiscountCourse
 from courses.filters import CourseFilter
 from users.permissions import IsVerifiedUser
 
@@ -72,3 +73,9 @@ class CommentViewSet(ModelViewSet):
 
     def get_queryset(self):
         return Comment.objects.filter(course__pk=self.kwargs['course_pk']).select_related("user", "course")
+
+
+class DiscountViewSet(ReadOnlyModelViewSet):
+    queryset = DiscountCourse.objects.filter(is_active=True, expired_date__gt=now()).select_related('course',
+                                                                                                    "course__professor")
+    serializer_class = DiscountCourseSerializer

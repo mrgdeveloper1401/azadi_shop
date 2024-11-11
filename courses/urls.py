@@ -1,10 +1,11 @@
 from django.urls import path, include
-from courses.views import CommentViewSet, CourseViewSet, CategoryViewSet
+from courses.views import CommentViewSet, CourseViewSet, CategoryViewSet, DiscountViewSet
 from rest_framework_nested.routers import DefaultRouter, NestedDefaultRouter
 
 router = DefaultRouter()
 router.register('category', CategoryViewSet, basename='category')
 router.register('course', CourseViewSet, basename='course')
+router.register('discount-course', DiscountViewSet, basename='discount-course')
 
 category_router = NestedDefaultRouter(router, 'category', lookup='category')
 category_router.register('course', CourseViewSet, basename='course')

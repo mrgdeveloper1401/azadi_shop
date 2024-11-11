@@ -1,6 +1,6 @@
 from rest_framework.serializers import ModelSerializer, SerializerMethodField, CharField, DecimalField
 
-from courses.models import Course, CourseCategory, Comment
+from courses.models import Course, CourseCategory, Comment, DiscountCourse
 from professors.models import Professor
 
 
@@ -65,3 +65,19 @@ class CategorySerializers(ModelSerializer):
     class Meta:
         model = CourseCategory
         fields = ['id', 'name', 'slug', "depth", "path", "numchild", "icon", "children"]
+
+
+class SimpleCourseSerializer(ModelSerializer):
+    professor = CharField()
+
+    class Meta:
+        model = Course
+        fields = ['id', "name", "show_image_url", "professor", "price", "calc_final_price"]
+
+
+class DiscountCourseSerializer(ModelSerializer):
+    course = SimpleCourseSerializer()
+
+    class Meta:
+        model = DiscountCourse
+        fields = '__all__'
