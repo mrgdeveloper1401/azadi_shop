@@ -9,8 +9,7 @@ from core.models import CreateMixin, UpdateMixin
 
 class CategoryNode(MP_Node):
     category_name = models.CharField(_('نام دسته بندی'), max_length=50)
-    category_slug = models.SlugField(_('اسلاگ دسته بندی'), max_length=255, allow_unicode=True, unique=True,
-                                     blank=True)
+    category_slug = models.SlugField(_('اسلاگ دسته بندی'), max_length=255, allow_unicode=True)
     node_order_by = ['category_name']
 
     def __str__(self):

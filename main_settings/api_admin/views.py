@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 
-from orders.api_admin.permissions import IsAdmin
 from users.api_admin.pagination import UserAdminPagination
+from users.api_admin.permissions import IsAdmin
 from .serializers import (AdminHeaderSiteSerializer, HomeSiteSerializer, AdminContactUsSerializer,
                           AdminTopRankStudentSerializer, AdminTopRankProfessorSerializer, AdminNewsLatterSerializer)
 from ..models import HeaderSite, HomeSite, ContactUs, TopRankStudent, TopRankProfessor, Newsletter

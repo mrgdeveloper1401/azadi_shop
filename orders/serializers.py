@@ -1,167 +1,47 @@
-from rest_framework.serializers import ModelSerializer, IntegerField, ValidationError, Serializer, CharField, \
-    SerializerMethodField
-from ulid import ULID
+from django.core.exceptions import ValidationError
 from django.db.transaction import atomic
-from datetime import datetime
+from rest_framework.serializers import ModelSerializer
 from django.utils.translation import gettext_lazy as _
 
-from users.models import User
 from courses.models import Course
-from orders.models import Cart, CartItem, OrderItem, Order
-from professors.models import Professor
+from users.models import User
+from .models import Order
 
 
-class SimpleUserSerializer(ModelSerializer):
+class OrderSerializer(ModelSerializer):
     class Meta:
-        model = User
-        fields = ['mobile_phone']
-
-
-class SimpleProfessorSerializer(ModelSerializer):
-    class Meta:
-        model = Professor
-        fields = ['get_full_name']
-
-
-class CourseCartItemSerialize(ModelSerializer):
-    """it is shows field of the course"""
-    professor = SimpleProfessorSerializer()
-    # final_price = DecimalField(max_digits=12, decimal_places=2, read_only=True)
-    discount_value = SerializerMethodField()
-
-    class Meta:
-        model = Course
-        fields = ['id', 'name', "professor", 'price', "calc_final_price", "discount_value", "show_image_url"]
-
-    def get_discount_value(self, obj):
-        return obj.price - obj.calc_final_price
-
-
-class CartItemSerializer(ModelSerializer):
-    """it is used in the address -->  url /cart/id or /cart/id/items"""
-    course = CourseCartItemSerialize(read_only=True)
-
-    class Meta:
-        model = CartItem
-        fields = ['id', 'course', 'quantity', 'item_price']
-
-
-class AddCartItemSerializer(ModelSerializer):
-    """it is used add cart_item into cart"""
-    course_id = IntegerField()
-
-    class Meta:
-        model = CartItem
-        fields = ['course_id', 'id', 'get_course_name', 'item_price', 'quantity']
-
-        extra_kwargs = {
-            'quantity': {'read_only': True},
-        }
-
-    def save(self, *args, **kwargs):
-        course_id = self.validated_data['course_id']
-        cart = Cart.objects.get(pk=self.context['cart_id'])
-        try:
-            cart_item = CartItem.objects.get(course_id=course_id, cart_id=cart.id)
-            self.instance = cart_item
-        except CartItem.DoesNotExist:
-            self.instance = CartItem.objects.create(cart_id=cart.id, course_id=course_id)
-        return self.instance
-
-    def validate_course_id(self, data):
-        try:
-            course = Course.objects.get(pk=data)
-        except Course.DoesNotExist:
-            raise ValidationError('دوره مورد نظر یافت نشد')
-        else:
-            if not course.is_active:
-                raise ValidationError('دوره مد نظر غیر فعال میباشد')
-            if not course.is_sale:
-                raise ValidationError({"message": _("دروه قابل فروش نیست")})
-        return data
-
-
-class CartSerializer(ModelSerializer):
-    cart_item = CartItemSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Cart
-        fields = ['id', 'cart_item', 'total_price']
-
-
-class OrderItemSerializer(ModelSerializer):
-    course = CourseCartItemSerialize()
-
-    class Meta:
-        model = OrderItem
+        model = Order
         fields = '__all__'
 
 
-class OrderSerialize(ModelSerializer):
-    order_item = OrderItemSerializer(many=True, read_only=True)
-    user = CharField(source="user.mobile_phone")
-
+class CreateOrderSerializer(ModelSerializer):
     class Meta:
         model = Order
-        fields = ['id', 'user', 'payment_status', 'created_at', 'order_item', 'order_total_price']
+        fields = ['user', "course"]
 
-
-class CreateOrderSerializer(Serializer):
-    cart_id = CharField()
-
-    def validate_cart_id(self, data):
-        if not Cart.objects.filter(id=data).exists():
-            raise ValidationError('سید خرید یافت نشد')
-        elif Cart.objects.filter(id=data).count() == 0:
-            raise ValidationError('سبد خرید خالی هست')
+    def validate_user(self, data):
+        try:
+            user = User.objects.get(pk=data.id)
+        except User.DoesNotExist:
+            raise ValidationError({"message": _("چنین کاربری وجود ندارد")})
+        else:
+            order = Order.objects.filter(user=user).last()
+            if order and order.payment_status == 'pending':
+                raise ValidationError({"message": _("شما از قبل یه سفارش دارید لطفا وضعیت ان را مشخص کنید")})
         return data
 
-    def generate_ulid(self):
-        return str(ULID.from_datetime(datetime.now()))
+    def validate(self, attrs):
+        course = attrs['course']
+        c = [i.id for i in course]
+        valid_course = Course.objects.filter(id__in=c, is_active=True)
+        attrs['valid_course'] = valid_course
+        return attrs
 
-    def validate(self, attr):
-        cart = Cart.objects.get(pk=attr['cart_id'])
-        order = Order.objects.filter(user_id=self.context['user_id']).last()
-        all_order = Order.objects.filter(user_id=self.context['user_id'])
-        if order and order.payment_status == "pending":
-            raise ValidationError({"message": "شما از قبل یک سفارش رو دارید, "
-                                              "ابتدا وضعیت ان را مشخص کنید"})
-        for i in cart.cart_item.all():
-            if not i.course.is_active:
-                raise ValidationError({"course": _(f"{i.course} غیر فعال میباشد ")})
-            if not i.course.is_sale:
-                raise ValidationError({"message": _(f"{i.course} قابل فروش نمیباشد ")})
-        return attr
-
-    def save(self, **kwargs):
+    def create(self, validated_data):
         with atomic():
-            self.cart_id = self.generate_ulid()
-            cart_id = self.validated_data['cart_id']
-            order = Order.objects.create(user_id=self.context['user_id'])
-            cart_item = CartItem.objects.filter(cart_id=cart_id)
-            order_item = [
-                OrderItem(
-                    order=order,
-                    course=item.course,
-                    quantity=item.quantity,
-                )
-                for item in cart_item
-            ]
-            OrderItem.objects.bulk_create(order_item)
-            Cart.objects.filter(pk=cart_id).delete()
+            total_price = sum(i.calc_final_price for i in validated_data['valid_course'])
+            course_ids = [i.id for i in validated_data['valid_course']]
+            user = validated_data['user']
+            order = Order.objects.create(user=user, total_price=total_price)
+            order.course.set(course_ids)
             return order
-
-
-class UpdateOrderItemSerializer(ModelSerializer):
-    class Meta:
-        model = Order
-        fields = ['payment_status']
-
-
-class CompleteOrderSerialize(ModelSerializer):
-    user = CharField(source='user.mobile_phone')
-    order_item = OrderItemSerializer(many=True, read_only=True)
-
-    class Meta:
-        model = Order
-        fields = ['id', "user", "payment_status", "order_item", "order_total_price", "order_number"]

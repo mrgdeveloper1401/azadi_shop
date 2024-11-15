@@ -10,7 +10,7 @@ RUN apk update && \
     apk add py3-pip && \
     apk add postgresql && \
     apk add celery && \
-    apk add nginx
+    apk add nginx && \
 
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 #COPY supervisor/conf.d /etc/supervisor/conf.d

@@ -123,7 +123,7 @@ class ForgetPasswordSerializer(serializers.Serializer):
         else:
             if user.is_deleted:
                 raise ValidationError({"message": _("کاربر گرامی حساب شما مسدود میباشد")})
-            if not user.is_active:
+            if not user.is_active or not user.is_verified:
                 raise ValidationError({"message": _("کاربر گرامی ابتدا باید حساب خود را تایید و فعال نمایید")})
         attrs['user'] = user
         return attrs

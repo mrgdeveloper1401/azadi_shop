@@ -33,7 +33,7 @@ api_admin = [
     path('user_admin/', include('users.api_admin.urls', namespace='user_admin')),
     path('professor_admin/', include('professors.api_admin.urls', namespace='professor_admin')),
     path('payment_admin/', include('payments.api_admin.urls', namespace='payment_admin')),
-    path('order_admin/', include('orders.api_admin.urls', namespace='order_admin')),
+    # path('order_admin/', include('orders.api_admin.urls', namespace='order_admin')),
     path('main_setting_admin/', include('main_settings.api_admin.urls', namespace='main_setting_admin')),
     path('image_admin/', include('images.api_admin.urls', namespace='image_admin')),
     path('course_admin/', include('courses.api_admin.urls', namespace='course_admin')),
@@ -47,7 +47,7 @@ urlpatterns += api_admin
 admin.site.index_title = 'پنل مدیریت'
 
 debug_mode = config("DEBUG", default=False, cast=str)
-# if debug_mode:
-#     from debug_toolbar.toolbar import debug_toolbar_urls
-#     urlpatterns += debug_toolbar_urls()
-#     urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)
+if debug_mode:
+    from debug_toolbar.toolbar import debug_toolbar_urls
+    urlpatterns += debug_toolbar_urls()
+    urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

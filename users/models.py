@@ -1,5 +1,5 @@
 from string import digits
-from random import choices
+from random import choices, randint
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
@@ -160,15 +160,10 @@ class Otp(CreateMixin):
             return True
         return False
 
-    @property
-    def generate_random_code(self):
-        code = ''.join(choices(digits, k=6))
-        return code
-
     def save(self, *args, **kwargs):
         self.expired_at = after_two_minute()
-        self.code = self.generate_random_code
-        send_sms(self.mobile_phone, self.code)
+        self.code = randint(1, 999999)
+        # send_sms(self.mobile_phone, self.code)
         return super().save(*args, **kwargs)
 
     class Meta:

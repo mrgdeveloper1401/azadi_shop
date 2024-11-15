@@ -9,8 +9,8 @@ from blogs.models import CategoryNode, Post
 
 # Register your models here.
 @admin.register(CategoryNode)
-class CategoryNodeAdmin(ModelAdmin, TreeAdmin, ImportExportModelAdmin):
-    form = movenodeform_factory(CategoryNode)
+class CategoryNodeAdmin(ModelAdmin, ImportExportModelAdmin):
+    # form = movenodeform_factory(CategoryNode)
     prepopulated_fields = {'category_slug': ("category_name",)}
     search_fields = ['category_name']
     list_display = ['category_name', "category_slug"]

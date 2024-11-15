@@ -1,8 +1,9 @@
 from rest_framework.mixins import ListModelMixin, RetrieveModelMixin
 from rest_framework.viewsets import GenericViewSet
 
-from orders.api_admin.permissions import IsAdmin
+
 from users.api_admin.pagination import UserAdminPagination
+from users.api_admin.permissions import IsAdmin
 from .serializers import AdminPaymentSerializer, Payment
 
 

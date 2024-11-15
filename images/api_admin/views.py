@@ -1,7 +1,7 @@
 from rest_framework.viewsets import ModelViewSet
 
-from orders.api_admin.permissions import IsAdmin
 from users.api_admin.pagination import UserAdminPagination
+from users.api_admin.permissions import IsAdmin
 from ..models import Image
 from .serializers import AdminImageSerializer
 
