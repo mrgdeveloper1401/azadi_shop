@@ -10,22 +10,10 @@ from datetime import datetime
 # Create your models here.
 class Payment(CreateMixin, UpdateMixin):
     user = models.ForeignKey(AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='payments')
-    order_number = models.CharField(max_length=20, unique=True)
     course = models.ForeignKey('courses.Course', on_delete=models.CASCADE, related_name='course_payment')
     final_price = models.DecimalField(max_digits=12, decimal_places=3)
     # discount_value = models.DecimalField(max_digits=12, decimal_places=3, blank=True, null=True)
     license_key = models.TextField(blank=True, null=True)
-
-    @property
-    def generate_order_number(self):
-        text = 'shop'
-        d = datetime.now().strftime("%Y-%m-%d")
-        res = text + '-' + d
-        return res
-
-    def save(self, *args, **kwargs):
-        self.order_number = self.generate_order_number
-        return super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'payments'

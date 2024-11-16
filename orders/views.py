@@ -2,7 +2,6 @@ from django.db.models import Q
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.generics import ListAPIView, RetrieveAPIView
-from drf_spectacular.utils import extend_schema
 
 
 from .pagination import OrdersPageNumberPagination
@@ -25,9 +24,16 @@ class OrderViewSet(ModelViewSet):
             return CreateOrderSerializer
         return super().get_serializer_class()
 
+    def get_serializer_context(self):
+        return {'request': self.request}
+
 
 class UserOrderAPIView(ListAPIView, RetrieveAPIView):
-    queryset = (Order.objects.filter(Q(payment_status='pending') | Q(payment_status="complete")).select_related('user').
-                prefetch_related('course'))
     serializer_class = OrderSerializer
     pagination_class = OrdersPageNumberPagination
+
+    def get_queryset(self):
+        user = self.request.user
+        return (Order.objects.filter(Q(payment_status='failed') | Q(payment_status="complete"), user=user)
+                .select_related('user')
+                .prefetch_related('course'))

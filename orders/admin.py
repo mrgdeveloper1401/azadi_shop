@@ -13,6 +13,7 @@ class OrderAdmin(ModelAdmin, ImportExportModelAdmin):
     list_select_related = ['user']
     filter_horizontal = ['course']
     list_filter = ['payment_status', 'created_at', 'updated_at']
+    list_editable = ['payment_status']
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

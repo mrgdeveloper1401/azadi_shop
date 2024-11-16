@@ -57,6 +57,10 @@ class User(AbstractBaseUser, CreateMixin, UpdateMixin, SoftDeleteMixin):
     def __str__(self):
         return self.mobile_phone
 
+    @property
+    def get_user_info_name(self):
+        return self.user_info.get_full_name
+
     class Meta:
         db_table = 'user'
         verbose_name = _("کاربر")

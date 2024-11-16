@@ -9,13 +9,12 @@ from shop.utils import create_token
 @receiver(post_save, sender=Order)
 def create_cart(sender, instance, created, **kwargs):
     if instance.payment_status == 'complete':
-        payment = [
-            Payment(
-                user=item.user,
-                course=item.course,
-                final_price=item.course.calc_final_price,
-                license_key=create_token(item.user.mobile_phone, item.course, item.user.user_info.get_full_name)
+        for item in instance.course.all():
+            token = create_token(mobile_phone=instance.user.mobile_phone, course=item.course_license,
+                                 name=instance.user.get_user_info_name)
+            Payment.objects.create(
+                user=instance.user,
+                course=item,
+                final_price=item.calc_final_price,
+                license_key=token['key']
             )
-            for item in instance
-        ]
-        Payment.objects.bulk_create(payment)

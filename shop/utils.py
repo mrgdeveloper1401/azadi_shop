@@ -8,7 +8,7 @@ api_key = config('SPOT_API_KEY', cast=str)
 def create_token(mobile_phone, course, name):
     params = {
         "test": True,
-        "course": course,
+        "course": [course],
         "name": name,
         "watermark": {"texts": [{"text": mobile_phone}]}
     }

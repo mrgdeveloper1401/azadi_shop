@@ -18,22 +18,22 @@ class CreateOrderSerializer(ModelSerializer):
     class Meta:
         model = Order
         fields = ['user', "course"]
+        extra_kwargs = {
+            "user": {'read_only': True},
+        }
 
     def validate_user(self, data):
+        user_id = self.context['request'].user.id
         try:
-            user = User.objects.get(pk=data.id)
+            user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
             raise ValidationError({"message": _("چنین کاربری وجود ندارد")})
-        else:
-            order = Order.objects.filter(user=user).last()
-            if order and order.payment_status == 'pending':
-                raise ValidationError({"message": _("شما از قبل یه سفارش دارید لطفا وضعیت ان را مشخص کنید")})
         return data
 
     def validate(self, attrs):
         course = attrs['course']
-        c = [i.id for i in course]
-        valid_course = Course.objects.filter(id__in=c, is_active=True)
+        courses = [i.id for i in course]
+        valid_course = Course.objects.filter(id__in=courses, is_active=True)
         attrs['valid_course'] = valid_course
         return attrs
 
@@ -41,7 +41,7 @@ class CreateOrderSerializer(ModelSerializer):
         with atomic():
             total_price = sum(i.calc_final_price for i in validated_data['valid_course'])
             course_ids = [i.id for i in validated_data['valid_course']]
-            user = validated_data['user']
+            user = self.context['request'].user
             order = Order.objects.create(user=user, total_price=total_price)
             order.course.set(course_ids)
             return order
