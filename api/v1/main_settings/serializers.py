@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from main_settings.models import ContactUs, Newsletter, HeaderSite, HomeSite, TopRankProfessor
+from main_settings.models import ContactUs, Newsletter, HeaderSite, HomeSite, TopRankProfessor, BusinessAddress, \
+    ContactUsSocial
 from shop import status_code
 
 
@@ -36,3 +37,15 @@ class TopRankProfessorSerializer(serializers.ModelSerializer):
     class Meta:
         model = TopRankProfessor
         fields = ['field_title', "full_name", "professor_image_url"]
+
+
+class BusinessAddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BusinessAddress
+        fields = ['location_lat', "location_long"]
+
+
+class ContactUsSocialSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactUsSocial
+        fields = ['social_link', "social_name"]

@@ -60,7 +60,8 @@ class ContactUs(CreateMixin, UpdateMixin, SoftDeleteMixin):
 
 
 class ContactUsSocial(CreateMixin, UpdateMixin, SoftDeleteMixin):
-    social_link = models.URLField()
+    social_name = models.CharField(max_length=50, null=True, help_text=_("نام شکبه اجتماعی"))
+    social_link = models.CharField(max_length=50, help_text=_("ادرس شبکه اجتماعی"))
     is_active = models.BooleanField(default=True)
 
     def __str__(self):

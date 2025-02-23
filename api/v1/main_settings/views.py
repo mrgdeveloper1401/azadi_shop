@@ -2,8 +2,10 @@ from django.utils.decorators import method_decorator
 from rest_framework import mixins, viewsets
 from django.views.decorators.cache import cache_page
 
-from main_settings.models import HeaderSite, ContactUs, Newsletter, HomeSite, TopRankProfessor
+from main_settings.models import HeaderSite, ContactUs, Newsletter, HomeSite, TopRankProfessor, BusinessAddress, \
+    ContactUsSocial
 from . import serializers
+from .pagination import TopTeacherPagination
 
 
 class HeaderSiteViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
@@ -38,6 +40,32 @@ class HomeSiteViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
         return response
 
 
-# class TopRankProfessorViewSet(ListModelMixin, GenericViewSet):
-#     queryset = TopRankProfessor.objects.all()
-#     serializer_class = TopRankProfessorSerializer
+class TopRankProfessorViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = TopRankProfessor.objects.filter(is_active=True).only("full_name", "professor_image", "field_title")
+    serializer_class = serializers.TopRankProfessorSerializer
+    pagination_class = TopTeacherPagination
+
+    @method_decorator(cache_page(20 * 60, key_prefix="top_teacher_cache"))
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return response
+
+
+class BusinessAddressViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = BusinessAddress.objects.filter(is_active=True).only("location_long", "location_lat")
+    serializer_class = serializers.BusinessAddressSerializer
+
+    @method_decorator(cache_page(20 * 60, key_prefix="business_address_cache"))
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return response
+
+
+class ContactUsSocialViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
+    queryset = ContactUsSocial.objects.filter(is_active=True).only("social_link", "social_name")
+    serializer_class = serializers.ContactUsSocialSerializer
+
+    @method_decorator(cache_page(20 * 60, key_prefix="social_cache"))
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return response

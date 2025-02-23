@@ -2,7 +2,8 @@ from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from unfold.admin import ModelAdmin
 
-from main_settings.models import HeaderSite, Newsletter, ContactUs, HomeSite, TopRankProfessor
+from main_settings.models import HeaderSite, Newsletter, ContactUs, HomeSite, TopRankProfessor, BusinessAddress, \
+    ContactUsSocial
 
 
 # Register your models here.
@@ -39,7 +40,6 @@ class ContactUsAdmin(ModelAdmin, ImportExportModelAdmin):
 
 @admin.register(HomeSite)
 class HomeSiteAdmin(ModelAdmin, ImportExportModelAdmin):
-    # filter_horizontal = ['slider_image', "slider_professor_image", "awards_image", "team_image"]
     # list_display = ['header_phone_number', "email", "is_active", "created_at", "updated_at"]
     # list_editable = ['is_active']
     # list_filter = ['created_at', 'updated_at']
@@ -51,3 +51,17 @@ class HomeSiteAdmin(ModelAdmin, ImportExportModelAdmin):
 class TopRankProfessorAdmin(ModelAdmin, ImportExportModelAdmin):
     list_display = ['full_name', "field_title"]
     search_fields = ['full_name', "field_title"]
+
+
+@admin.register(BusinessAddress)
+class BusinessAddressAdmin(admin.ModelAdmin):
+    list_display = ['location_lat', 'location_long', "is_active"]
+    list_filter = ['is_active']
+    list_per_page = 20
+
+
+@admin.register(ContactUsSocial)
+class ContactUsSocialAdmin(admin.ModelAdmin):
+    list_per_page = 20
+    list_display = ['social_name', "is_active"]
+    list_filter = ['is_active']
