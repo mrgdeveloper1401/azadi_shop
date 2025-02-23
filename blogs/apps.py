@@ -6,3 +6,6 @@ class BlogsConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "blogs"
     verbose_name = _("وبلاگ")
+
+    def ready(self):
+        from . import signals

@@ -14,8 +14,8 @@ from django.core.asgi import get_asgi_application
 debug_mode = config('DEBUG', default=True, cast=bool)
 
 if debug_mode:
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.development')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.envs.development')
 if not debug_mode:
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.production')
+    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.envs.production')
 
 application = get_asgi_application()

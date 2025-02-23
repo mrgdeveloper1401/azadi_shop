@@ -7,12 +7,13 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path("ckeditor5/", include('django_ckeditor_5.urls')),
     # path("api_auth/", include("users.urls", namespace="users")),
     # path("api_course/", include("courses.urls", namespace="course")),
     # path("api_payment/", include("payments.urls", namespace="payments")),
     # path("api_order/", include("orders.urls", namespace="orders")),
     path('api/main_settings/', include('api.v1.main_settings.urls', namespace='v1_main_settings')),
-    # path('api_blog/', include("blogs.urls", namespace='blogs')),
+    path('api/blog/', include("api.v1.blogs.urls", namespace='v1_blogs')),
     # path('images/', include('images.urls', namespace='images')),
     # swagger ui
     # path('api/schema/', SpectacularAPIView.as_view(), name='schema'),

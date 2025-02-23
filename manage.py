@@ -10,9 +10,9 @@ debug_mode = config("DEBUG", default=True, cast=bool)
 def main():
     """Run administrative tasks."""
     if debug_mode:
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.development')
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.envs.development')
     if not debug_mode:
-        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.production')
+        os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.envs.production')
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

@@ -2,10 +2,8 @@ from pathlib import Path
 from datetime import timedelta
 from decouple import config
 import os
-from django.utils import timezone
 
-from shop.unfold_settings import UNFOLD
-
+from shop.ckeditor_config import CKEDITOR_5_CONFIGS, customColorPalette
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -33,20 +31,20 @@ THIRD_PARTY_PACKAGE = [
     "storages",
     "corsheaders",
     "import_export",
+    "django_ckeditor_5"
 ]
 
 INSTALLED_APPS = [
-    "unfold",
-    "unfold.contrib.filters",
-    "unfold.contrib.inlines",
-    "unfold.contrib.forms",
-    "unfold.contrib.import_export",
+    # "unfold",
+    # "unfold.contrib.filters",
+    # "unfold.contrib.inlines",
+    # "unfold.contrib.forms",
+    # "unfold.contrib.import_export",
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    "whitenoise.runserver_nostatic",
     'django.contrib.staticfiles',
     # 'django.contrib.gis',
     *THIRD_PARTY_APPS,
@@ -102,7 +100,7 @@ AUTH_PASSWORD_VALIDATORS = [
     # }
 ]
 
-LANGUAGE_CODE = 'fa-ir'
+LANGUAGE_CODE = 'en-us'
 
 TIME_ZONE = 'Asia/Tehran'
 
@@ -115,11 +113,11 @@ USE_L10N = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = config("STATIC_URL", cast=str)
 STATIC_ROOT = os.path.join(BASE_DIR / 'staticfiles')
 
-MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = config("MEDIA_URL", cast=str)
+MEDIA_ROOT = os.path.join(config("MEDIA_ROOT", cast=str), 'media')
 
 # user
 AUTH_USER_MODEL = 'users.User'
@@ -141,10 +139,9 @@ STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3.S3Storage",
     },
-    'staticfiles': {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        # "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
-    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage",
+    }
 }
 
 # rest framework config
@@ -177,20 +174,6 @@ AWS_S3_USE_SSL = True
 AWS_S3_SECURE_URLS = True
 AWS_DEFAULT_ACL = "public-read"
 
-CKEDITOR_ALLOW_ALL_FILE_TYPES = True
-CKEDITOR_MAX_FILE_SIZE = 5
-CKEDITOR_FILE_UPLOAD_PERMISSION = "staff"
-CKEDITOR_UPLOAD_PATH = "uploads/"
-CKEDITOR_RESTRICT_BY_USER = True
-CKEDITOR_IMAGE_BACKEND = "pillow"
-CKEDITOR_STORAGE_BACKEND = STORAGES['default']['BACKEND']
-# CKEDITOR_BASEPATH = os.path.join(BASE_DIR, 'static', 'ckeditor')
-CKEDITOR_BROWSE_SHOW_DIRS = True
-# CKEDITOR_RESTRICT_BY_DATE = True
-CKEDITOR_THUMBNAIL_SIZE = (100, 100)
-CKEDITOR_IMAGE_QUALITY = 100
-
-
 # django admin chart config
 # ADMIN_CHARTS_NVD3_JS_PATH = 'bow/nvd3/build/nv.d3.js'
 # ADMIN_CHARTS_NVD3_CSS_PATH = 'bow/nvd3/build/nv.d3.css'
@@ -211,17 +194,8 @@ CKEDITOR_IMAGE_QUALITY = 100
 # JET_TOKEN = config("JET_TOKEN", cast=str)
 
 
-# cache
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://localhost:6379/1",
-    }
-}
-
-
 # logging
-log_dir = os.path.join(BASE_DIR / 'general_log_django', timezone.now().strftime("%Y-%m-%d"))
+log_dir = os.path.join(BASE_DIR / 'general_log_django')
 os.makedirs(log_dir, exist_ok=True)
 LOGGING = {
     "version": 1,
@@ -277,3 +251,7 @@ LOGGING = {
         }
     }
 }
+
+# ckeditor 5
+CKEDITOR_5_FILE_STORAGE = "storages.backends.s3.S3Storage"
+CKEDITOR_5_FILE_UPLOAD_PERMISSION = "staff"

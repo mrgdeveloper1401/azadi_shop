@@ -4,7 +4,6 @@ ALLOWED_HOSTS = []
 
 SECRET_KEY = config('SECRET_KEY', cast=str)
 
-
 # debug toolbar
 INTERNAL_IPS = [
     # ...
@@ -26,14 +25,20 @@ DATABASES = {
 INSTALLED_APPS += [
     # "django_logging",
     'debug_toolbar',
-    # "django_ckeditor_5",
 ]
 MIDDLEWARE += [
     # debug toolbar
     "debug_toolbar.middleware.DebugToolbarMiddleware",
-    # whitenoise
-    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 # simple jwt config
 SIMPLE_JWT['SIGNING_KEY'] = config("SECRET_KEY", cast=str)
+
+
+# cache
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost:6379/1",
+    }
+}

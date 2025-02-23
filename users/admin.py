@@ -1,7 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.forms import AdminUserCreationForm
 from django.contrib.auth.models import Group
-from unfold.admin import ModelAdmin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from django.utils.translation import gettext_lazy as _
 from django.contrib.admin import SimpleListFilter
@@ -34,7 +33,7 @@ class IsActiveUserInfo(SimpleListFilter):
 
 
 @admin.register(User)
-class UserAdmin(BaseUserAdmin, ModelAdmin, ImportExportModelAdmin):
+class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
     form = UserChangeForm
     add_form = AdminUserCreationForm
     change_password_form = AdminPasswordChangeForm
@@ -74,7 +73,7 @@ class UserAdmin(BaseUserAdmin, ModelAdmin, ImportExportModelAdmin):
 
 
 @admin.register(UserInfo)
-class UserInfoAdmin(ModelAdmin, ImportExportModelAdmin):
+class UserInfoAdmin(ImportExportModelAdmin):
     list_display = ["id", 'user', 'email', 'first_name', 'last_name', 'get_active', "get_is_verified",
                     "created_at", "updated_at", "is_deleted", "deleted_at"]
     list_select_related = ['user']
@@ -87,14 +86,14 @@ class UserInfoAdmin(ModelAdmin, ImportExportModelAdmin):
 
 
 @admin.register(Otp)
-class OtpAdmin(ModelAdmin):
+class OtpAdmin(admin.ModelAdmin):
     list_display = ['mobile_phone', 'id', 'code', 'created_at', 'expired_at']
     search_fields = ['mobile_phone']
     list_filter = ["created_at"]
 
 
 @admin.register(GradeGpa)
-class GradeGpaAdmin(ModelAdmin, ImportExportModelAdmin):
+class GradeGpaAdmin(ImportExportModelAdmin):
     list_display = ['user', 'id', "grade", "gpa", "created_at", "updated_at"]
     list_select_related = ['user', "grade"]
     search_fields = ['user__mobile_phone']
@@ -104,10 +103,10 @@ class GradeGpaAdmin(ModelAdmin, ImportExportModelAdmin):
 
 
 @admin.register(Grade)
-class GradeAdmin(ModelAdmin, ImportExportModelAdmin):
+class GradeAdmin(ImportExportModelAdmin):
     pass
 
 
 @admin.register(Major)
-class MajorAdmin(ModelAdmin, ImportExportModelAdmin):
+class MajorAdmin(ImportExportModelAdmin):
     pass

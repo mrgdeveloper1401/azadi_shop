@@ -24,6 +24,6 @@ requests==2.32.3
 hiredis==3.0.0
 redis==5.2.0
 pyzstd==0.16.1
-django-ckeditor==6.7.1
 django-unfold==0.40.0
 django-import-export==4.3.6
+django-ckeditor-5==0.2.17

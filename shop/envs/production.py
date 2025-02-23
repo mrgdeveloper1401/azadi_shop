@@ -11,6 +11,11 @@ DATABASES = {
 
 MIDDLEWARE.insert(0, 'corsheaders.middleware.CorsMiddleware',)
 
+MIDDLEWARE += [
+    # whitenoise
+    "whitenoise.middleware.WhiteNoiseMiddleware",
+]
+
 # cors allowed origin config
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
@@ -52,3 +57,5 @@ MIDDLEWARE += [
     # cors-header
     "corsheaders.middleware.CorsMiddleware",
 ]
+
+STORAGES['staticfiles']['BACKEND'] = "whitenoise.storage.CompressedManifestStaticFilesStorage"

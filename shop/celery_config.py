@@ -6,9 +6,9 @@ from os import environ
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 if DEBUG:
-    environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.development')
+    environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.envs.development')
 if not DEBUG:
-    environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.settings.production')
+    environ.setdefault('DJANGO_SETTINGS_MODULE', 'shop.envs.production')
 
 app = Celery('shop')
 app.config_from_object('shop.celery_config_redis')
