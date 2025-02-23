@@ -7,20 +7,20 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("api_auth/", include("users.urls", namespace="users")),
-    path("api_course/", include("courses.urls", namespace="course")),
-    path("api_payment/", include("payments.urls", namespace="payments")),
-    path("api_order/", include("orders.urls", namespace="orders")),
-    path('api_main_settings/', include('main_settings.urls', namespace='main_settings')),
-    path('api_blog/', include("blogs.urls", namespace='blogs')),
+    # path("api_auth/", include("users.urls", namespace="users")),
+    # path("api_course/", include("courses.urls", namespace="course")),
+    # path("api_payment/", include("payments.urls", namespace="payments")),
+    # path("api_order/", include("orders.urls", namespace="orders")),
+    path('api/main_settings/', include('api.v1.main_settings.urls', namespace='v1_main_settings')),
+    # path('api_blog/', include("blogs.urls", namespace='blogs')),
     # path('images/', include('images.urls', namespace='images')),
     # swagger ui
-    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    # path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    # path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    # path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
     # api auth
-    path('api-auth/', include('rest_framework.urls')),
+    # path('api-auth/', include('rest_framework.urls')),
     # django ckeditor
     # path('ckeditor/', include('ckeditor_uploader.urls')),
 
@@ -30,14 +30,14 @@ urlpatterns = [
 ]
 
 api_admin = [
-    path('user_admin/', include('users.api_admin.urls', namespace='user_admin')),
-    path('professor_admin/', include('professors.api_admin.urls', namespace='professor_admin')),
-    path('payment_admin/', include('payments.api_admin.urls', namespace='payment_admin')),
+    # path('user_admin/', include('users.api_admin.urls', namespace='user_admin')),
+    # path('professor_admin/', include('professors.api_admin.urls', namespace='professor_admin')),
+    # path('payment_admin/', include('payments.api_admin.urls', namespace='payment_admin')),
     # path('order_admin/', include('orders.api_admin.urls', namespace='order_admin')),
-    path('main_setting_admin/', include('main_settings.api_admin.urls', namespace='main_setting_admin')),
-    path('image_admin/', include('images.api_admin.urls', namespace='image_admin')),
-    path('course_admin/', include('courses.api_admin.urls', namespace='course_admin')),
-    path('blog_admin/', include('blogs.api_admin.urls', namespace='blog_admin'))
+    # path('main_setting_admin/', include('main_settings.api_admin.urls', namespace='main_setting_admin')),
+    # path('image_admin/', include('images.api_admin.urls', namespace='image_admin')),
+    # path('course_admin/', include('courses.api_admin.urls', namespace='course_admin')),
+    # path('blog_admin/', include('blogs.api_admin.urls', namespace='blog_admin'))
 ]
 
 # api admin

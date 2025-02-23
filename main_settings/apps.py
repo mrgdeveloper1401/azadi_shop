@@ -6,3 +6,6 @@ class MainSettingsConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
     name = "main_settings"
     verbose_name = _("تنظیمات سایت")
+
+    def ready(self):
+        from . import signals

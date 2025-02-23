@@ -2,16 +2,13 @@ from pathlib import Path
 from datetime import timedelta
 from decouple import config
 import os
+from django.utils import timezone
 
 from shop.unfold_settings import UNFOLD
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
-
-# SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
 
 THIRD_PARTY_APPS = [
@@ -31,17 +28,11 @@ THIRD_PARTY_PACKAGE = [
     "rest_framework",
     'rest_framework_simplejwt',
     'drf_spectacular',
-    # "rest_framework_simplejwt.token_blacklist",
     "treebeard",
     "django_filters",
-    # "django_celery_results",
-    # "django_celery_beat",
     "storages",
     "corsheaders",
-    # 'ckeditor',
-    # "ckeditor_uploader",
     "import_export",
-    # "jet_django"
 ]
 
 INSTALLED_APPS = [
@@ -64,11 +55,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    # cors middleware
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    # whitenoise
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -82,7 +69,7 @@ ROOT_URLCONF = 'shop.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -97,9 +84,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'shop.wsgi.application'
 
-# Password validation
-# https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
-
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -113,13 +97,10 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
-    {
-        'NAME': 'shop.uppercase_password_validator.UppercasePasswordValidator',
-    }
+    # {
+    #     'NAME': 'shop.uppercase_password_validator.UppercasePasswordValidator',
+    # }
 ]
-
-# Internationalization
-# https://docs.djangoproject.com/en/4.2/topics/i18n/
 
 LANGUAGE_CODE = 'fa-ir'
 
@@ -172,14 +153,6 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    # 'DEFAULT_THROTTLE_CLASSES': [
-    #     'rest_framework.throttling.AnonRateThrottle',
-    #     'rest_framework.throttling.UserRateThrottle'
-    # ],
-    # 'DEFAULT_THROTTLE_RATES': {
-    #     'anon': '10/minute',
-    #     'user': '30/minute'
-    # }
 }
 
 # simple jwt config
@@ -192,13 +165,6 @@ SIMPLE_JWT = {
     "UPDATE_LAST_LOGIN": True,
 }
 
-# liara config
-# S3 Settings
-# endpoint_url = config("ARVAN_ENDPOINT", cast=str)
-# ARVAN_BUCKET_NAME = config("ARVAN_BUCKET_NAME", cast=str)
-# aws_access_key_id = config("ARVAN_ACCESS_KEY", cast=str)
-# aws_secret_access_key = config("ARVAN_SECRET_KEY", cast=str)
-
 # S3 Settings Based on AWS (optional)
 AWS_ACCESS_KEY_ID = config("ARVAN_ACCESS_KEY", cast=str)
 AWS_SECRET_ACCESS_KEY = config("ARVAN_SECRET_KEY", cast=str)
@@ -207,18 +173,9 @@ AWS_S3_ENDPOINT_URL = config("ARVAN_ENDPOINT", cast=str)
 AWS_S3_REGION_NAME = 'us-east-1'
 AWS_S3_FILE_OVERWRITE = False
 AWS_SERVICE_NAME = 's3'
-# AWS_QUERYSTRING_AUTH = False
-# AWS_S3_VERIFY = False
-# for upload object storage
+AWS_S3_USE_SSL = True
 AWS_S3_SECURE_URLS = True
-
-# ckeditor
-# CKEDITOR_CONFIGS = {
-#     'default': {
-#         'toolbar': 'full',
-#         'removePlugins': "exportpdf",
-#     },
-# }
+AWS_DEFAULT_ACL = "public-read"
 
 CKEDITOR_ALLOW_ALL_FILE_TYPES = True
 CKEDITOR_MAX_FILE_SIZE = 5
@@ -232,6 +189,7 @@ CKEDITOR_BROWSE_SHOW_DIRS = True
 # CKEDITOR_RESTRICT_BY_DATE = True
 CKEDITOR_THUMBNAIL_SIZE = (100, 100)
 CKEDITOR_IMAGE_QUALITY = 100
+
 
 # django admin chart config
 # ADMIN_CHARTS_NVD3_JS_PATH = 'bow/nvd3/build/nv.d3.js'
@@ -251,3 +209,71 @@ CKEDITOR_IMAGE_QUALITY = 100
 # jet admin token
 # JET_PROJECT = 'raminazadi_shop'
 # JET_TOKEN = config("JET_TOKEN", cast=str)
+
+
+# cache
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://localhost:6379/1",
+    }
+}
+
+
+# logging
+log_dir = os.path.join(BASE_DIR / 'general_log_django', timezone.now().strftime("%Y-%m-%d"))
+os.makedirs(log_dir, exist_ok=True)
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "color": {
+            "()": "colorlog.ColoredFormatter",
+            "format": "%(log_color)s%(levelname)s %(reset)s%(asctime)s %(module)s %(process)d %(thread)d %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
+        },
+    },
+    'filters': {
+        'require_debug_true': {
+            "()": "django.utils.log.RequireDebugTrue",
+        },
+    },
+    "handlers": {
+        "console": {
+            "level": "DEBUG",
+            "class": "logging.StreamHandler",
+            "formatter": "color",
+            "filters": ["require_debug_true"],
+        },
+        "info_file": {
+            "level": "INFO",
+            "class": "logging.FileHandler",
+            "formatter": "color",
+            "filename": os.path.join(BASE_DIR / log_dir / 'info_file.log')
+        },
+        "error_file": {
+            "level": "ERROR",
+            "class": "logging.FileHandler",
+            "formatter": "color",
+            "filename": os.path.join(BASE_DIR / log_dir / 'error_file.log')
+        },
+        "warning_file": {
+            "level": "WARN",
+            "class": "logging.FileHandler",
+            "formatter": "color",
+            "filename": os.path.join(BASE_DIR / log_dir / 'warning_file.log')
+        },
+        "critical_file": {
+            "level": "CRITICAL",
+            "class": "logging.FileHandler",
+            "formatter": "color",
+            "filename": os.path.join(BASE_DIR / log_dir / 'critical_file.log')
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "info_file", "warning_file", "critical_file", "error_file"],
+            'propagate': True,
+        }
+    }
+}

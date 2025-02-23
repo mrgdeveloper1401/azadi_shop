@@ -2,7 +2,7 @@ from django.contrib import admin
 from import_export.admin import ImportExportModelAdmin
 from unfold.admin import ModelAdmin
 
-from main_settings.models import HeaderSite, Newsletter, ContactUs, TopRankStudent, HomeSite, TopRankProfessor
+from main_settings.models import HeaderSite, Newsletter, ContactUs, HomeSite, TopRankProfessor
 
 
 # Register your models here.
@@ -13,6 +13,10 @@ class HeaderSiteAdmin(ModelAdmin, ImportExportModelAdmin):
     list_filter = ['is_active']
     search_fields = ['title']
     list_per_page = 20
+
+    def get_queryset(self, request):
+        q = super().get_queryset(request).only("title", "is_active")
+        return q
 
 
 @admin.register(Newsletter)
@@ -33,32 +37,14 @@ class ContactUsAdmin(ModelAdmin, ImportExportModelAdmin):
     list_per_page = 30
 
 
-# @admin.register(Services)
-# class ServicesAdmin(ModelAdmin, ImportExportModelAdmin):
-#     list_display = ['title', "services_image", "is_active"]
-#     list_editable = ['is_active']
-#     search_fields = ['title']
-#     list_per_page = 30
-#     list_display_links = ['services_image']
-#     list_filter = ['is_active', "created_at", "updated_at"]
-#     raw_id_fields = ['services_image']
-
-
-@admin.register(TopRankStudent)
-class TopRankAdmin(ModelAdmin, ImportExportModelAdmin):
-    list_filter = ['is_active', "created_at", "updated_at"]
-    search_fields = ['first_name', "last_name", "fields"]
-    list_display = ['first_name', "last_name", "is_active", "fields"]
-    list_editable = ['is_active']
-
-
 @admin.register(HomeSite)
 class HomeSiteAdmin(ModelAdmin, ImportExportModelAdmin):
-    filter_horizontal = ['slider_image', "slider_professor_image", "awards_image", "team_image"]
-    list_display = ['header_phone_number', "email", "is_active", "created_at", "updated_at"]
-    list_editable = ['is_active']
-    list_filter = ['created_at', 'updated_at']
-    list_display_links = ['header_phone_number', "email"]
+    # filter_horizontal = ['slider_image', "slider_professor_image", "awards_image", "team_image"]
+    # list_display = ['header_phone_number', "email", "is_active", "created_at", "updated_at"]
+    # list_editable = ['is_active']
+    # list_filter = ['created_at', 'updated_at']
+    # list_display_links = ['header_phone_number', "email"]
+    pass
 
 
 @admin.register(TopRankProfessor)

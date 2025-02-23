@@ -10,7 +10,7 @@ RUN apk update && \
     apk add py3-pip && \
     apk add postgresql && \
     apk add celery && \
-    apk add nginx && \
+    apk add nginx
 
 COPY ./nginx/nginx.conf /etc/nginx/nginx.conf
 #COPY supervisor/conf.d /etc/supervisor/conf.d
@@ -19,8 +19,8 @@ RUN adduser -D -H azadi
 RUN pip install --upgrade pip
 RUN pip install -r /home/app/requirements/production.txt
 RUN python /home/app/manage.py collectstatic --settings=shop.settings.production
-RUN #chown -R azadi:azadi /home/app/static
-RUN #chmod +x /home/app/start.sh
+#RUN chown -R azadi:azadi /home/app/static
+#RUN chmod +x /home/app/start.sh
 ENV PYTHONDDONOTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 

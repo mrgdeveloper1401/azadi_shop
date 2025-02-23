@@ -1,6 +1,8 @@
 from decouple import config
 from requests import post
 
+from shop.status_code import MAX_UPLOADING_SIZE
+
 base_url = 'https://panel.spotplayer.ir/license/edit/'
 api_key = config('SPOT_API_KEY', cast=str)
 
@@ -47,4 +49,8 @@ def send_sms(mobile_phone, code):
         raise e
 
 
-# print(send_sms("09210514437", "1234"))
+def image_upload_validator(value):
+    max_image_size = 1 * 1024 * 1024
+    if value.size > max_image_size:
+        raise MAX_UPLOADING_SIZE
+    return value
