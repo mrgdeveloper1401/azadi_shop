@@ -137,8 +137,7 @@ GitHub.sublime-settings
 !.vscode/extensions.json 
 .history
 .idea
-azadi-shop.zip
-./staticfiles
+azadi_shop.zip
 general_log_django
 logs
 test-azadi-shop.zip
@@ -148,3 +147,4 @@ templates
 
 jet_bridge_store
 celerybeat-schedule
+staticfiles

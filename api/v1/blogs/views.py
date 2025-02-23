@@ -43,9 +43,12 @@ class PostViewSet(ReadOnlyModelViewSet):
             "is_publish", "view_number"
         ))
 
+    @method_decorator(cache_page(20 * 60, key_prefix="post_list_cache"))
+    def list(self, request, *args, **kwargs):
+        response = super().list(request, *args, **kwargs)
+        return response
 
-class ListPostViewSet(mixins.ListModelMixin, GenericViewSet):
-    queryset = Post.objects.filter(is_publish=True).prefetch_related(
-        "category"
-    ).defer("is_deleted", "deleted_at").select_related("author").select_related("author")
-    serializer_class = serializers.PostSerializer
+    @method_decorator(cache_page(20 * 60, key_prefix="post_retrieve_cache"))
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        return response
