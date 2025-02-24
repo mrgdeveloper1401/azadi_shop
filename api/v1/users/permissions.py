@@ -13,3 +13,8 @@ class IsVerifiedUser(BasePermission):
         if not request.user.is_verified:
             raise PermissionDenied("you must verify account")
         return True
+
+
+class NotAuthenticated(BasePermission):
+    def has_permission(self, request, view):
+        return not request.user.is_authenticated

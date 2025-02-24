@@ -7,8 +7,8 @@ from images.models import Image
 
 
 @admin.register(Image)
-class ImageAdmin(ModelAdmin, ImportExportModelAdmin):
-    list_display = ["id", 'title', "file_size"]
+class ImageAdmin(ImportExportModelAdmin):
+    list_display = ["id", 'title', "file_size", "created_at"]
     list_display_links = ['id', "title"]
     search_fields = ['title']
     list_per_page = 100

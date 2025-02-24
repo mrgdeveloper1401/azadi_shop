@@ -1,5 +1,7 @@
 from decouple import config
-from requests import post
+import aiohttp
+import asyncio
+import requests
 
 from shop.status_code import MAX_UPLOADING_SIZE
 
@@ -19,7 +21,7 @@ def create_token(mobile_phone, course, name):
         '$LEVEL': '-1',
     }
     try:
-        response = post(base_url, json=params, headers=headers)
+        response = requests.post(base_url, json=params, headers=headers)
         response.raise_for_status()
         return response.json()
     except Exception as e:
@@ -27,7 +29,7 @@ def create_token(mobile_phone, course, name):
         raise e
 
 
-def send_sms(mobile_phone, code):
+async def send_sms(mobile_phone, code):
     u = "https://www.payamak.vip/api/v1/RestWebApi/"
     url = u + "SendBatchSms"
     username = config("SMS_USERNAME", cast=str)
@@ -43,8 +45,9 @@ def send_sms(mobile_phone, code):
         "sendDelay": 0
     }
     try:
-        response = post(url, json=data, headers={'Content-Type': 'application/json'})
-        return response
+        async with aiohttp.ClientSession() as session:
+            async with session.post(url, json=data, headers={'Content-Type': 'application/json'}) as response:
+                return await response.json()
     except Exception as e:
         raise e
 

@@ -23,9 +23,6 @@ class Image(CreateMixin, UpdateMixin):
             hasher.update(c)
         return hasher.hexdigest()
 
-    def __str__(self):
-        return self.title
-
     @property
     def image_url(self):
         return self.image.url

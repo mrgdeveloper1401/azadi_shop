@@ -49,6 +49,8 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # # simple jwt config
 SIMPLE_JWT['SIGNING_KEY'] = config('DEPLOY_SECRET_KEY', cast=str)
+SIMPLE_JWT['AUTH_COOKIE_SECURE'] = True,  # Whether the auth cookies should be secure (https:// only).
+SIMPLE_JWT['AUTH_COOKIE_DOMAIN'] = None,     # A string like "example.com", or None for standard domain cookie.]
 
 MIDDLEWARE += [
     # "django.middleware.cache.UpdateCacheMiddleware",

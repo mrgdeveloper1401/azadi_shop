@@ -8,4 +8,4 @@ class UsersConfig(AppConfig):
     verbose_name = _("کاربر")
 
     def ready(self):
-        import users.signals
+        from . import signals

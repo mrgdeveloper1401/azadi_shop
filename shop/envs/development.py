@@ -33,7 +33,8 @@ MIDDLEWARE += [
 
 # simple jwt config
 SIMPLE_JWT['SIGNING_KEY'] = config("SECRET_KEY", cast=str)
-
+SIMPLE_JWT['AUTH_COOKIE_SECURE'] = False,  # Whether the auth cookies should be secure (https:// only).
+SIMPLE_JWT['AUTH_COOKIE_DOMAIN'] = None,     # A string like "example.com", or None for standard domain cookie.]
 
 # cache
 CACHES = {

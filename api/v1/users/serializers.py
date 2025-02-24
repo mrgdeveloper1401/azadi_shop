@@ -4,87 +4,86 @@ from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from images.models import Image
+from shop import status_code
 from users.models import User, Otp, UserInfo, GradeGpa, Grade
 from users.validators import MobileValidator
 
 
-class UserRegisterSerializer(serializers.Serializer):
+class UserRegisterSerializer(serializers.ModelSerializer):
     """
     user registration serializer
     """
-    mobile_phone = serializers.CharField(max_length=11, validators=[MobileValidator()])
-    password = serializers.CharField(write_only=True, min_length=8,
-                                     style={'input_type': 'password'})
-    confirm_password = serializers.CharField(write_only=True,
-                                             min_length=8,
-                                             style={'input_type': 'password'})
+    confirm_password = serializers.CharField(write_only=True, style={"input_type": "password"})
+
+    class Meta:
+        model = User
+        fields = ['mobile_phone', "password", "confirm_password"]
+        extra_kwargs = {
+            "password": {"write_only": True},
+        }
 
     def create(self, validated_data):
         del validated_data['confirm_password']
-        user_account = User.objects.filter(mobile_phone=validated_data['mobile_phone']).last()
-        if user_account:
-            if user_account.is_deleted:
-                raise ValidationError({"message": _("کاربر گرامی دسترسی حساب شما مسدود میباشد!")})
-            Otp.objects.get_or_create(mobile_phone=validated_data['mobile_phone'])
-            return user_account
-        else:
-            user, created = User.objects.get_or_create(**validated_data)
-            user.set_password(validated_data['password'])
-            user.save()
-            return user
+        return User.objects.create(**validated_data)
 
     def validate(self, attrs):
-        if attrs['password'] != attrs['confirm_password']:
-            raise serializers.ValidationError(_("رمز عبور باید یکسان باشد"))
-        try:
-            validate_password(attrs['password'])
-        except ValidationError as e:
-            return ValidationError({'message': e})
-        try:
-            otp = Otp.objects.get(mobile_phone=attrs['mobile_phone'])
-        except Otp.DoesNotExist:
-            pass
-        else:
-            if otp:
-                if otp.is_expired():
-                    otp.delete()
-                else:
-                    raise ValidationError({"message": _("شما از قبل یه درخواست رو دارید لطفا به مدت 2 دقیقه صبر کنید")})
+        mobile_phone = attrs.get('mobile_phone')
+        password = attrs.get("password")
+        confirm_password = attrs.get('confirm_password')
+
+        get_user = User.objects.filter(mobile_phone=mobile_phone)
+        if get_user.exists():
+            raise status_code.OBJECT_ALREADY_EXISTS
+        if password != confirm_password:
+            raise status_code.NOT_EQUAL_FIELD
         return attrs
 
+    def validate_password(self, data):
+        try:
+            validate_password(data)
+        except Exception as e:
+            raise e
+        return data
 
-class UserVerifyRegisterSerializer(serializers.Serializer):
-    """
-    verify user register with mobile phone
-    """
-    code = serializers.CharField(max_length=8)
 
-    # mobile_phone = serializers.CharField(required=False, validators=[MobileValidator()])
+class UserLoginByPhoneSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Otp
+        fields = ['mobile_phone']
+
+    def validate_mobile_phone(self, data):
+        get_user = User.objects.filter(mobile_phone=data)
+        get_otp_code = Otp.objects.filter(mobile_phone=data)
+        if not get_user.exists():
+            raise status_code.OBJECT_NOT_FOUND
+        if not get_otp_code.last().is_expired():
+            raise status_code.WAITING
+        return data
+
+    def create(self, validated_data):
+        user_ip = self.context['request'].META['REMOTE_ADDR']
+        return Otp.objects.create(mobile_phone=validated_data['mobile_phone'], user_ip_address=user_ip)
+
+    def to_representation(self, instance):
+        return {'message': _("یک کد تایید برای شما ارسال شد")}
+
+
+class VerifyOtpCodeSerializer(serializers.Serializer):
+    code = serializers.IntegerField()
 
     def validate(self, attrs):
-        try:
-            get_code = Otp.objects.get(code=attrs['code'])
-        except Exception:
-            raise ValidationError({'message': "کد اشتباه هست"})
-        else:
-            if get_code.is_expired():
-                get_code.delete_if_expired()
-                raise ValidationError({'message': _('کد شما منقضی شده لظفا دوباره درخواست خود را ارسال کنید')})
-        attrs['user'] = get_code
-        return attrs
-
-    def save(self, **kwargs):
-        user = User.objects.get(mobile_phone=self.validated_data['user'])
-        if not user.is_active or not user.is_verified:
-            user.is_active = True
-            user.is_verified = True
-            user.save()
-        Otp.objects.get(code=self.validated_data['code']).delete()
+        user_ip = self.context['request'].META['REMOTE_ADDR']
+        get_otp_code = Otp.objects.filter(code=attrs.get('code'), user_ip_address=user_ip)
+        if not get_otp_code.exists():
+            raise status_code.WRONG_DATA
+        if get_otp_code.last().is_expired():
+            get_otp_code.delete()
+            raise serializers.ValidationError({"message": _("کد شما منقضی شده هست لطفا دوباره درخواست کنید")})
+        user = User.objects.filter(mobile_phone=get_otp_code.first().mobile_phone).first()
         refresh = RefreshToken.for_user(user)
-        return {
-            'refresh': str(refresh),
-            'access': str(refresh.access_token)
-        }
+        attrs['refresh'] = refresh
+        return attrs
 
 
 class ResetPasswordSerializer(serializers.Serializer):
@@ -195,11 +194,25 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class ProfileSerializer(serializers.ModelSerializer):
-    user = serializers.CharField(read_only=True)
+    user_info_image = serializers.ImageField(required=False)
+    user_info_image_url = serializers.SerializerMethodField()
 
     class Meta:
         model = UserInfo
-        fields = ("user", "first_name", "last_name", "email")
+        exclude = ['is_deleted', "deleted_at", "user"]
+
+    def update(self, instance, validated_data):
+        get_user_info_image = validated_data.pop('user_info_image', None)
+        if get_user_info_image:
+            image = Image.objects.create(image=get_user_info_image)
+            instance.user_info_image = image
+        for i, j in validated_data.items():
+            setattr(instance, i, j)
+        instance.save()
+        return instance
+
+    def get_user_info_image_url(self, obj):
+        return obj.user_info_image_url
 
 
 class SimpleUserSerializer(serializers.ModelSerializer):

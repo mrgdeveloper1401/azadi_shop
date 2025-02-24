@@ -46,7 +46,7 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
                     "is_active",
                     "is_staff",
                     "is_superuser",
-                    "is_verified",
+                    "is_verified"
                 ),
             },
         ),
@@ -61,20 +61,20 @@ class UserAdmin(BaseUserAdmin, ImportExportModelAdmin):
             },
         ),
     )
-    list_display = ("id", "mobile_phone", "is_staff", 'is_superuser', 'is_active', "is_verified", "created_at",
+    list_display = ("id", "mobile_phone", "is_staff", 'is_superuser', 'is_active', "created_at",
                     "updated_at", "is_deleted", "deleted_at")
-    list_filter = ("is_staff", "is_superuser", "is_active", 'is_verified', "created_at", "updated_at")
+    list_filter = ("is_staff", "is_superuser", "is_active", "created_at", "updated_at")
     search_fields = ("mobile_phone",)
     ordering = ("-created_at",)
     readonly_fields = ['created_at', "last_login", "updated_at"]
     list_display_links = ['id', "mobile_phone", "created_at", "updated_at"]
     filter_horizontal = []
-    list_editable = ['is_staff', "is_superuser", "is_active", "is_verified"]
+    list_editable = ['is_staff', "is_superuser", "is_active"]
 
 
 @admin.register(UserInfo)
 class UserInfoAdmin(ImportExportModelAdmin):
-    list_display = ["id", 'user', 'email', 'first_name', 'last_name', 'get_active', "get_is_verified",
+    list_display = ["id", 'user', 'email', 'first_name', 'last_name', 'get_active',
                     "created_at", "updated_at", "is_deleted", "deleted_at"]
     list_select_related = ['user']
     search_fields = ["major_major_name", "user__mobile_phone"]

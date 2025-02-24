@@ -11,3 +11,7 @@ class ErrorResponse(APIException):
 
 OBJECT_ALREADY_EXISTS = ErrorResponse("object already exists")
 MAX_UPLOADING_SIZE = ErrorResponse("max uploading size")
+OBJECT_NOT_FOUND = ErrorResponse("object not found")
+NOT_EQUAL_FIELD = ErrorResponse("not equal")
+WAITING = ErrorResponse("Waiting")
+WRONG_DATA = ErrorResponse("wrong data")

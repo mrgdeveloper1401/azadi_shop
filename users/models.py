@@ -1,23 +1,22 @@
-from string import digits
-from random import choices, randint
+import random
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 
 from shop.utils import send_sms
 from users.managers import UserManager, OtpManager
 from users.validators import MobileValidator
 from core.models import CreateMixin, UpdateMixin, SoftDeleteMixin
 from core.datetime_config import after_two_minute
-from django.utils.timezone import now
 
 
 # Create your models here.
 class User(AbstractBaseUser, CreateMixin, UpdateMixin, SoftDeleteMixin):
     mobile_phone = models.CharField(_("شماره همراه"), max_length=11, unique=True,
                                     validators=[MobileValidator()])
-    is_verified = models.BooleanField(_('احراز هویت'), default=False)
+    is_verified = models.BooleanField(default=False, help_text=_("کاربر احراز شده"))
     is_active = models.BooleanField(
         _("فعال"),
         default=False,
@@ -51,7 +50,6 @@ class User(AbstractBaseUser, CreateMixin, UpdateMixin, SoftDeleteMixin):
 
     def deactivate_user(self):
         self.is_active = False
-        self.is_verified = False
         self.save()
 
     def __str__(self):
@@ -95,23 +93,18 @@ class Major(models.Model):
 class UserInfo(CreateMixin, UpdateMixin, SoftDeleteMixin):
     user = models.OneToOneField(User, on_delete=models.PROTECT, related_name='user_info',
                                 verbose_name=_("کاربر"))
-    # grade = models.ForeignKey(Grade, on_delete=models.PROTECT, related_name='grade',
-    #                           verbose_name=_("پایه"), blank=True, null=True)
-    # major = models.ForeignKey(Major, on_delete=models.PROTECT, related_name='major',
-    #                           verbose_name=_("رشته"), blank=True, null=True)
-    # gpa = models.FloatField(_("معدل"), validators=[MinValueValidator(0), MaxValueValidator(20)],
-    #                         blank=True, null=True)
-    email = models.EmailField(_("ایمیل"), blank=True, null=True)
+    email = models.EmailField(_("ایمیل"), blank=True, null=True, unique=True)
     first_name = models.CharField(_("نام"), max_length=30, blank=True, null=True)
     last_name = models.CharField(_("نام خوانوادگی"), max_length=30, blank=True, null=True)
+    bio = models.CharField(max_length=255, help_text=_("درباره خودت"), blank=True, null=True)
+    user_info_image = models.ForeignKey("images.Image", on_delete=models.DO_NOTHING, related_name="user_info_image",
+                                        blank=True, null=True)
+    birth_date = models.DateField(help_text=_("تاریخ تولد"), blank=True, null=True)
 
     class Meta:
         verbose_name = _("پروفایل کاربر")
         verbose_name_plural = _("پروفایل کاربرها")
         db_table = 'user_info'
-        constraints = [
-            models.UniqueConstraint(fields=['email'], name='unique_email')
-        ]
         ordering = ('-created_at',)
 
     def __str__(self):
@@ -122,16 +115,15 @@ class UserInfo(CreateMixin, UpdateMixin, SoftDeleteMixin):
         return self.user.is_active
 
     @property
-    def get_is_verified(self):
-        return self.user.is_verified
-
-    @property
     def get_full_name(self):
         return f'{self.first_name} {self.last_name}'
 
+    @property
+    def user_info_image_url(self):
+        return self.user_info_image.image_url
 
 class GradeGpa(CreateMixin, UpdateMixin):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_grade_gpas',
+    user = models.ForeignKey(User, on_delete=models.DO_NOTHING, related_name='user_grade_gpas',
                              verbose_name=_("کاربر"), limit_choices_to={"is_active": True, "is_verified": True})
     grade = models.ForeignKey(Grade, on_delete=models.PROTECT, related_name='grade_gpa',
                               verbose_name=_("پایه"))
@@ -149,6 +141,7 @@ class Otp(CreateMixin):
     mobile_phone = models.CharField(_("شماره همراه"), max_length=11, validators=[MobileValidator()])
     code = models.PositiveIntegerField(_('کد'), blank=True, null=True)
     expired_at = models.DateTimeField(_('زمان انتقضای کد'), blank=True, null=True)
+    user_ip_address = models.GenericIPAddressField(null=True, blank=True)
 
     objects = OtpManager()
 
@@ -156,7 +149,7 @@ class Otp(CreateMixin):
         return self.mobile_phone
 
     def is_expired(self):
-        return now() > self.expired_at
+        return timezone.now() > self.expired_at
 
     def delete_if_expired(self):
         if self.is_expired():
@@ -166,12 +159,10 @@ class Otp(CreateMixin):
 
     def save(self, *args, **kwargs):
         self.expired_at = after_two_minute()
-        self.code = randint(1, 999999)
-        # send_sms(self.mobile_phone, self.code)
+        self.code = random.randint(1, 999999)
         return super().save(*args, **kwargs)
 
     class Meta:
         db_table = 'otp'
         verbose_name = _('کد otp')
         verbose_name_plural = _('کدهای otp')
-        ordering = ('-created_at',)
