@@ -32,20 +32,8 @@ class UserVerifyOtpApiView(views.APIView):
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
         res = response.Response({'refresh': refresh_token, "access": access_token})
-        res.set_cookie(
-            key='access_token',
-            value=access_token,
-            httponly=True,
-            secure=True,
-            samesite='Lax',
-        )
-        res.set_cookie(
-            key='refresh_token',
-            value=refresh_token,
-            httponly=True,
-            secure=True,
-            samesite='Lax',
-        )
+        res.set_cookie(key='access_token', value=access_token, httponly=True, secure=True, samesite='Lax')
+        res.set_cookie(key='refresh_token', value=refresh_token, httponly=True, secure=True, samesite='Lax')
         return res
 
 
@@ -73,45 +61,27 @@ class LoginByPasswordApiView(views.APIView):
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)
         res = response.Response({'refresh': refresh_token, "access": access_token}, status=status.HTTP_200_OK)
-        res.set_cookie("refresh", httponly=True, samesite='Lax', secure=True)
-        res.set_cookie("access", httponly=True, samesite='Lax', secure=True)
+        res.set_cookie("refresh", httponly=True, samesite='Lax', secure=True, value=refresh_token)
+        res.set_cookie("access", httponly=True, samesite='Lax', secure=True, value=access_token)
         return res
 
 
-class ResetPasswordAPIView(views.APIView):
+class ForgetPasswordApiView(generics.CreateAPIView):
+    serializer_class = serializers.ForgetPasswordSerializer
+    queryset = None
+    permission_classes = [NotAuthenticated]
+
+
+class ForgetPasswordConfirmAPIView(generics.CreateAPIView):
+    serializer_class = serializers.ForgetPasswordConfirmSerializer
+    permission_classes = [NotAuthenticated]
+    queryset = None
+
+
+class ResetPasswordAPIView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.ResetPasswordSerializer
-
-    def post(self, request):
-        ser_data = serializers.ResetPasswordSerializer(data=request.data, context={'request': request.user})
-        ser_data.is_valid(raise_exception=True)
-        ser_data.save()
-        return response.Response({"message": "کاربر گرامی پسورد شما با موفقیت تغییر یافت"}, status=status.HTTP_200_OK)
-
-
-class ForgetPasswordApiView(views.APIView):
-    @extend_schema(
-        request=serializers.ForgetPasswordSerializer,
-        responses={200: serializers.ForgetPasswordSerializer},
-        description="for recovery password, user must be enter mobile phone"
-    )
-    def post(self, request):
-        ser_data = serializers.ForgetPasswordSerializer(data=request.data)
-        ser_data.is_valid(raise_exception=True)
-        ser_data.save()
-        return response.Response({"message": "در صورت وجود حساب یک کد بازیابی ارسال خواهد شد"}, status=status.HTTP_200_OK)
-
-
-class ForgetPasswordConfirmAPIView(views.APIView):
-    @extend_schema(
-        request=serializers.ForgetPasswordConfirmSerializer,
-        responses={200, serializers.ForgetPasswordConfirmSerializer}
-    )
-    def post(self, request):
-        ser_data = serializers.ForgetPasswordConfirmSerializer(data=request.data)
-        ser_data.is_valid(raise_exception=True)
-        ser_data.save()
-        return response.Response({"message": "کاربر گرامی پسورد شما با موفقیت تغییر یافت"}, status=status.HTTP_200_OK)
+    queryset = None
 
 
 class GradeGpaViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, mixins.CreateModelMixin,

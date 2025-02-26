@@ -1,4 +1,5 @@
 from django.contrib.auth.password_validation import validate_password
+from django.contrib.auth.models import User
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
@@ -86,101 +87,6 @@ class VerifyOtpCodeSerializer(serializers.Serializer):
         return attrs
 
 
-class ResetPasswordSerializer(serializers.Serializer):
-    old_password = serializers.CharField(write_only=True, min_length=8)
-    new_password = serializers.CharField(write_only=True, min_length=8)
-    confirm_password = serializers.CharField(write_only=True, min_length=8)
-
-    def validate(self, attrs):
-        user = self.context['request']
-        if attrs['new_password'] != attrs['confirm_password']:
-            raise ValidationError({"message": _('کاربر گرامی پسورد باید یکی باشد')})
-        try:
-            validate_password(attrs['new_password'])
-        except Exception as e:
-            raise ValidationError({"message": e})
-        if not user.check_password(attrs['old_password']):
-            raise ValidationError({"message": _("کاربر گرامی رمز عبور قدیمی شما نامعتبر میباشد")})
-        return attrs
-
-    def save(self, **kwargs):
-        validate_data = self.validated_data
-        del validate_data['confirm_password']
-        user = self.context['request']
-        user.set_password(validate_data['new_password'])
-        user.save()
-
-
-class ForgetPasswordSerializer(serializers.Serializer):
-    mobile_phone = serializers.CharField(validators=[MobileValidator()])
-
-    def validate(self, attrs):
-        try:
-            user = User.objects.get(mobile_phone=attrs['mobile_phone'])
-        except User.DoesNotExist:
-            raise ValidationError({"message": _("در صورت وجود حساب یک کد بازیابی ارسال خواهد شد")})
-        else:
-            if user.is_deleted:
-                raise ValidationError({"message": _("کاربر گرامی حساب شما مسدود میباشد")})
-            if not user.is_active or not user.is_verified:
-                raise ValidationError({"message": _("کاربر گرامی ابتدا باید حساب خود را تایید و فعال نمایید")})
-        attrs['user'] = user
-        return attrs
-
-    def create(self, validated_data):
-        try:
-            otp = Otp.objects.get(mobile_phone=validated_data['mobile_phone'])
-        except Otp.DoesNotExist:
-            pass
-        else:
-            if otp:
-                if otp.is_expired():
-                    otp.delete()
-                else:
-                    raise ValidationError({"message": _("شما از قبل یه درخواست رو داشته اید"
-                                                        " لطفا به مدت 2 دقیقه صبر کنید")})
-        return Otp.objects.create(mobile_phone=validated_data['mobile_phone'])
-
-
-class ForgetPasswordConfirmSerializer(serializers.Serializer):
-    code = serializers.CharField()
-    new_password = serializers.CharField(write_only=True, min_length=8)
-    confirm_password = serializers.CharField(write_only=True, min_length=8)
-
-    def validate(self, attrs):
-        # validate new_password and confirm_password
-        if attrs['new_password'] != attrs['confirm_password']:
-            raise ValidationError({"message": _("کاربر گرامی پسورد ها باید یکسان باشد")})
-
-        # validate password
-        try:
-            validate_password(attrs['new_password'])
-        except Exception as e:
-            raise ValidationError({"message": e})
-
-        # get otp code
-        try:
-            code = Otp.objects.get(code=attrs['code'])
-        except Otp.DoesNotExist:
-            raise ValidationError({"message": _("کاربر گرامی کد شما نامعتبر یا صحیح نمیباشد")})
-        else:
-            if code.is_expired():
-                code.delete_if_expired()
-                raise ValidationError({"message": _("کاربر گرامی این کد منقضی شده هست لطفا دوباره درخواست خود را ارسال "
-                                                    "نمایید")})
-            user = User.objects.get(mobile_phone=code.mobile_phone)
-        attrs['user'] = user
-        return attrs
-
-    def create(self, validated_data):
-        del validated_data['confirm_password']
-        user = validated_data['user']
-        user.set_password(validated_data['new_password'])
-        user.save()
-        Otp.objects.filter(user=validated_data['user']).delete()
-        return {"message": _("کاربر گرامی پسورد شما با موفقیت تغییر پیدا کرد")}
-
-
 class ProfileSerializer(serializers.ModelSerializer):
     user_info_image = serializers.ImageField(required=False)
     user_info_image_url = serializers.SerializerMethodField()
@@ -203,15 +109,9 @@ class ProfileSerializer(serializers.ModelSerializer):
         return obj.user_info_image_url
 
 
-class SimpleUserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ['mobile_phone']
-
-
 class UserLoginByPasswordSerializer(serializers.Serializer):
     mobile_phone = serializers.CharField(validators=[MobileValidator()])
-    password = serializers.CharField(write_only=True, min_length=8)
+    password = serializers.CharField(write_only=True, min_length=8, style={"input_type": "password"})
 
     def validate(self, attrs):
         try:
@@ -221,6 +121,96 @@ class UserLoginByPasswordSerializer(serializers.Serializer):
         refresh = RefreshToken.for_user(get_user)
         attrs['refresh'] = refresh
         return attrs
+
+
+class ForgetPasswordSerializer(serializers.Serializer):
+    mobile_phone = serializers.CharField(validators=[MobileValidator()])
+
+    def validate_mobile_phone(self, data):
+        get_user = User.objects.filter(mobile_phone=data)
+        if not get_user.exists():
+            raise status_code.OBJECT_NOT_FOUND
+        return data
+
+    def validate(self, attrs):
+        user_ip = self.context['request'].META['REMOTE_ADDR']
+        get_otp_code = Otp.objects.filter(mobile_phone=attrs['mobile_phone'], user_ip_address=user_ip).last()
+        if not get_otp_code.is_expired():
+            raise status_code.WAITING
+        return attrs
+
+    def create(self, validated_data):
+        user_ip = self.context['request'].META['REMOTE_ADDR']
+        return Otp.objects.create(mobile_phone=validated_data['mobile_phone'], user_ip_address=user_ip)
+
+
+class ForgetPasswordConfirmSerializer(serializers.Serializer):
+    code = serializers.CharField()
+    new_password = serializers.CharField(write_only=True, min_length=8)
+    confirm_password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate_password(self, data):
+        try:
+            validate_password(data)
+        except Exception as e:
+            raise e
+
+    def validate(self, attrs):
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise serializers.ValidationError({"message": _("password must be same")})
+        get_user_ip = self.context['request'].META['REMOTE_ADDR']
+        get_code = Otp.objects.filter(code=attrs['code'], user_ip_address=get_user_ip)
+        if not get_code.exists():
+            raise status_code.OBJECT_NOT_FOUND
+        if get_code.last().is_expired():
+            get_code.delete()
+            raise serializers.ValidationError({"message": _("کد شما متقضی شده هست لطفا دوباره درخواست کنید")})
+        get_user = User.objects.filter(mobile_phone=get_code.last().mobile_phone)
+        attrs['user'] = get_user
+        return attrs
+
+    def to_representation(self, instance):
+        return {"message": _("پسورد با شما با موفقیت تغییر یافت")}
+    
+    def save(self, **kwargs):
+        valid_data = self.validated_data
+        user = valid_data['user'].last()
+        user.set_password(valid_data['new_password'])
+        user.save()
+
+
+class ResetPasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField(write_only=True, min_length=8)
+    new_password = serializers.CharField(write_only=True, min_length=8)
+    confirm_password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate(self, attrs):
+        user = self.context['request'].user
+        if attrs['new_password'] != attrs['confirm_password']:
+            raise ValidationError({"message": _('کاربر گرامی پسورد باید یکی باشد')})
+        try:
+            validate_password(attrs['new_password'])
+        except Exception as e:
+            raise e
+        if not user.check_password(attrs['old_password']):
+            raise ValidationError({"message": _("کاربر گرامی رمز عبور قدیمی شما نامعتبر میباشد")})
+        return attrs
+
+    def save(self, **kwargs):
+        validate_data = self.validated_data
+        del validate_data['confirm_password']
+        user = self.context['request'].user
+        user.set_password(validate_data['new_password'])
+        user.save()
+
+    def to_representation(self, instance):
+        return {"message": _("پسورد شما با موفقیت تغییر یافت")}
+
+
+class SimpleUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['mobile_phone']
 
 
 class SimpleGradeSerializer(serializers.ModelSerializer):
