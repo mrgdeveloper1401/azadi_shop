@@ -16,6 +16,7 @@ router.register("profile", views.ProfileViewSet, basename="user_profile")
 
 urlpatterns = [
     path("user_otp_verify/", views.UserVerifyOtpApiView.as_view(), name="user_otp_verify"),
+    path("login_by_password/", views.LoginByPasswordApiView.as_view(), name="login_by_password"),
     # path("user_verify/", views.UserVerifyRegisterCodeAPIView.as_view(), name="user_verify"),
     # path('reset_password/', views.ResetPasswordAPIView.as_view(), name='reset_password'),
     # path('forget_password/', views.ForgetPasswordApiView.as_view(), name='forget_password'),

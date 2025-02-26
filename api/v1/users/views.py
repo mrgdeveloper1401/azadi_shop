@@ -61,6 +61,23 @@ class ProfileViewSet(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.
         ).select_related("user_info_image")
 
 
+class LoginByPasswordApiView(views.APIView):
+    serializer_class = serializers.UserLoginByPasswordSerializer
+    permission_classes = [NotAuthenticated]
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        validated_data = serializer.validated_data
+        refresh = validated_data['refresh']
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+        res = response.Response({'refresh': refresh_token, "access": access_token}, status=status.HTTP_200_OK)
+        res.set_cookie("refresh", httponly=True, samesite='Lax', secure=True)
+        res.set_cookie("access", httponly=True, samesite='Lax', secure=True)
+        return res
+
+
 class ResetPasswordAPIView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
     serializer_class = serializers.ResetPasswordSerializer

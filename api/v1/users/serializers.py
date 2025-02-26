@@ -181,18 +181,6 @@ class ForgetPasswordConfirmSerializer(serializers.Serializer):
         return {"message": _("کاربر گرامی پسورد شما با موفقیت تغییر پیدا کرد")}
 
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('last_login', "is_verified", "id")
-
-        extra_kwargs = {
-            "last_login": {'read_only': True, "required": False},
-            "is_verified": {'read_only': True},
-            "id": {'read_only': True},
-        }
-
-
 class ProfileSerializer(serializers.ModelSerializer):
     user_info_image = serializers.ImageField(required=False)
     user_info_image_url = serializers.SerializerMethodField()
@@ -219,6 +207,20 @@ class SimpleUserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['mobile_phone']
+
+
+class UserLoginByPasswordSerializer(serializers.Serializer):
+    mobile_phone = serializers.CharField(validators=[MobileValidator()])
+    password = serializers.CharField(write_only=True, min_length=8)
+
+    def validate(self, attrs):
+        try:
+            get_user = User.objects.filter(mobile_phone=attrs['mobile_phone']).last()
+        except Exception as e:
+            raise status_code.OBJECT_NOT_FOUND
+        refresh = RefreshToken.for_user(get_user)
+        attrs['refresh'] = refresh
+        return attrs
 
 
 class SimpleGradeSerializer(serializers.ModelSerializer):
