@@ -8,17 +8,17 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("ckeditor5/", include('django_ckeditor_5.urls')),
-    path("api/auth/", include("api.v1.users.urls", namespace="users")),
+    path("api/auth/v1/", include("api.v1.users.urls", namespace="users")),
     # path("api_course/", include("courses.urls", namespace="course")),
     # path("api_payment/", include("payments.urls", namespace="payments")),
     # path("api_order/", include("orders.urls", namespace="orders")),
-    path('api/main_settings/', include('api.v1.main_settings.urls', namespace='v1_main_settings')),
-    path('api/blog/', include("api.v1.blogs.urls", namespace='v1_blogs')),
+    path('api/main_settings/v1/', include('api.v1.main_settings.urls', namespace='v1_main_settings')),
+    path('api/blog/v1/', include("api.v1.blogs.urls", namespace='v1_blogs')),
     # path('images/', include('images.urls', namespace='images')),
     # swagger ui
-    # path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    # path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    # path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
+    path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
 
     # api auth
     # path('api-auth/', include('rest_framework.urls')),
