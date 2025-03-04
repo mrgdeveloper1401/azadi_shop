@@ -13,10 +13,6 @@ DATABASES = {
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOW_HEADERS = '*'
-# CORS_ALLOWED_ORIGINS = [
-#     'http://localhost:3000',
-#     "https://test-azadi.liara.run"
-# ]
 CORS_ALLOW_METHODS = [
     "DELETE",
     "GET",
@@ -25,6 +21,7 @@ CORS_ALLOW_METHODS = [
     "POST",
     "PUT",
 ]
+
 # ssl config
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
@@ -66,13 +63,9 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 DJANGO_REDIS_LOG_IGNORED_EXCEPTIONS = True
 SESSION_REDIS_TTL = 750
 
-MIDDLEWARE += [
-    # "django.middleware.cache.UpdateCacheMiddleware",
-    # "django.middleware.common.CommonMiddleware",
-    # "django.middleware.cache.FetchFromCacheMiddleware",
-    # cors-header
-    "corsheaders.middleware.CorsMiddleware",
-]
+MIDDLEWARE.insert(0, "corsheaders.middleware.CorsMiddleware")
+MIDDLEWARE += ["whitenoise.middleware.WhiteNoiseMiddleware",]
+
 
 # with logging django
 log_dir = os.path.join(BASE_DIR / 'general_log_django')
@@ -131,3 +124,6 @@ LOGGING = {
         }
     }
 }
+
+# whitenoise config
+STORAGES['staticfiles']['BACKEND'] = "whitenoise.storage.CompressedManifestStaticFilesStorage"

@@ -64,11 +64,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    # cors middleware
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
-    # whitenoise
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -161,8 +157,7 @@ STORAGES = {
         "BACKEND": "storages.backends.s3.S3Storage",
     },
     'staticfiles': {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-        # "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"
     },
 }
 
@@ -172,14 +167,14 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    # 'DEFAULT_THROTTLE_CLASSES': [
-    #     'rest_framework.throttling.AnonRateThrottle',
-    #     'rest_framework.throttling.UserRateThrottle'
-    # ],
-    # 'DEFAULT_THROTTLE_RATES': {
-    #     'anon': '10/minute',
-    #     'user': '30/minute'
-    # }
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle'
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '10/minute',
+        'user': '30/minute'
+    }
 }
 
 # simple jwt config

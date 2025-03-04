@@ -148,3 +148,4 @@ templates
 
 jet_bridge_store
 celerybeat-schedule
+staticfiles
