@@ -3,7 +3,9 @@ import dj_database_url
 
 SECRET_KEY = config('DEPLOY_SECRET_KEY', cast=str)
 
-ALLOWED_HOSTS = ["*"]
+hosts = config("ALLOWED_HOSTS", cast=list)
+
+ALLOWED_HOSTS = ''.join(hosts).split(",")
 
 DATABASES = {
     'default': dj_database_url.config(default=config('DATABASE_URL', cast=str))
